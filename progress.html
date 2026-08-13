@@ -1,0 +1,309 @@
+
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>ההתקדמות שלי</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+
+    <header>
+
+        <h1>🌸 המסע שלי</h1>
+
+        <nav>
+
+            <a href="index.html">
+                🏠 היום
+            </a>
+
+            <a href="calendar.html">
+                📅 לוח שנה
+            </a>
+            <a href="food-list.html">
+    📋 מאגר מאכלים
+</a>
+<a href="weight-login.html">
+    📉 משקל
+</a>
+            <a href="challenges.html">
+                🎯 אתגרים
+            </a>
+
+            <a href="progress.html">
+                📈 התקדמות
+            </a>
+
+            <a href="achievements.html">
+                🏆 הישגים
+            </a>
+
+        </nav>
+
+    </header>
+
+
+
+    <main>
+
+        <section class="progress-page">
+
+
+            <h2>
+                📈 ההתקדמות שלי
+            </h2>
+
+
+            <p class="progress-subtitle">
+                כל יום קטן הוא צעד קדימה 🌸
+            </p>
+
+
+            <!-- =========================
+                 סטטיסטיקות
+            ========================== -->
+
+            <div class="stats-grid">
+
+
+                <div class="stat-card">
+
+                    <span class="stat-icon">
+                        🔥
+                    </span>
+
+                    <strong id="currentStreak">
+                        0
+                    </strong>
+
+                    <span>
+                        ימים רצופים
+                    </span>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <span class="stat-icon">
+                        🌟
+                    </span>
+
+                    <strong id="perfectDays">
+                        0
+                    </strong>
+
+                    <span>
+                        ימים מושלמים
+                    </span>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <span class="stat-icon">
+                        📅
+                    </span>
+
+                    <strong id="activeDays">
+                        0
+                    </strong>
+
+                    <span>
+                        ימים פעילים
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =========================
+                 סיכום ימים
+            ========================== -->
+
+            <div class="progress-card">
+
+                <h3>
+                    הסיכום שלי
+                </h3>
+
+
+                <div class="summary-row">
+
+                    <span>
+                        ימים שהושלמו
+                    </span>
+
+                    <strong id="completedDays">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-row">
+
+                    <span>
+                        ימים חלקיים
+                    </span>
+
+                    <strong id="partialDays">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-row">
+
+                    <span>
+                        ימים ללא פעילות
+                    </span>
+
+                    <strong id="emptyDays">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =========================
+                 נתונים יומיים ממוצעים
+            ========================== -->
+
+            <div class="progress-card">
+
+                <h3>
+                    הנתונים שלי
+                </h3>
+
+
+                <div class="summary-row">
+
+                    <span>
+                        🍽️ ממוצע קלוריות ליום
+                    </span>
+
+                    <strong
+                        id="averageCalories">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-row">
+
+                    <span>
+                        🏃 ממוצע דקות פעילות
+                    </span>
+
+                    <strong
+                        id="averageActivity">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-row">
+
+                    <span>
+                        🎯 ימי אתגר שהושלמו
+                    </span>
+
+                    <strong
+                        id="challengeDays">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =========================
+                 התקדמות כללית
+            ========================== -->
+
+            <div class="progress-card">
+
+                <h3>
+                    ההתקדמות הכללית
+                </h3>
+
+
+                <div class="overall-progress">
+
+
+                    <div class="overall-progress-info">
+
+                        <span>
+                            השלמת המשימות
+                        </span>
+
+                        <strong id="overallPercentage">
+                            0%
+                        </strong>
+
+                    </div>
+
+
+                    <div class="overall-progress-bar">
+
+                        <div
+                            id="overallProgressFill"
+                            class="overall-progress-fill">
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =========================
+                 הודעה
+            ========================== -->
+
+            <div
+                id="progressMessage"
+                class="progress-message">
+            </div>
+
+
+        </section>
+
+    </main>
+
+
+    <script src="progress.js"></script>
+    <script src="achievement-data.js"></script>
+<script src="achievement-notifier.js"></script>
+<script src="xp.js"></script>
+</body>
+
+</html>

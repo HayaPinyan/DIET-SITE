@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>האתגר השבועי</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
+</head>
+
+
+<body>
+
+    <header>
+
+        <h1>🌸 המסע שלי</h1>
+
+
+        <nav>
+
+            <a href="index.html">
+                🏠 היום
+            </a>
+
+            <a href="calendar.html">
+                📅 לוח שנה
+            </a>
+
+            <a href="food-list.html">
+                📋 מאגר מאכלים
+            </a>
+
+            <a href="weight-login.html">
+                📉 משקל
+            </a>
+
+            <a href="challenges.html">
+                🎯 אתגרים
+            </a>
+
+            <a href="progress.html">
+                📈 התקדמות
+            </a>
+
+            <a href="achievements.html">
+                🏆 הישגים
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <main>
+
+        <section class="challenge-page">
+
+
+            <!-- =========================
+                 כותרת
+            ========================== -->
+
+            <div class="challenge-title">
+
+                <span>
+                    🎯
+                </span>
+
+
+                <div>
+
+                    <h2>
+                        האתגר השבועי
+                    </h2>
+
+                    <p id="weekNumber"></p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =========================
+                 כרטיס האתגר
+            ========================== -->
+
+            <div class="challenge-card">
+
+
+                <div class="challenge-icon">
+                    ☀️
+                </div>
+
+
+                <h2 id="challengeName">
+                    מתחילים את היום נכון
+                </h2>
+
+
+                <p id="challengeDescription">
+                    השבוע ננסה להתחיל כל יום בצורה מסודרת.
+                </p>
+
+
+
+                <!-- =========================
+                     התקדמות
+                ========================== -->
+
+                <div class="challenge-progress">
+
+                    <div class="progress-info">
+
+                        <span>
+                            ההתקדמות שלי
+                        </span>
+
+
+                        <strong id="challengeScore">
+                            0 / 7
+                        </strong>
+
+                    </div>
+
+
+                    <div class="progress-bar">
+
+                        <div
+                            id="challengeProgress"
+                            class="progress-fill">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =========================
+                     ימי השבוע
+                ========================== -->
+
+                <div
+                    id="challengeDays"
+                    class="challenge-days">
+                </div>
+
+
+
+                <!-- =========================
+                     הודעה
+                ========================== -->
+
+                <div
+                    id="challengeMessage"
+                    class="challenge-message">
+                </div>
+
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- חשוב:
+         קודם טוענים את נתוני האתגרים
+         ורק אחר כך את הקוד של הדף -->
+
+    <script src="challenge-data.js"></script>
+
+    <script src="challenges.js"></script>
+
+    <script src="achievement-data.js"></script>
+
+    <script src="achievement-notifier.js"></script>
+
+    <script src="xp.js"></script>
+
+
+</body>
+
+</html>

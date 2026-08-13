@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>לוח השנה שלי</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+
+        <h1>🌸 המסע שלי</h1>
+
+        <nav>
+            <a href="index.html">🏠 היום</a>
+            <a href="calendar.html">📅 לוח שנה</a>
+            <a href="food-list.html">
+    📋 מאגר מאכלים
+</a>
+            <a href="weight-login.html">
+    📉 משקל
+</a>
+            <a href="challenges.html">🎯 אתגרים</a>
+            <a href="progress.html">📈 התקדמות</a>
+            <a href="achievements.html">🏆 הישגים</a>
+        </nav>
+
+    </header>
+
+
+    <main>
+
+        <section class="calendar-section">
+
+            <h2>📅 לוח השנה</h2>
+
+            <div class="calendar-header">
+
+                <button id="prevMonth">‹</button>
+
+                <h2 id="monthTitle"></h2>
+
+                <button id="nextMonth">›</button>
+
+            </div>
+
+
+            <div class="weekdays">
+
+                <div>א׳</div>
+                <div>ב׳</div>
+                <div>ג׳</div>
+                <div>ד׳</div>
+                <div>ה׳</div>
+                <div>ו׳</div>
+                <div>ש׳</div>
+
+            </div>
+
+
+            <div id="calendar" class="calendar"></div>
+
+
+            <div class="calendar-legend">
+
+                <span>
+                    <i class="legend-color none"></i>
+                    0/3
+                </span>
+
+                <span>
+                    <i class="legend-color one"></i>
+                    1/3
+                </span>
+
+                <span>
+                    <i class="legend-color two"></i>
+                    2/3
+                </span>
+
+                <span>
+                    <i class="legend-color three"></i>
+                    3/3
+                </span>
+
+            </div>
+
+        </section>
+
+    </main>
+<div id="dayModal" class="day-modal">
+
+    <div class="day-modal-content">
+
+        <button id="closeModal" class="close-modal">×</button>
+
+        <h2 id="modalDate"></h2>
+
+        <div id="modalTasks"></div>
+
+        <div class="modal-score">
+            <span>היום:</span>
+            <strong id="modalScore">0 / 3</strong>
+        </div>
+
+    </div>
+
+</div>
+
+    <script src="calendar.js"></script>
+    <script src="achievement-data.js"></script>
+<script src="achievement-notifier.js"></script>
+<script src="xp.js"></script>
+</body>
+
+</html>

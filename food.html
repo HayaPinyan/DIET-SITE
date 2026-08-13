@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>האוכל שלי</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         כותרת וניווט
+    ========================== -->
+
+    <header>
+
+        <h1>🌸 המסע שלי</h1>
+
+       <nav>
+            <a href="index.html">🏠 היום</a>
+            <a href="calendar.html">📅 לוח שנה</a>
+            <a href="food-list.html">
+    📋 מאגר מאכלים
+</a>
+            <a href="weight-login.html">
+    📉 משקל
+</a>
+            <a href="challenges.html">🎯 אתגרים</a>
+            <a href="progress.html">📈 התקדמות</a>
+            <a href="achievements.html">🏆 הישגים</a>
+        </nav>
+
+    </header>
+
+
+
+    <main>
+
+
+        <!-- =========================
+             עמוד האוכל
+        ========================== -->
+
+        <section class="food-page">
+
+
+            <h2>
+                🍽️ מה אכלתי היום?
+            </h2>
+
+
+            <p class="food-subtitle">
+                חפשי מאכל או הוסיפי מאכל משלך
+            </p>
+
+
+
+            <!-- =========================
+                 חיפוש
+            ========================== -->
+
+            <div class="food-search-box">
+
+                <input
+                    type="text"
+                    id="foodSearch"
+                    placeholder="🔍 התחל להקליד מאכל..."
+                    autocomplete="off">
+
+
+                <div
+                    id="foodSuggestions"
+                    class="food-suggestions">
+                </div>
+
+            </div>
+
+
+
+            <!-- =========================
+                 מאכל חדש
+            ========================== -->
+
+            <div
+                id="customFoodBox"
+                class="custom-food-box"
+                style="display: none;">
+
+                <p id="customFoodText"></p>
+
+                <button
+                    id="addCustomFood"
+                    type="button">
+
+                    + הוסף מאכל זה
+
+                </button>
+
+            </div>
+
+
+
+            <!-- =========================
+                 טבלת אוכל
+            ========================== -->
+
+            <div class="food-table-card">
+
+
+                <table class="food-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                מאכל
+                            </th>
+
+                            <th>
+                                כמות
+                            </th>
+
+                            <th>
+                                קלוריות
+                            </th>
+
+                            <th>
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="foodTableBody">
+                    </tbody>
+
+                </table>
+
+
+                <div
+                    id="emptyFoodMessage"
+                    class="empty-food-message">
+
+                    עדיין לא הוספת שום מאכל היום 🌸
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =========================
+                 סיכום
+            ========================== -->
+
+            <div class="food-total">
+
+                <span>
+                    סה״כ היום:
+                </span>
+
+                <strong id="foodTotal">
+                    0
+                </strong>
+
+                <span>
+                    קלוריות
+                </span>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+
+    <script src="food.js"></script>
+
+    <script src="achievement-data.js"></script>
+    <script src="achievement-notifier.js"></script>
+    <script src="xp.js"></script>
+
+</body>
+
+</html>

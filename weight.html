@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>המשקל שלי</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+    <header>
+
+        <h1>🌸 המסע שלי</h1>
+
+        <nav>
+
+            <a href="index.html">
+                🏠 היום
+            </a>
+
+            <a href="calendar.html">
+                📅 לוח שנה
+            </a>
+            <a href="food-list.html">
+    📋 מאגר מאכלים
+</a>
+            <a href="weight-login.html">
+    📉 משקל
+</a>
+
+            <a href="challenges.html">
+                🎯 אתגרים
+            </a>
+
+            <a href="progress.html">
+                📈 התקדמות
+            </a>
+
+            <a href="achievements.html">
+                🏆 הישגים
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <main>
+
+        <section class="weight-page">
+
+            <h2>
+                📉 המסע שלי ל־50 ק״ג
+            </h2>
+
+            <p class="weight-subtitle">
+                כל שקילה היא עוד צעד בדרך 🌸
+            </p>
+
+
+            <!-- =========================
+                 סיכום
+            ========================== -->
+
+            <div class="weight-summary">
+
+                <div class="weight-stat">
+
+                    <span>
+                        🎯 היעד
+                    </span>
+
+                    <strong>
+                        50 ק״ג
+                    </strong>
+
+                </div>
+
+
+                <div class="weight-stat">
+
+                    <span>
+                        ✅ ירדו
+                    </span>
+
+                    <strong id="weightLost">
+                        0 ק״ג
+                    </strong>
+
+                </div>
+
+
+                <div class="weight-stat">
+
+                    <span>
+                        ⏳ נשארו
+                    </span>
+
+                    <strong id="weightRemaining">
+                        50 ק״ג
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 שקילה
+            ========================== -->
+
+            <div
+                id="weighInCard"
+                class="progress-card">
+
+                <h3>
+                    ⚖️ השקילה החודשית
+                </h3>
+
+
+                <p
+                    id="weighInMessage"
+                    class="weight-message">
+                </p>
+
+
+                <div class="weight-form">
+
+                    <label for="weightInput">
+                        המשקל שלך
+                    </label>
+
+
+                    <div class="weight-input-row">
+
+                        <input
+                            type="number"
+                            id="weightInput"
+                            min="1"
+                            step="0.1"
+                            placeholder="לדוגמה 85.5">
+
+
+                        <span>
+                            ק״ג
+                        </span>
+
+                    </div>
+
+
+                    <button
+                        id="saveWeightButton"
+                        type="button">
+
+                        💾 שמירת שקילה
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 גרף
+            ========================== -->
+
+            <div class="progress-card">
+
+                <h3>
+                    📈 ההתקדמות שלי
+                </h3>
+
+
+                <p class="graph-subtitle">
+                    כמה ק״ג נשארו מתוך 50
+                </p>
+
+
+                <div class="weight-chart-wrapper">
+
+                    <svg
+                        id="weightChart"
+                        class="weight-chart"
+                        viewBox="0 0 800 400"
+                        preserveAspectRatio="none">
+                    </svg>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 היסטוריה
+            ========================== -->
+
+            <div class="progress-card">
+
+                <h3>
+                    📅 השקילות שלי
+                </h3>
+
+
+                <div id="weightHistory">
+                </div>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+
+    <script src="weight.js"></script>
+<script src="xp.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>מאגר המאכלים שלי</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
+</head>
+
+
+<body>
+
+    <header>
+
+        <h1>🌸 המסע שלי</h1>
+
+    
+
+                <nav>
+            <a href="index.html">🏠 היום</a>
+            <a href="calendar.html">📅 לוח שנה</a>
+            <a href="food-list.html">
+    📋 מאגר מאכלים
+</a>
+            <a href="weight-login.html">
+    📉 משקל
+</a>
+            <a href="challenges.html">🎯 אתגרים</a>
+            <a href="progress.html">📈 התקדמות</a>
+            <a href="achievements.html">🏆 הישגים</a>
+        </nav>
+
+
+          
+        
+
+    </header>
+
+
+    <main>
+
+        <section class="food-list-page">
+
+            <h2>
+                🍎 מאגר המאכלים שלי
+            </h2>
+
+            <p class="food-list-subtitle">
+                הגדירי בעצמך את המאכלים, הכמויות והקלוריות
+            </p>
+
+
+            <div class="progress-card food-catalog-card">
+
+                <div class="food-list-header">
+
+                    <h3>
+                        📋 המאכלים שלי
+                    </h3>
+
+                    <button
+                        id="addFoodRowButton"
+                        type="button">
+
+                        ➕ הוספת שורה
+
+                    </button>
+
+                </div>
+
+
+                <div class="food-list-table-wrapper">
+
+                    <table class="food-list-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    מאכל
+                                </th>
+
+                                <th>
+                                    כמות
+                                </th>
+
+                                <th>
+                                    קלוריות
+                                </th>
+
+                                <th>
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody
+                            id="foodListTableBody">
+                        </tbody>
+
+                    </table>
+
+
+                    <p
+                        id="emptyFoodList"
+                        class="food-list-empty">
+
+                        עדיין לא הוספת מאכלים 🌸
+
+                    </p>
+
+                </div>
+
+
+                <p
+                    id="foodListMessage"
+                    class="food-list-message">
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="food-list.js"></script>
+
+</body>
+
+</html>

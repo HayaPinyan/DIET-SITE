@@ -1,0 +1,205 @@
+
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>הפעילות שלי</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         כותרת וניווט
+    ========================== -->
+
+    <header>
+
+        <h1>🌸 המסע שלי</h1>
+
+        <nav>
+
+            <a href="index.html">
+                🏠 היום
+            </a>
+
+            <a href="calendar.html">
+                📅 לוח שנה
+            </a>
+            <a href="food-list.html">
+    📋 מאגר מאכלים
+</a>
+            <a href="weight-login.html">
+    📉 משקל
+</a>
+
+            <a href="challenges.html">
+                🎯 אתגרים
+            </a>
+
+            <a href="progress.html">
+                📈 התקדמות
+            </a>
+
+            <a href="achievements.html">
+                🏆 הישגים
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <main>
+
+
+        <!-- =========================
+             עמוד הפעילות
+        ========================== -->
+
+        <section class="activity-page">
+
+
+            <h2>
+                🏃 הפעילות שלי היום
+            </h2>
+
+
+            <p class="activity-subtitle">
+                בחרי פעילות והזיני כמה דקות ביצעת
+            </p>
+
+
+            <!-- =========================
+                 חיפוש פעילות
+            ========================== -->
+
+            <div class="activity-search-box">
+
+                <input
+                    type="text"
+                    id="activitySearch"
+                    placeholder="🔍 התחל להקליד פעילות..."
+                    autocomplete="off">
+
+
+                <div
+                    id="activitySuggestions"
+                    class="activity-suggestions">
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 הוספת פעילות חופשית
+            ========================== -->
+
+            <div
+                id="customActivityBox"
+                class="custom-activity-box"
+                style="display: none;">
+
+                <p id="customActivityText"></p>
+
+                <button id="addCustomActivity">
+                    + הוסף פעילות זו
+                </button>
+
+            </div>
+
+
+            <!-- =========================
+                 טבלת פעילויות
+            ========================== -->
+
+            <div class="activity-table-card">
+
+
+                <table class="activity-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                פעילות
+                            </th>
+
+                            <th>
+                                דקות
+                            </th>
+
+                            <th>
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="activityTableBody">
+                    </tbody>
+
+                </table>
+
+
+                <div
+                    id="emptyActivityMessage"
+                    class="empty-activity-message">
+
+                    עדיין לא הוספת פעילות היום 🌸
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =========================
+                 סיכום
+            ========================== -->
+
+            <div class="activity-total">
+
+                <span>
+                    סה״כ היום:
+                </span>
+
+                <strong id="activityTotal">
+                    0
+                </strong>
+
+                <span>
+                    דקות
+                </span>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+    <script src="activity.js"></script>
+    <script src="achievement-data.js"></script>
+<script src="achievement-notifier.js"></script>
+<script src="xp.js"></script>
+
+</body>
+
+</html>
+

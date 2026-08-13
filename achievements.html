@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ההישגים שלי</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+
+        <h1>🌸 המסע שלי</h1>
+
+        <nav>
+            <a href="index.html">🏠 היום</a>
+            <a href="calendar.html">📅 לוח שנה</a>
+            <a href="food-list.html">
+    📋 מאגר מאכלים
+</a>
+            <a href="weight-login.html">
+    📉 משקל
+</a>
+            <a href="challenges.html">🎯 אתגרים</a>
+            <a href="progress.html">📈 התקדמות</a>
+            <a href="achievements.html">🏆 הישגים</a>
+        </nav>
+
+    </header>
+
+
+    <main>
+
+        <section class="achievements-page">
+
+            <h2>🏆 ההישגים שלי</h2>
+
+            <p class="achievements-subtitle">
+                כל צעד קטן הוא הישג
+            </p>
+
+
+            <div
+                id="achievementsGrid"
+                class="achievements-grid">
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="achievements.js"></script>
+<!-- =========================
+     הודעת הישג חדש
+========================== -->
+
+<div
+    id="achievementPopup"
+    class="achievement-popup">
+
+    <div class="achievement-popup-content">
+
+        <button
+            id="closeAchievementPopup"
+            class="achievement-popup-close"
+            type="button">
+
+            ×
+
+        </button>
+
+
+        <div
+            id="achievementPopupIcon"
+            class="achievement-popup-icon">
+
+            🏆
+
+        </div>
+
+
+        <div class="achievement-popup-title">
+            הישג חדש! 🎉
+        </div>
+
+
+        <div
+            id="achievementPopupName"
+            class="achievement-popup-name">
+
+        </div>
+
+
+        <div class="achievement-popup-text">
+            כל הכבוד! כל צעד קטן מביא אותך קדימה 🌸
+        </div>
+
+
+        <button
+            id="achievementPopupButton"
+            class="achievement-popup-button"
+            type="button">
+
+            איזה כיף! 🎉
+
+        </button>
+
+    </div>
+
+</div>
+
+<script src="achievements.js"></script>
+
+<script src="achievement-notifier.js"></script>
+
+</body>
+
+</html>
