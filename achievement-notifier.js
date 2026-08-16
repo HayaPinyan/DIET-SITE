@@ -2,7 +2,7 @@
 // הגדרות
 // ==================================================
 
-const NOTIFIER_CALORIE_TARGET = 1800;
+const NOTIFIER_CALORIE_TARGET = 1500;
 const NOTIFIER_ACTIVITY_TARGET = 20;
 
 
