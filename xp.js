@@ -403,7 +403,7 @@ function calculateXPStats() {
                 (
                     finishDayData[dateKey] &&
                     finishDayData[dateKey].finished === true &&
-                    calories <= 1800
+                    calories <= 1500
                 );
 
 
@@ -558,7 +558,7 @@ function calculateXPStats() {
 
             finishDayData[dateKey] &&
             finishDayData[dateKey].finished === true &&
-            calories <= 1800 &&
+            calories <= 1500 &&
             activityMinutes >= 20 &&
             day.challenge === true
 
@@ -667,7 +667,7 @@ function calculateTaskXP() {
                 (
                     finishDayData[dateKey] &&
                     finishDayData[dateKey].finished === true &&
-                    calories <= 1800
+                    calories <= 1500
                 );
 
 
