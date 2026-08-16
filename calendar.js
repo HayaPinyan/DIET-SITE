@@ -3,7 +3,7 @@
 // הגדרות
 // ==================================================
 
-const DAILY_CALORIE_TARGET = 1800;
+const DAILY_CALORIE_TARGET = 1500;
 const DAILY_ACTIVITY_TARGET = 20;
 
 
