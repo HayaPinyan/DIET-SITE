@@ -10,7 +10,7 @@ const achievementsGrid =
 // הגדרות
 // ==================================================
 
-const CALORIE_TARGET = 1800;
+const CALORIE_TARGET = 1500;
 const ACTIVITY_TARGET = 20;
 
 
