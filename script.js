@@ -2,25 +2,17 @@
 // הגדרות
 // ==================================================
 
-const DAILY_CALORIE_TARGET = 1800;
+const DAILY_CALORIE_TARGET = 1500;
 const DAILY_ACTIVITY_TARGET = 20;
- // ==================================================
+
+
+// ==================================================
 // EMAILJS
 // ==================================================
 
-const EMAILJS_SERVICE_ID =
-    "service_8s7fe3a";
+const EMAILJS_SERVICE_ID = "service_8s7fe3a";
+const EMAILJS_TEMPLATE_ID = "template_tcts9d9";
 
-const EMAILJS_DAILY_TEMPLATE_ID =
-    "template_tcts9d9" ;
-
-
-// ==================================================
-// כתובת המייל שאליה יישלח הסיכום
-// ==================================================
-
-const SUMMARY_EMAIL =
-    "h44640410@gmail.com";
 
 // ==================================================
 // אלמנטים
@@ -71,440 +63,11 @@ const finishDayButton =
 const finishDayMessage =
     document.getElementById("finishDayMessage");
 
-// ==================================================
-// יצירת HTML של רשימת המאכלים
-// ==================================================
 
-function buildFoodEmailHtml(dateKey) {
-
-    const foods =
-        foodData[dateKey] || [];
-
-
-    if (foods.length === 0) {
-
-        return `
-            <div style="
-                text-align:center;
-                padding:15px;
-                color:#8d7c77;
-            ">
-                לא נרשמו מאכלים היום 🌸
-            </div>
-        `;
-
-    }
-
-
-    let html = `
-
-        <table class="food-table">
-
-            <thead>
-
-                <tr>
-
-                    <th>
-                        מאכל
-                    </th>
-
-                    <th>
-                        כמות
-                    </th>
-
-                    <th>
-                        קלוריות
-                    </th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-    `;
-
-
-    foods.forEach(food => {
-
-        const name =
-            escapeHtml(
-                food.name || "מאכל"
-            );
-
-
-        const amount =
-            escapeHtml(
-                food.amount || ""
-            );
-
-
-        const calories =
-            Number(
-                food.calories || 0
-            );
-
-
-        const emoji =
-            escapeHtml(
-                food.emoji || "🍽️"
-            );
-
-
-        html += `
-
-            <tr>
-
-                <td>
-                    ${emoji}
-                    ${name}
-                </td>
-
-                <td>
-                    ${amount}
-                </td>
-
-                <td>
-                    ${calories}
-                </td>
-
-            </tr>
-
-        `;
-
-    });
-
-
-    html += `
-
-            </tbody>
-
-        </table>
-
-    `;
-
-
-    return html;
-
-}
-
-
-// ==================================================
-// יצירת HTML של רשימת הפעילויות
-// ==================================================
-
-function buildActivityEmailHtml(dateKey) {
-
-    const activities =
-        activityData[dateKey] || [];
-
-
-    if (activities.length === 0) {
-
-        return `
-            <div style="
-                text-align:center;
-                padding:15px;
-                color:#8d7c77;
-            ">
-                לא נרשמה פעילות היום 🌸
-            </div>
-        `;
-
-    }
-
-
-    let html = "";
-
-
-    activities.forEach(activity => {
-
-        const name =
-            escapeHtml(
-                activity.name || "פעילות"
-            );
-
-
-        const minutes =
-            Number(
-                activity.minutes || 0
-            );
-
-
-        const emoji =
-            escapeHtml(
-                activity.emoji || "🏃"
-            );
-
-
-        html += `
-
-            <div class="activity-row">
-
-                <div class="activity-name">
-
-                    ${emoji}
-                    ${name}
-
-                </div>
-
-                <div class="activity-minutes">
-
-                    ${minutes} דקות
-
-                </div>
-
-            </div>
-
-        `;
-
-    });
-
-
-    return html;
-
-}
-
-
-// ==================================================
-// שם האתגר של היום
-// ==================================================
-
-function getTodayChallengeName() {
-
-    try {
-
-        if (
-            typeof currentChallenge !==
-            "undefined" &&
-            currentChallenge
-        ) {
-
-            return (
-                currentChallenge.name ||
-                "האתגר השבועי"
-            );
-
-        }
-
-    }
-    catch (error) {
-
-        console.log(
-            "לא ניתן לקרוא את האתגר:",
-            error
-        );
-
-    }
-
-
-    return "האתגר השבועי";
-
-}
-
-
-// ==================================================
-// הודעת סיכום לפי הציון
-// ==================================================
-
-function getDailyEmailMessage(score) {
-
-    if (score === 3) {
-
-        return `
-            🎉 כל הכבוד!
-            השלמת את כל שלושת היעדים של היום.
-            יום מושלם במסע שלך!
-        `;
-
-    }
-
-
-    if (score === 2) {
-
-        return `
-            🌟 כמעט מושלם!
-            שניים מתוך שלושה יעדים הושלמו.
-            ממשיכים קדימה!
-        `;
-
-    }
-
-
-    if (score === 1) {
-
-        return `
-            💪 כל צעד נחשב.
-            היום התחלת — ומחר ממשיכים להתקדם.
-        `;
-
-    }
-
-
-    return `
-        🌷 גם ימים כאלה הם חלק מהמסע.
-        מחר מתחיל יום חדש.
-    `;
-
-}
-
-
-// ==================================================
-// שליחת מייל סיכום יומי
-// ==================================================
-
-async function sendDailySummaryEmail() {
-
-    // ----------------------------------------------
-    // בדיקה ש-EmailJS נטען
-    // ----------------------------------------------
-
-    if (
-        typeof emailjs ===
-        "undefined"
-    ) {
-
-        console.error(
-            "EmailJS לא נטען."
-        );
-
-        return false;
-
-    }
-
-
-    // ----------------------------------------------
-    // נתוני היום
-    // ----------------------------------------------
-
-    const calories =
-        getTodayCalories();
-
-
-    const activity =
-        getTodayActivityMinutes();
-
-
-    const score =
-        getTodayScore();
-
-
-    const challengeCompleted =
-        !!(
-            savedData[dateKey] &&
-            savedData[dateKey].challenge
-        );
-
-
-    // ----------------------------------------------
-    // תאריך יפה
-    // ----------------------------------------------
-
-    const formattedDate =
-        `${today.getDate()} ב${months[today.getMonth()]} ${today.getFullYear()}`;
-
-
-    // ----------------------------------------------
-    // הפרמטרים לתבנית
-    // ----------------------------------------------
-
-    const templateParams = {
-
-        to_email:
-            SUMMARY_EMAIL,
-
-        date:
-            formattedDate,
-
-        score:
-            score,
-
-        total_calories:
-            calories,
-
-        calorie_target:
-            DAILY_CALORIE_TARGET,
-
-        total_activity:
-            activity,
-
-        activity_target:
-            DAILY_ACTIVITY_TARGET,
-
-        challenge_name:
-            getTodayChallengeName(),
-
-        challenge_completed:
-            challengeCompleted,
-
-        food_html:
-            buildFoodEmailHtml(
-                dateKey
-            ),
-
-        activity_html:
-            buildActivityEmailHtml(
-                dateKey
-            ),
-
-        daily_message:
-            getDailyEmailMessage(
-                score
-            )
-
-    };
-
-
-    // ----------------------------------------------
-    // שליחה
-    // ----------------------------------------------
-
-    try {
-
-        console.log(
-            "שולחת מייל סיכום יומי...",
-            templateParams
-        );
-
-
-        const response =
-            await emailjs.send(
-
-                EMAILJS_SERVICE_ID,
-
-                EMAILJS_DAILY_TEMPLATE_ID,
-
-                templateParams
-
-            );
-
-
-        console.log(
-            "המייל נשלח בהצלחה:",
-            response
-        );
-
-
-        return true;
-
-    }
-    catch (error) {
-
-        console.error(
-            "שגיאה בשליחת המייל:",
-            error
-        );
-
-
-        return false;
-
-    }
-
-}
 // ==================================================
 // היום של האתר
-// 06:00 -> יום חדש
-// לפני 06:00 -> עדיין היום הקודם
+// 06:00 = יום חדש
+// לפני 06:00 = עדיין היום הקודם
 // ==================================================
 
 function getSiteToday() {
@@ -530,6 +93,7 @@ function getSiteToday() {
             ).value
         );
 
+
     let month =
         Number(
             parts.find(
@@ -537,12 +101,14 @@ function getSiteToday() {
             ).value
         ) - 1;
 
+
     let day =
         Number(
             parts.find(
                 x => x.type === "day"
             ).value
         );
+
 
     const hour =
         Number(
@@ -593,19 +159,28 @@ const today =
 
 
 // ==================================================
-// מפתח התאריך
+// מפתח תאריך
 // ==================================================
 
+function getDateKeyFromDate(date) {
+
+    return (
+        date.getFullYear() +
+        "-" +
+        String(
+            date.getMonth() + 1
+        ).padStart(2, "0") +
+        "-" +
+        String(
+            date.getDate()
+        ).padStart(2, "0")
+    );
+
+}
+
+
 const dateKey =
-    today.getFullYear() +
-    "-" +
-    String(
-        today.getMonth() + 1
-    ).padStart(2, "0") +
-    "-" +
-    String(
-        today.getDate()
-    ).padStart(2, "0");
+    getDateKeyFromDate(today);
 
 
 // ==================================================
@@ -617,19 +192,32 @@ const savedData =
         localStorage.getItem("dietData")
     ) || {};
 
+
 const foodData =
     JSON.parse(
         localStorage.getItem("foodData")
     ) || {};
+
 
 const activityData =
     JSON.parse(
         localStorage.getItem("activityData")
     ) || {};
 
+
 const finishDayData =
     JSON.parse(
         localStorage.getItem("finishDayData")
+    ) || {};
+
+
+// ==================================================
+// נתוני שליחת מיילים
+// ==================================================
+
+const emailSentData =
+    JSON.parse(
+        localStorage.getItem("emailSentData")
     ) || {};
 
 
@@ -721,7 +309,9 @@ function getTodayCalories() {
             food
         ) =>
             total +
-            Number(food.calories || 0),
+            Number(
+                food.calories || 0
+            ),
         0
     );
 
@@ -744,7 +334,9 @@ function getTodayActivityMinutes() {
             activity
         ) =>
             total +
-            Number(activity.minutes || 0),
+            Number(
+                activity.minutes || 0
+            ),
         0
     );
 
@@ -1225,14 +817,1523 @@ taskButtons.forEach(
 
 
 // ==================================================
-// סיום היום
+// פונקציות עזר למיילים
+// ==================================================
+
+function escapeEmailHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+// ==================================================
+// יצירת רשימת מאכלים למייל
+// ==================================================
+
+function createFoodEmailHtml(date) {
+
+    const key =
+        getDateKeyFromDate(date);
+
+    const foods =
+        foodData[key] || [];
+
+
+    const totalCalories =
+        foods.reduce(
+            (total, food) =>
+                total +
+                Number(food.calories || 0),
+            0
+        );
+
+
+    if (foods.length === 0) {
+
+        return `
+            <div style="
+                padding:15px;
+                border-radius:12px;
+                background:#fff8fb;
+                color:#777;
+                text-align:center;
+                margin-top:10px;
+            ">
+                לא נרשמו מאכלים ביום הזה 🌸
+            </div>
+        `;
+
+    }
+
+
+    let html = "";
+
+
+    foods.forEach(
+        food => {
+
+            html += `
+                <div style="
+                    display:flex;
+                    align-items:center;
+                    justify-content:space-between;
+                    gap:10px;
+                    padding:12px 10px;
+                    border-bottom:1px solid #eee;
+                    direction:rtl;
+                ">
+
+                    <div style="flex:1;">
+                        <strong>
+                            ${escapeEmailHtml(
+                                food.emoji || "🍽️"
+                            )}
+                            ${escapeEmailHtml(
+                                food.name || "מאכל"
+                            )}
+                        </strong>
+                    </div>
+
+                    <div style="
+                        color:#777;
+                        font-size:14px;
+                    ">
+                        ${escapeEmailHtml(
+                            food.amount || ""
+                        )}
+                    </div>
+
+                    <div style="
+                        font-weight:bold;
+                        white-space:nowrap;
+                    ">
+                        ${Number(
+                            food.calories || 0
+                        )} קל׳
+                    </div>
+
+                </div>
+            `;
+
+        }
+    );
+
+
+    html += `
+        <div style="
+            padding:15px 10px;
+            text-align:right;
+            font-size:17px;
+            font-weight:bold;
+        ">
+            סה״כ: ${totalCalories} קלוריות
+        </div>
+    `;
+
+
+    return html;
+
+}
+
+
+// ==================================================
+// יצירת רשימת פעילות למייל
+// ==================================================
+
+function createActivityEmailHtml(date) {
+
+    const key =
+        getDateKeyFromDate(date);
+
+    const activities =
+        activityData[key] || [];
+
+
+    const totalMinutes =
+        activities.reduce(
+            (total, activity) =>
+                total +
+                Number(activity.minutes || 0),
+            0
+        );
+
+
+    if (activities.length === 0) {
+
+        return `
+            <div style="
+                padding:15px;
+                border-radius:12px;
+                background:#f8fbff;
+                color:#777;
+                text-align:center;
+                margin-top:10px;
+            ">
+                לא נרשמה פעילות ביום הזה 🌸
+            </div>
+        `;
+
+    }
+
+
+    let html = "";
+
+
+    activities.forEach(
+        activity => {
+
+            html += `
+                <div style="
+                    display:flex;
+                    align-items:center;
+                    justify-content:space-between;
+                    gap:10px;
+                    padding:12px 10px;
+                    border-bottom:1px solid #eee;
+                    direction:rtl;
+                ">
+
+                    <div style="flex:1;">
+                        <strong>
+                            ${escapeEmailHtml(
+                                activity.emoji || "🏃"
+                            )}
+                            ${escapeEmailHtml(
+                                activity.name || "פעילות"
+                            )}
+                        </strong>
+                    </div>
+
+                    <div style="
+                        font-weight:bold;
+                        white-space:nowrap;
+                    ">
+                        ${Number(
+                            activity.minutes || 0
+                        )} דקות
+                    </div>
+
+                </div>
+            `;
+
+        }
+    );
+
+
+    html += `
+        <div style="
+            padding:15px 10px;
+            text-align:right;
+            font-size:17px;
+            font-weight:bold;
+        ">
+            סה״כ: ${totalMinutes} דקות פעילות
+        </div>
+    `;
+
+
+    return html;
+
+}
+
+
+// ==================================================
+// מידע על האתגר
+// ==================================================
+
+function getChallengeEmailHtml(date) {
+
+    const key =
+        getDateKeyFromDate(date);
+
+
+    const completed =
+        !!(
+            savedData[key] &&
+            savedData[key].challenge
+        );
+
+
+    let challengeName =
+        "האתגר השבועי";
+
+
+    let challengeDescription =
+        "";
+
+
+    let challengeIcon =
+        "🎯";
+
+
+    if (
+        typeof currentChallenge !==
+        "undefined" &&
+        currentChallenge
+    ) {
+
+        challengeName =
+            currentChallenge.name ||
+            challengeName;
+
+        challengeDescription =
+            currentChallenge.description ||
+            "";
+
+        challengeIcon =
+            currentChallenge.icon ||
+            challengeIcon;
+
+    }
+
+
+    return `
+        <div style="
+            text-align:center;
+            padding:20px;
+            border-radius:16px;
+            background:#fffaf0;
+            border:1px solid #f0dfb0;
+        ">
+
+            <div style="
+                font-size:34px;
+                margin-bottom:8px;
+            ">
+                ${escapeEmailHtml(
+                    challengeIcon
+                )}
+            </div>
+
+            <div style="
+                font-size:19px;
+                font-weight:bold;
+                margin-bottom:8px;
+            ">
+                ${escapeEmailHtml(
+                    challengeName
+                )}
+            </div>
+
+            ${
+                challengeDescription
+                    ? `
+                        <div style="
+                            color:#777;
+                            margin-bottom:15px;
+                        ">
+                            ${escapeEmailHtml(
+                                challengeDescription
+                            )}
+                        </div>
+                    `
+                    : ""
+            }
+
+            <div style="
+                font-size:18px;
+                font-weight:bold;
+            ">
+                ${
+                    completed
+                        ? "✓ האתגר הושלם"
+                        : "○ האתגר לא הושלם"
+                }
+            </div>
+
+        </div>
+    `;
+
+}
+
+
+// ==================================================
+// יצירת סיכום יומי
+// ==================================================
+
+function createDailyEmailContent(date) {
+
+    const key =
+        getDateKeyFromDate(date);
+
+
+    const calories =
+        getCaloriesForDate(key);
+
+
+    const activity =
+        getActivityForDate(key);
+
+
+    const score =
+        getScoreForDate(key);
+
+
+    const foodSuccess =
+        !!(
+            savedData[key] &&
+            savedData[key].food
+        );
+
+
+    const activitySuccess =
+        activity >=
+        DAILY_ACTIVITY_TARGET;
+
+
+    const challengeSuccess =
+        !!(
+            savedData[key] &&
+            savedData[key].challenge
+        );
+
+
+    const dateText =
+        formatHebrewDate(date);
+
+
+    return `
+        <div style="
+            direction:rtl;
+            font-family:Arial,sans-serif;
+            max-width:650px;
+            margin:auto;
+            background:#ffffff;
+            color:#444;
+        ">
+
+            <div style="
+                text-align:center;
+                padding:30px 20px;
+                background:#fff5fa;
+                border-radius:20px 20px 0 0;
+            ">
+
+                <div style="font-size:38px;">
+                    🌸
+                </div>
+
+                <h1 style="
+                    margin:8px 0;
+                    color:#555;
+                ">
+                    סיכום היום שלי
+                </h1>
+
+                <div style="
+                    color:#888;
+                    font-size:16px;
+                ">
+                    ${dateText}
+                </div>
+
+            </div>
+
+
+            <div style="padding:20px;">
+
+
+                <!-- ציון -->
+
+                <div style="
+                    text-align:center;
+                    padding:20px;
+                    border-radius:16px;
+                    background:#fafafa;
+                    margin-bottom:20px;
+                ">
+
+                    <div style="
+                        color:#888;
+                        margin-bottom:5px;
+                    ">
+                        הציון היומי
+                    </div>
+
+                    <div style="
+                        font-size:34px;
+                        font-weight:bold;
+                    ">
+                        ${score} / 3
+                    </div>
+
+                </div>
+
+
+                <!-- תזונה -->
+
+                <h2 style="
+                    border-bottom:1px solid #eee;
+                    padding-bottom:10px;
+                ">
+                    🍽️ תזונה
+                </h2>
+
+                <div style="
+                    padding:12px 0;
+                ">
+
+                    <strong>
+                        סה״כ קלוריות:
+                    </strong>
+
+                    ${calories}
+
+                    / ${DAILY_CALORIE_TARGET}
+
+                </div>
+
+                <div style="
+                    padding:8px 0;
+                    font-weight:bold;
+                ">
+                    ${
+                        foodSuccess
+                            ? "✓ עמדתי ביעד הקלורי"
+                            : "○ לא עמדתי ביעד הקלורי"
+                    }
+                </div>
+
+                ${createFoodEmailHtml(date)}
+
+
+                <!-- פעילות -->
+
+                <h2 style="
+                    border-bottom:1px solid #eee;
+                    padding-bottom:10px;
+                    margin-top:30px;
+                ">
+                    🏃 פעילות
+                </h2>
+
+                <div style="
+                    padding:12px 0;
+                ">
+
+                    <strong>
+                        סה״כ פעילות:
+                    </strong>
+
+                    ${activity}
+
+                    / ${DAILY_ACTIVITY_TARGET}
+
+                    דקות
+
+                </div>
+
+                <div style="
+                    padding:8px 0;
+                    font-weight:bold;
+                ">
+                    ${
+                        activitySuccess
+                            ? "✓ עמדתי ביעד הפעילות"
+                            : "○ לא עמדתי ביעד הפעילות"
+                    }
+                </div>
+
+                ${createActivityEmailHtml(date)}
+
+
+                <!-- אתגר -->
+
+                <h2 style="
+                    border-bottom:1px solid #eee;
+                    padding-bottom:10px;
+                    margin-top:30px;
+                ">
+                    🎯 אתגר
+                </h2>
+
+                ${createChallengeEmailHtml(date)}
+
+            </div>
+
+
+            <div style="
+                text-align:center;
+                padding:20px;
+                color:#999;
+                font-size:13px;
+                border-top:1px solid #eee;
+            ">
+                המסע שלי 🌸
+            </div>
+
+        </div>
+    `;
+
+}
+
+
+// ==================================================
+// סיכום לתקופה
+// ==================================================
+
+function createPeriodEmailContent(
+    startDate,
+    endDate,
+    title,
+    icon
+) {
+
+    let totalCalories = 0;
+    let totalActivity = 0;
+
+    let totalScore = 0;
+
+    let successfulFoodDays = 0;
+    let successfulActivityDays = 0;
+    let successfulChallengeDays = 0;
+
+    let daysCount = 0;
+
+
+    let dailyRows = "";
+
+
+    const current =
+        new Date(startDate);
+
+
+    while (
+        current <= endDate
+    ) {
+
+        const key =
+            getDateKeyFromDate(current);
+
+
+        const calories =
+            getCaloriesForDate(key);
+
+
+        const activity =
+            getActivityForDate(key);
+
+
+        const score =
+            getScoreForDate(key);
+
+
+        const foodSuccess =
+            !!(
+                savedData[key] &&
+                savedData[key].food
+            );
+
+
+        const activitySuccess =
+            activity >=
+            DAILY_ACTIVITY_TARGET;
+
+
+        const challengeSuccess =
+            !!(
+                savedData[key] &&
+                savedData[key].challenge
+            );
+
+
+        totalCalories +=
+            calories;
+
+        totalActivity +=
+            activity;
+
+        totalScore +=
+            score;
+
+        daysCount++;
+
+
+        if (foodSuccess)
+            successfulFoodDays++;
+
+
+        if (activitySuccess)
+            successfulActivityDays++;
+
+
+        if (challengeSuccess)
+            successfulChallengeDays++;
+
+
+        dailyRows += `
+            <tr>
+
+                <td style="
+                    padding:10px;
+                    border-bottom:1px solid #eee;
+                ">
+                    ${formatShortDate(current)}
+                </td>
+
+                <td style="
+                    padding:10px;
+                    text-align:center;
+                    border-bottom:1px solid #eee;
+                ">
+                    ${calories}
+                </td>
+
+                <td style="
+                    padding:10px;
+                    text-align:center;
+                    border-bottom:1px solid #eee;
+                ">
+                    ${activity}
+                </td>
+
+                <td style="
+                    padding:10px;
+                    text-align:center;
+                    border-bottom:1px solid #eee;
+                ">
+                    ${score}/3
+                </td>
+
+            </tr>
+        `;
+
+
+        current.setDate(
+            current.getDate() + 1
+        );
+
+    }
+
+
+    const averageScore =
+        daysCount > 0
+            ? (
+                totalScore /
+                daysCount
+            ).toFixed(1)
+            : "0";
+
+
+    const averageCalories =
+        daysCount > 0
+            ? Math.round(
+                totalCalories /
+                daysCount
+            )
+            : 0;
+
+
+    const averageActivity =
+        daysCount > 0
+            ? Math.round(
+                totalActivity /
+                daysCount
+            )
+            : 0;
+
+
+    return `
+        <div style="
+            direction:rtl;
+            font-family:Arial,sans-serif;
+            max-width:700px;
+            margin:auto;
+            background:#fff;
+            color:#444;
+        ">
+
+            <div style="
+                text-align:center;
+                padding:30px 20px;
+                background:#fff5fa;
+                border-radius:20px 20px 0 0;
+            ">
+
+                <div style="font-size:40px;">
+                    ${icon}
+                </div>
+
+                <h1 style="
+                    margin:8px 0;
+                ">
+                    ${title}
+                </h1>
+
+                <div style="
+                    color:#888;
+                ">
+                    ${formatShortDate(startDate)}
+                    –
+                    ${formatShortDate(endDate)}
+                </div>
+
+            </div>
+
+
+            <div style="padding:20px;">
+
+
+                <!-- נתוני על -->
+
+                <div style="
+                    display:flex;
+                    flex-wrap:wrap;
+                    gap:10px;
+                    justify-content:center;
+                    margin-bottom:25px;
+                ">
+
+                    <div style="
+                        flex:1;
+                        min-width:130px;
+                        padding:18px;
+                        background:#fff8fb;
+                        border-radius:15px;
+                        text-align:center;
+                    ">
+
+                        <div style="font-size:13px;color:#888;">
+                            ציון ממוצע
+                        </div>
+
+                        <strong style="font-size:25px;">
+                            ${averageScore} / 3
+                        </strong>
+
+                    </div>
+
+
+                    <div style="
+                        flex:1;
+                        min-width:130px;
+                        padding:18px;
+                        background:#fff8fb;
+                        border-radius:15px;
+                        text-align:center;
+                    ">
+
+                        <div style="font-size:13px;color:#888;">
+                            ממוצע קלוריות
+                        </div>
+
+                        <strong style="font-size:25px;">
+                            ${averageCalories}
+                        </strong>
+
+                    </div>
+
+
+                    <div style="
+                        flex:1;
+                        min-width:130px;
+                        padding:18px;
+                        background:#fff8fb;
+                        border-radius:15px;
+                        text-align:center;
+                    ">
+
+                        <div style="font-size:13px;color:#888;">
+                            ממוצע פעילות
+                        </div>
+
+                        <strong style="font-size:25px;">
+                            ${averageActivity}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <h2>
+                    📊 סיכום התקופה
+                </h2>
+
+
+                <div style="
+                    line-height:2;
+                ">
+
+                    <div>
+                        🍽️ סה״כ קלוריות:
+                        <strong>
+                            ${totalCalories}
+                        </strong>
+                    </div>
+
+                    <div>
+                        🏃 סה״כ דקות פעילות:
+                        <strong>
+                            ${totalActivity}
+                        </strong>
+                    </div>
+
+                    <div>
+                        🎯 ימים שבהם האתגר הושלם:
+                        <strong>
+                            ${successfulChallengeDays}
+                        </strong>
+                    </div>
+
+                    <div>
+                        🍽️ ימים שבהם עמדת ביעד התזונה:
+                        <strong>
+                            ${successfulFoodDays}
+                        </strong>
+                    </div>
+
+                    <div>
+                        🏃 ימים שבהם עמדת ביעד הפעילות:
+                        <strong>
+                            ${successfulActivityDays}
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <h2 style="
+                    margin-top:30px;
+                ">
+                    📅 פירוט יומי
+                </h2>
+
+
+                <div style="
+                    overflow-x:auto;
+                ">
+
+                    <table style="
+                        width:100%;
+                        border-collapse:collapse;
+                        direction:rtl;
+                    ">
+
+                        <thead>
+
+                            <tr style="
+                                background:#fafafa;
+                            ">
+
+                                <th style="padding:10px;">
+                                    יום
+                                </th>
+
+                                <th style="padding:10px;">
+                                    קלוריות
+                                </th>
+
+                                <th style="padding:10px;">
+                                    פעילות
+                                </th>
+
+                                <th style="padding:10px;">
+                                    ציון
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            ${dailyRows}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <div style="
+                text-align:center;
+                padding:20px;
+                color:#999;
+                border-top:1px solid #eee;
+                font-size:13px;
+            ">
+                המסע שלי 🌸
+            </div>
+
+        </div>
+    `;
+
+}
+
+
+// ==================================================
+// נתונים לפי תאריך
+// ==================================================
+
+function getCaloriesForDate(key) {
+
+    const foods =
+        foodData[key] || [];
+
+
+    return foods.reduce(
+        (total, food) =>
+            total +
+            Number(
+                food.calories || 0
+            ),
+        0
+    );
+
+}
+
+
+function getActivityForDate(key) {
+
+    const activities =
+        activityData[key] || [];
+
+
+    return activities.reduce(
+        (total, activity) =>
+            total +
+            Number(
+                activity.minutes || 0
+            ),
+        0
+    );
+
+}
+
+
+function getScoreForDate(key) {
+
+    let score = 0;
+
+
+    if (
+        savedData[key] &&
+        savedData[key].food
+    ) {
+
+        score++;
+
+    }
+
+
+    if (
+        savedData[key] &&
+        savedData[key].activity
+    ) {
+
+        score++;
+
+    }
+
+
+    if (
+        savedData[key] &&
+        savedData[key].challenge
+    ) {
+
+        score++;
+
+    }
+
+
+    return score;
+
+}
+
+
+// ==================================================
+// תאריך עברי להצגה
+// ==================================================
+
+function formatHebrewDate(date) {
+
+    return `
+        יום ${daysOfWeek[date.getDay()]},
+        ${date.getDate()} ב${months[date.getMonth()]}
+        ${date.getFullYear()}
+    `;
+
+}
+
+
+function formatShortDate(date) {
+
+    return `
+        ${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}
+    `;
+
+}
+
+
+// ==================================================
+// שליחת מייל
+// ==================================================
+
+async function sendEmail(
+    subject,
+    content,
+    uniqueKey
+) {
+
+    if (
+        emailSentData[uniqueKey]
+    ) {
+
+        console.log(
+            "המייל כבר נשלח:",
+            uniqueKey
+        );
+
+        return false;
+
+    }
+
+
+    if (
+        typeof emailjs ===
+        "undefined"
+    ) {
+
+        console.error(
+            "EmailJS לא נטען."
+        );
+
+        return false;
+
+    }
+
+
+    try {
+
+        await emailjs.send(
+            EMAILJS_SERVICE_ID,
+            EMAILJS_TEMPLATE_ID,
+            {
+
+                date:
+                    subject,
+
+                email_content:
+                    content
+
+            }
+        );
+
+
+        emailSentData[uniqueKey] =
+            true;
+
+
+        localStorage.setItem(
+            "emailSentData",
+            JSON.stringify(
+                emailSentData
+            )
+        );
+
+
+        console.log(
+            "המייל נשלח בהצלחה:",
+            subject
+        );
+
+
+        return true;
+
+    }
+    catch (error) {
+
+        console.error(
+            "שגיאה בשליחת המייל:",
+            error
+        );
+
+
+        return false;
+
+    }
+
+}
+
+
+// ==================================================
+// סיכום יומי
+// ==================================================
+
+async function sendDailyEmail() {
+
+    const subject =
+        `🌸 סיכום היום – ${formatShortDate(today)}`;
+
+
+    const content =
+        createDailyEmailContent(today);
+
+
+    return await sendEmail(
+        subject,
+        content,
+        `daily-${dateKey}`
+    );
+
+}
+
+
+// ==================================================
+// תחילת שבוע
+// ==================================================
+
+function getWeekStart(date) {
+
+    const result =
+        new Date(date);
+
+
+    result.setDate(
+        result.getDate() -
+        result.getDay()
+    );
+
+
+    return result;
+
+}
+
+
+// ==================================================
+// סוף שבוע
+// ==================================================
+
+function getWeekEnd(date) {
+
+    const result =
+        getWeekStart(date);
+
+
+    result.setDate(
+        result.getDate() + 6
+    );
+
+
+    return result;
+
+}
+
+
+// ==================================================
+// שליחת סיכום שבועי
+// נשלח רק בשבת
+// ==================================================
+
+async function sendWeeklyEmail() {
+
+    if (
+        today.getDay() !== 6
+    ) {
+
+        return false;
+
+    }
+
+
+    const weekStart =
+        getWeekStart(today);
+
+
+    const weekEnd =
+        getWeekEnd(today);
+
+
+    const weekKey =
+        getDateKeyFromDate(weekStart);
+
+
+    const subject =
+        `📅 סיכום שבועי – ${formatShortDate(weekStart)} עד ${formatShortDate(weekEnd)}`;
+
+
+    const content =
+        createPeriodEmailContent(
+            weekStart,
+            weekEnd,
+            "הסיכום השבועי שלי",
+            "📅"
+        );
+
+
+    return await sendEmail(
+        subject,
+        content,
+        `weekly-${weekKey}`
+    );
+
+}
+
+
+// ==================================================
+// האם היום הוא היום האחרון בחודש
+// ==================================================
+
+function isLastDayOfMonth(date) {
+
+    const tomorrow =
+        new Date(date);
+
+
+    tomorrow.setDate(
+        tomorrow.getDate() + 1
+    );
+
+
+    return (
+        tomorrow.getMonth() !==
+        date.getMonth()
+    );
+
+}
+
+
+// ==================================================
+// תחילת חודש
+// ==================================================
+
+function getMonthStart(date) {
+
+    return new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        1
+    );
+
+}
+
+
+// ==================================================
+// סוף חודש
+// ==================================================
+
+function getMonthEnd(date) {
+
+    return new Date(
+        date.getFullYear(),
+        date.getMonth() + 1,
+        0
+    );
+
+}
+
+
+// ==================================================
+// שליחת סיכום חודשי
+// ==================================================
+
+async function sendMonthlyEmail() {
+
+    if (
+        !isLastDayOfMonth(today)
+    ) {
+
+        return false;
+
+    }
+
+
+    const monthStart =
+        getMonthStart(today);
+
+
+    const monthEnd =
+        getMonthEnd(today);
+
+
+    const monthKey =
+        `${today.getFullYear()}-${String(
+            today.getMonth() + 1
+        ).padStart(2, "0")}`;
+
+
+    const subject =
+        `🗓️ סיכום חודשי – ${months[today.getMonth()]} ${today.getFullYear()}`;
+
+
+    const content =
+        createPeriodEmailContent(
+            monthStart,
+            monthEnd,
+            `הסיכום החודשי שלי – ${months[today.getMonth()]}`,
+            "🗓️"
+        );
+
+
+    return await sendEmail(
+        subject,
+        content,
+        `monthly-${monthKey}`
+    );
+
+}
+
+
+// ==================================================
+// האם היום האחרון בשנה
+// ==================================================
+
+function isLastDayOfYear(date) {
+
+    return (
+        date.getMonth() === 11 &&
+        date.getDate() === 31
+    );
+
+}
+
+
+// ==================================================
+// תחילת שנה
+// ==================================================
+
+function getYearStart(date) {
+
+    return new Date(
+        date.getFullYear(),
+        0,
+        1
+    );
+
+}
+
+
+// ==================================================
+// סוף שנה
+// ==================================================
+
+function getYearEnd(date) {
+
+    return new Date(
+        date.getFullYear(),
+        11,
+        31
+    );
+
+}
+
+
+// ==================================================
+// שליחת סיכום שנתי
+// ==================================================
+
+async function sendYearlyEmail() {
+
+    if (
+        !isLastDayOfYear(today)
+    ) {
+
+        return false;
+
+    }
+
+
+    const yearStart =
+        getYearStart(today);
+
+
+    const yearEnd =
+        getYearEnd(today);
+
+
+    const yearKey =
+        String(
+            today.getFullYear()
+        );
+
+
+    const subject =
+        `🎉 סיכום שנתי – ${today.getFullYear()}`;
+
+
+    const content =
+        createPeriodEmailContent(
+            yearStart,
+            yearEnd,
+            `הסיכום השנתי שלי – ${today.getFullYear()}`,
+            "🎉"
+        );
+
+
+    return await sendEmail(
+        subject,
+        content,
+        `yearly-${yearKey}`
+    );
+
+}
+
+
+// ==================================================
+// שליחת כל הסיכומים הרלוונטיים
+// ==================================================
+
+async function sendAllRelevantEmails() {
+
+    // סיכום יומי
+    await sendDailyEmail();
+
+
+    // שבת → סיכום שבועי
+    if (
+        today.getDay() === 6
+    ) {
+
+        await sendWeeklyEmail();
+
+    }
+
+
+    // סוף חודש → סיכום חודשי
+    if (
+        isLastDayOfMonth(today)
+    ) {
+
+        await sendMonthlyEmail();
+
+    }
+
+
+    // סוף שנה → סיכום שנתי
+    if (
+        isLastDayOfYear(today)
+    ) {
+
+        await sendYearlyEmail();
+
+    }
+
+}
+
+
+// ==================================================
+// אתגר – כפתור סיום היום
 // ==================================================
 
 if (finishDayButton) {
 
     finishDayButton.addEventListener(
         "click",
-        () => {
+        async () => {
+
+            // ------------------------------------------
+            // אם היום כבר הסתיים → ביטול
+            // ------------------------------------------
 
             if (isDayFinished()) {
 
@@ -1274,6 +2375,10 @@ if (finishDayButton) {
             }
 
 
+            // ------------------------------------------
+            // שמירת מצב קודם
+            // ------------------------------------------
+
             const previousFood =
                 savedData[dateKey].food;
 
@@ -1293,7 +2398,8 @@ if (finishDayButton) {
 
 
             savedData[dateKey].food =
-                calories <= DAILY_CALORIE_TARGET;
+                calories <=
+                DAILY_CALORIE_TARGET;
 
 
             localStorage.setItem(
@@ -1317,6 +2423,59 @@ if (finishDayButton) {
 
             loadToday();
 
+
+            // ------------------------------------------
+            // שליחת המיילים
+            // ------------------------------------------
+
+            finishDayButton.disabled =
+                true;
+
+
+            const originalText =
+                finishDayButton.textContent;
+
+
+            finishDayButton.textContent =
+                "✓ היום נשמר — שולחת סיכום...";
+
+
+            await sendAllRelevantEmails();
+
+
+            finishDayButton.disabled =
+                false;
+
+
+            finishDayButton.textContent =
+                originalText;
+
+
+            // ------------------------------------------
+            // הודעה
+            // ------------------------------------------
+
+            if (finishDayMessage) {
+
+                const score =
+                    getTodayScore();
+
+
+                if (score === 3) {
+
+                    finishDayMessage.textContent =
+                        "🎉 היום הושלם והמייל נשלח בהצלחה!";
+
+                }
+                else {
+
+                    finishDayMessage.textContent =
+                        "🌸 היום נשמר והמייל נשלח בהצלחה!";
+
+                }
+
+            }
+
         }
     );
 
@@ -1331,6 +2490,7 @@ const greeting =
     document.getElementById(
         "greeting"
     );
+
 
 const timeMessage =
     document.getElementById(
@@ -1414,30 +2574,36 @@ const homeChallengeName =
         "homeChallengeName"
     );
 
+
 const homeChallengeDescription =
     document.getElementById(
         "homeChallengeDescription"
     );
+
 
 const homeChallengeIcon =
     document.getElementById(
         "homeChallengeIcon"
     );
 
+
 const homeWeekNumber =
     document.getElementById(
         "homeWeekNumber"
     );
+
 
 const homeChallengeProgress =
     document.getElementById(
         "homeChallengeProgress"
     );
 
+
 const homeChallengeScore =
     document.getElementById(
         "homeChallengeScore"
     );
+
 
 const homeChallengeDays =
     document.getElementById(
@@ -1461,11 +2627,14 @@ function updateHomeChallenge() {
     homeChallengeName.textContent =
         currentChallenge.name;
 
+
     homeChallengeDescription.textContent =
         currentChallenge.description;
 
+
     homeChallengeIcon.textContent =
         currentChallenge.icon;
+
 
     homeWeekNumber.textContent =
         `שבוע ${currentWeek}`;
@@ -1488,6 +2657,7 @@ function updateHomeChallenge() {
 
 
     const dayNames = [
+
         "א׳",
         "ב׳",
         "ג׳",
@@ -1495,6 +2665,7 @@ function updateHomeChallenge() {
         "ה׳",
         "ו׳",
         "ש׳"
+
     ];
 
 
@@ -1521,9 +2692,7 @@ function updateHomeChallenge() {
 
 
         const challengeDateKey =
-            getDateKeyFromDate(
-                date
-            );
+            getDateKeyFromDate(date);
 
 
         const day =
@@ -1633,6 +2802,7 @@ function updateHomeChallenge() {
             day.style.opacity =
                 "0.5";
 
+
             day.style.cursor =
                 "default";
 
@@ -1649,29 +2819,9 @@ function updateHomeChallenge() {
     homeChallengeScore.textContent =
         `${completed} מתוך 7 ימים`;
 
+
     homeChallengeProgress.style.width =
         `${(completed / 7) * 100}%`;
-
-}
-
-
-function getDateKeyFromDate(
-    date
-) {
-
-    return (
-
-        date.getFullYear() +
-        "-" +
-        String(
-            date.getMonth() + 1
-        ).padStart(2, "0") +
-        "-" +
-        String(
-            date.getDate()
-        ).padStart(2, "0")
-
-    );
 
 }
 
@@ -1685,15 +2835,18 @@ const countdownDays =
         "countdownDays"
     );
 
+
 const countdownHours =
     document.getElementById(
         "countdownHours"
     );
 
+
 const countdownMinutes =
     document.getElementById(
         "countdownMinutes"
     );
+
 
 const countdownSeconds =
     document.getElementById(
@@ -1721,14 +2874,18 @@ function updateCountdown() {
         if (countdownDays)
             countdownDays.textContent = "0";
 
+
         if (countdownHours)
             countdownHours.textContent = "00";
+
 
         if (countdownMinutes)
             countdownMinutes.textContent = "00";
 
+
         if (countdownSeconds)
             countdownSeconds.textContent = "00";
+
 
         return;
 
@@ -1769,15 +2926,19 @@ function updateCountdown() {
 
 
     if (countdownDays)
-        countdownDays.textContent = days;
+        countdownDays.textContent =
+            days;
+
 
     if (countdownHours)
         countdownHours.textContent =
             String(hours).padStart(2, "0");
 
+
     if (countdownMinutes)
         countdownMinutes.textContent =
             String(minutes).padStart(2, "0");
+
 
     if (countdownSeconds)
         countdownSeconds.textContent =
@@ -1787,6 +2948,7 @@ function updateCountdown() {
 
 
 updateCountdown();
+
 
 setInterval(
     updateCountdown,
@@ -1805,5 +2967,6 @@ localStorage.setItem(
 
 
 loadToday();
+
 
 updateHomeChallenge();
