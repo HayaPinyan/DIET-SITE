@@ -20,7 +20,7 @@ const EMAILJS_DAILY_TEMPLATE_ID =
 // ==================================================
 
 const SUMMARY_EMAIL =
-    "YOUR_EMAIL@example.com";
+    "h44640410@gmail.com";
 
 // ==================================================
 // אלמנטים
