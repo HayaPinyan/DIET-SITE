@@ -71,7 +71,436 @@ const finishDayButton =
 const finishDayMessage =
     document.getElementById("finishDayMessage");
 
+// ==================================================
+// יצירת HTML של רשימת המאכלים
+// ==================================================
 
+function buildFoodEmailHtml(dateKey) {
+
+    const foods =
+        foodData[dateKey] || [];
+
+
+    if (foods.length === 0) {
+
+        return `
+            <div style="
+                text-align:center;
+                padding:15px;
+                color:#8d7c77;
+            ">
+                לא נרשמו מאכלים היום 🌸
+            </div>
+        `;
+
+    }
+
+
+    let html = `
+
+        <table class="food-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        מאכל
+                    </th>
+
+                    <th>
+                        כמות
+                    </th>
+
+                    <th>
+                        קלוריות
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+    `;
+
+
+    foods.forEach(food => {
+
+        const name =
+            escapeHtml(
+                food.name || "מאכל"
+            );
+
+
+        const amount =
+            escapeHtml(
+                food.amount || ""
+            );
+
+
+        const calories =
+            Number(
+                food.calories || 0
+            );
+
+
+        const emoji =
+            escapeHtml(
+                food.emoji || "🍽️"
+            );
+
+
+        html += `
+
+            <tr>
+
+                <td>
+                    ${emoji}
+                    ${name}
+                </td>
+
+                <td>
+                    ${amount}
+                </td>
+
+                <td>
+                    ${calories}
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+
+    html += `
+
+            </tbody>
+
+        </table>
+
+    `;
+
+
+    return html;
+
+}
+
+
+// ==================================================
+// יצירת HTML של רשימת הפעילויות
+// ==================================================
+
+function buildActivityEmailHtml(dateKey) {
+
+    const activities =
+        activityData[dateKey] || [];
+
+
+    if (activities.length === 0) {
+
+        return `
+            <div style="
+                text-align:center;
+                padding:15px;
+                color:#8d7c77;
+            ">
+                לא נרשמה פעילות היום 🌸
+            </div>
+        `;
+
+    }
+
+
+    let html = "";
+
+
+    activities.forEach(activity => {
+
+        const name =
+            escapeHtml(
+                activity.name || "פעילות"
+            );
+
+
+        const minutes =
+            Number(
+                activity.minutes || 0
+            );
+
+
+        const emoji =
+            escapeHtml(
+                activity.emoji || "🏃"
+            );
+
+
+        html += `
+
+            <div class="activity-row">
+
+                <div class="activity-name">
+
+                    ${emoji}
+                    ${name}
+
+                </div>
+
+                <div class="activity-minutes">
+
+                    ${minutes} דקות
+
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+
+    return html;
+
+}
+
+
+// ==================================================
+// שם האתגר של היום
+// ==================================================
+
+function getTodayChallengeName() {
+
+    try {
+
+        if (
+            typeof currentChallenge !==
+            "undefined" &&
+            currentChallenge
+        ) {
+
+            return (
+                currentChallenge.name ||
+                "האתגר השבועי"
+            );
+
+        }
+
+    }
+    catch (error) {
+
+        console.log(
+            "לא ניתן לקרוא את האתגר:",
+            error
+        );
+
+    }
+
+
+    return "האתגר השבועי";
+
+}
+
+
+// ==================================================
+// הודעת סיכום לפי הציון
+// ==================================================
+
+function getDailyEmailMessage(score) {
+
+    if (score === 3) {
+
+        return `
+            🎉 כל הכבוד!
+            השלמת את כל שלושת היעדים של היום.
+            יום מושלם במסע שלך!
+        `;
+
+    }
+
+
+    if (score === 2) {
+
+        return `
+            🌟 כמעט מושלם!
+            שניים מתוך שלושה יעדים הושלמו.
+            ממשיכים קדימה!
+        `;
+
+    }
+
+
+    if (score === 1) {
+
+        return `
+            💪 כל צעד נחשב.
+            היום התחלת — ומחר ממשיכים להתקדם.
+        `;
+
+    }
+
+
+    return `
+        🌷 גם ימים כאלה הם חלק מהמסע.
+        מחר מתחיל יום חדש.
+    `;
+
+}
+
+
+// ==================================================
+// שליחת מייל סיכום יומי
+// ==================================================
+
+async function sendDailySummaryEmail() {
+
+    // ----------------------------------------------
+    // בדיקה ש-EmailJS נטען
+    // ----------------------------------------------
+
+    if (
+        typeof emailjs ===
+        "undefined"
+    ) {
+
+        console.error(
+            "EmailJS לא נטען."
+        );
+
+        return false;
+
+    }
+
+
+    // ----------------------------------------------
+    // נתוני היום
+    // ----------------------------------------------
+
+    const calories =
+        getTodayCalories();
+
+
+    const activity =
+        getTodayActivityMinutes();
+
+
+    const score =
+        getTodayScore();
+
+
+    const challengeCompleted =
+        !!(
+            savedData[dateKey] &&
+            savedData[dateKey].challenge
+        );
+
+
+    // ----------------------------------------------
+    // תאריך יפה
+    // ----------------------------------------------
+
+    const formattedDate =
+        `${today.getDate()} ב${months[today.getMonth()]} ${today.getFullYear()}`;
+
+
+    // ----------------------------------------------
+    // הפרמטרים לתבנית
+    // ----------------------------------------------
+
+    const templateParams = {
+
+        to_email:
+            SUMMARY_EMAIL,
+
+        date:
+            formattedDate,
+
+        score:
+            score,
+
+        total_calories:
+            calories,
+
+        calorie_target:
+            DAILY_CALORIE_TARGET,
+
+        total_activity:
+            activity,
+
+        activity_target:
+            DAILY_ACTIVITY_TARGET,
+
+        challenge_name:
+            getTodayChallengeName(),
+
+        challenge_completed:
+            challengeCompleted,
+
+        food_html:
+            buildFoodEmailHtml(
+                dateKey
+            ),
+
+        activity_html:
+            buildActivityEmailHtml(
+                dateKey
+            ),
+
+        daily_message:
+            getDailyEmailMessage(
+                score
+            )
+
+    };
+
+
+    // ----------------------------------------------
+    // שליחה
+    // ----------------------------------------------
+
+    try {
+
+        console.log(
+            "שולחת מייל סיכום יומי...",
+            templateParams
+        );
+
+
+        const response =
+            await emailjs.send(
+
+                EMAILJS_SERVICE_ID,
+
+                EMAILJS_DAILY_TEMPLATE_ID,
+
+                templateParams
+
+            );
+
+
+        console.log(
+            "המייל נשלח בהצלחה:",
+            response
+        );
+
+
+        return true;
+
+    }
+    catch (error) {
+
+        console.error(
+            "שגיאה בשליחת המייל:",
+            error
+        );
+
+
+        return false;
+
+    }
+
+}
 // ==================================================
 // היום של האתר
 // 06:00 -> יום חדש
