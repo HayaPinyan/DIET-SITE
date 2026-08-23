@@ -4,7 +4,23 @@
 
 const DAILY_CALORIE_TARGET = 1800;
 const DAILY_ACTIVITY_TARGET = 20;
+ // ==================================================
+// EMAILJS
+// ==================================================
 
+const EMAILJS_SERVICE_ID =
+    "service_8s7fe3a";
+
+const EMAILJS_DAILY_TEMPLATE_ID =
+    "template_tcts9d9" ;
+
+
+// ==================================================
+// כתובת המייל שאליה יישלח הסיכום
+// ==================================================
+
+const SUMMARY_EMAIL =
+    "YOUR_EMAIL@example.com";
 
 // ==================================================
 // אלמנטים
