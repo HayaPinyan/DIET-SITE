@@ -1,5 +1,5 @@
 // ==================================================
-// אלמנטים בדף
+// אלמנטים
 // ==================================================
 
 const challengeDays =
@@ -7,24 +7,20 @@ const challengeDays =
         "challengeDays"
     );
 
-
 const challengeScore =
     document.getElementById(
         "challengeScore"
     );
-
 
 const challengeProgress =
     document.getElementById(
         "challengeProgress"
     );
 
-
 const challengeMessage =
     document.getElementById(
         "challengeMessage"
     );
-
 
 const weekNumber =
     document.getElementById(
@@ -33,37 +29,192 @@ const weekNumber =
 
 
 // ==================================================
-// הצגת פרטי האתגר הנוכחי
+// אתגרים
 // ==================================================
 
-document.getElementById(
-    "challengeName"
-).textContent =
-    currentChallenge.name;
+const challenges = [
 
+    {
+        name:
+            "מתחילים את היום נכון",
 
-document.getElementById(
-    "challengeDescription"
-).textContent =
-    currentChallenge.description;
+        description:
+            "השבוע ננסה להתחיל כל יום בצורה מסודרת.",
+
+        icon:
+            "☀️"
+    },
+
+    {
+        name:
+            "מים",
+
+        description:
+            "השבוע מקפידים לשתות מספיק מים בכל יום.",
+
+        icon:
+            "💧"
+    },
+
+    {
+        name:
+            "צעדים",
+
+        description:
+            "השבוע מוסיפים קצת יותר תנועה לשגרה.",
+
+        icon:
+            "👟"
+    },
+
+    {
+        name:
+            "ירקות",
+
+        description:
+            "השבוע מקפידים לשלב ירקות במהלך היום.",
+
+        icon:
+            "🥦"
+    },
+
+    {
+        name:
+            "ארוחה מסודרת",
+
+        description:
+            "השבוע מקפידים לאכול את הארוחות בצורה מסודרת.",
+
+        icon:
+            "🍽️"
+    }
+
+];
 
 
 // ==================================================
-// אייקון
+// יום התחלה
 // ==================================================
 
-const challengeIconElement =
-    document.querySelector(
-        ".challenge-icon"
+const startDate =
+    new Date(
+        2026,
+        7,
+        10
     );
 
 
-if (
-    challengeIconElement
+// ==================================================
+// היום של האתר
+// ==================================================
+
+function getSiteToday() {
+
+    const parts =
+        new Intl.DateTimeFormat(
+            "en-CA",
+            {
+                timeZone: "Asia/Jerusalem",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                hour12: false
+            }
+        ).formatToParts(new Date());
+
+
+    let year =
+        Number(
+            parts.find(
+                x => x.type === "year"
+            ).value
+        );
+
+    let month =
+        Number(
+            parts.find(
+                x => x.type === "month"
+            ).value
+        ) - 1;
+
+    let day =
+        Number(
+            parts.find(
+                x => x.type === "day"
+            ).value
+        );
+
+
+    const hour =
+        Number(
+            parts.find(
+                x => x.type === "hour"
+            ).value
+        );
+
+
+    if (hour < 6) {
+
+        const previousDay =
+            new Date(
+                year,
+                month,
+                day
+            );
+
+
+        previousDay.setDate(
+            previousDay.getDate() - 1
+        );
+
+
+        year =
+            previousDay.getFullYear();
+
+        month =
+            previousDay.getMonth();
+
+        day =
+            previousDay.getDate();
+
+    }
+
+
+    return new Date(
+        year,
+        month,
+        day
+    );
+
+}
+
+
+const today =
+    getSiteToday();
+
+
+// ==================================================
+// מפתח
+// ==================================================
+
+function getDateKey(
+    date
 ) {
 
-    challengeIconElement.textContent =
-        currentChallenge.icon;
+    return (
+
+        date.getFullYear() +
+        "-" +
+        String(
+            date.getMonth() + 1
+        ).padStart(2, "0") +
+        "-" +
+        String(
+            date.getDate()
+        ).padStart(2, "0")
+
+    );
 
 }
 
@@ -72,18 +223,60 @@ if (
 // מספר השבוע
 // ==================================================
 
-if (
-    weekNumber
-) {
+function getWeekNumber() {
 
-    weekNumber.textContent =
-        `שבוע ${currentWeek}`;
+    const difference =
+        today -
+        startDate;
+
+
+    const days =
+        Math.floor(
+            difference /
+            (
+                1000 *
+                60 *
+                60 *
+                24
+            )
+        );
+
+
+    return (
+        Math.floor(
+            days / 7
+        ) + 1
+    );
 
 }
 
 
+const currentWeek =
+    Math.max(
+        1,
+        getWeekNumber()
+    );
+
+
 // ==================================================
-// נתוני המשתמש
+// האתגר הנוכחי
+// ==================================================
+
+const challengeIndex =
+    (
+        currentWeek - 1
+    ) %
+    challenges.length;
+
+
+const currentChallenge =
+    challenges[
+        challengeIndex
+    ];
+
+
+// ==================================================
+// נתונים
 // ==================================================
 
 const savedData =
@@ -95,7 +288,77 @@ const savedData =
 
 
 // ==================================================
-// שמות ימי השבוע
+// הצגת פרטי האתגר
+// ==================================================
+
+const challengeNameElement =
+    document.getElementById(
+        "challengeName"
+    );
+
+const challengeDescriptionElement =
+    document.getElementById(
+        "challengeDescription"
+    );
+
+const challengeIconElement =
+    document.querySelector(
+        ".challenge-icon"
+    );
+
+
+if (challengeNameElement) {
+
+    challengeNameElement.textContent =
+        currentChallenge.name;
+
+}
+
+
+if (
+    challengeDescriptionElement
+) {
+
+    challengeDescriptionElement.textContent =
+        currentChallenge.description;
+
+}
+
+
+if (challengeIconElement) {
+
+    challengeIconElement.textContent =
+        currentChallenge.icon;
+
+}
+
+
+if (weekNumber) {
+
+    weekNumber.textContent =
+        `שבוע ${currentWeek}`;
+
+}
+
+
+// ==================================================
+// תחילת השבוע
+// ==================================================
+
+const weekStart =
+    new Date(
+        startDate
+    );
+
+
+weekStart.setDate(
+    weekStart.getDate() +
+    (currentWeek - 1) * 7
+);
+
+
+// ==================================================
+// ימי השבוע
 // ==================================================
 
 const dayNames = [
@@ -112,30 +375,7 @@ const dayNames = [
 
 
 // ==================================================
-// תחילת השבוע הנוכחי
-// ==================================================
-
-const weekStart =
-    new Date(
-        startDate
-    );
-
-
-weekStart.setDate(
-    weekStart.getDate() +
-    (
-        (
-            (
-                currentWeek - 1
-            ) %
-            52
-        ) * 7
-    )
-);
-
-
-// ==================================================
-// יצירת 7 הימים
+// יצירת הימים
 // ==================================================
 
 for (
@@ -155,31 +395,9 @@ for (
     );
 
 
-    // ----------------------------------------------
-    // מפתח התאריך
-    // ----------------------------------------------
-
     const dateKey =
-        date.getFullYear() +
-        "-" +
-        String(
-            date.getMonth() + 1
-        ).padStart(
-            2,
-            "0"
-        ) +
-        "-" +
-        String(
-            date.getDate()
-        ).padStart(
-            2,
-            "0"
-        );
+        getDateKey(date);
 
-
-    // ----------------------------------------------
-    // יצירת משבצת היום
-    // ----------------------------------------------
 
     const dayElement =
         document.createElement(
@@ -190,10 +408,6 @@ for (
     dayElement.className =
         "challenge-day";
 
-
-    // ----------------------------------------------
-    // האם היום הושלם?
-    // ----------------------------------------------
 
     if (
         savedData[dateKey] &&
@@ -207,70 +421,27 @@ for (
     }
 
 
-    // ----------------------------------------------
-    // תוכן
-    // ----------------------------------------------
-
     dayElement.innerHTML = `
 
         <span class="day-name">
-
             ${dayNames[i]}
-
         </span>
 
-
         <span class="day-number">
-
             ${date.getDate()}
-
         </span>
 
     `;
 
 
-    // ----------------------------------------------
-    // בדיקה האם היום עתידי
-    // ----------------------------------------------
-
-    const today =
-        getIsraelToday();
-
-
-    today.setHours(
-        0,
-        0,
-        0,
-        0
-    );
-
-
-    const currentDate =
-        new Date(
-            date
-        );
-
-
-    currentDate.setHours(
-        0,
-        0,
-        0,
-        0
-    );
-
-
     const isFuture =
-        currentDate >
-        today;
+        date > today;
 
 
-    if (
-        isFuture
-    ) {
+    if (isFuture) {
 
         dayElement.style.opacity =
             "0.5";
-
 
         dayElement.style.cursor =
             "default";
@@ -278,28 +449,20 @@ for (
     }
     else {
 
-        // ------------------------------------------
-        // לחיצה על יום
-        // ------------------------------------------
-
         dayElement.addEventListener(
             "click",
             () => {
-
-                // ----------------------------------
-                // יצירת נתונים ליום אם אין
-                // ----------------------------------
 
                 if (
                     !savedData[dateKey]
                 ) {
 
-                    savedData[dateKey] = {
+                    savedData[
+                        dateKey
+                    ] = {
 
                         food: false,
-
                         activity: false,
-
                         challenge: false
 
                     };
@@ -307,25 +470,13 @@ for (
                 }
 
 
-                // ----------------------------------
-                // שינוי מצב האתגר
-                // ----------------------------------
-
-                const isCompleted =
+                savedData[
+                    dateKey
+                ].challenge =
                     !savedData[
                         dateKey
                     ].challenge;
 
-
-                savedData[
-                    dateKey
-                ].challenge =
-                    isCompleted;
-
-
-                // ----------------------------------
-                // שמירה
-                // ----------------------------------
 
                 localStorage.setItem(
                     "dietData",
@@ -335,10 +486,6 @@ for (
                 );
 
 
-                // ----------------------------------
-                // עדכון XP
-                // ----------------------------------
-
                 window.dispatchEvent(
                     new Event(
                         "xpDataChanged"
@@ -346,19 +493,13 @@ for (
                 );
 
 
-                // ----------------------------------
-                // עדכון התצוגה
-                // ----------------------------------
-
                 dayElement.classList.toggle(
                     "completed",
-                    isCompleted
+                    savedData[
+                        dateKey
+                    ].challenge
                 );
 
-
-                // ----------------------------------
-                // עדכון ההתקדמות
-                // ----------------------------------
 
                 updateProgress();
 
@@ -368,10 +509,6 @@ for (
     }
 
 
-    // ----------------------------------------------
-    // הוספה לדף
-    // ----------------------------------------------
-
     challengeDays.appendChild(
         dayElement
     );
@@ -380,7 +517,7 @@ for (
 
 
 // ==================================================
-// עדכון ההתקדמות
+// התקדמות
 // ==================================================
 
 function updateProgress() {
@@ -406,20 +543,8 @@ function updateProgress() {
 
 
         const dateKey =
-            date.getFullYear() +
-            "-" +
-            String(
-                date.getMonth() + 1
-            ).padStart(
-                2,
-                "0"
-            ) +
-            "-" +
-            String(
-                date.getDate()
-            ).padStart(
-                2,
-                "0"
+            getDateKey(
+                date
             );
 
 
@@ -435,56 +560,7 @@ function updateProgress() {
     }
 
 
-    // ==================================================
-    // שבוע ללא אתגר
-    // ==================================================
-
-    if (
-        currentChallenge.isNoChallenge
-    ) {
-
-        if (
-            challengeScore
-        ) {
-
-            challengeScore.textContent =
-                "🌸 שבוע מנוחה";
-
-        }
-
-
-        if (
-            challengeProgress
-        ) {
-
-            challengeProgress.style.width =
-                "100%";
-
-        }
-
-
-        if (
-            challengeMessage
-        ) {
-
-            challengeMessage.textContent =
-                "🌸 השבוע אין אתגר — ממשיכים במסע בשבוע הבא!";
-
-        }
-
-
-        return;
-
-    }
-
-
-    // ==================================================
-    // מספר הימים שהושלמו
-    // ==================================================
-
-    if (
-        challengeScore
-    ) {
+    if (challengeScore) {
 
         challengeScore.textContent =
             `${completed} / 7`;
@@ -492,71 +568,43 @@ function updateProgress() {
     }
 
 
-    // ==================================================
-    // פס התקדמות
-    // ==================================================
-
-    if (
-        challengeProgress
-    ) {
-
-        const percentage =
-            (
-                completed /
-                7
-            ) * 100;
-
+    if (challengeProgress) {
 
         challengeProgress.style.width =
-            `${percentage}%`;
+            `${(
+                completed /
+                7
+            ) * 100}%`;
 
     }
 
 
-    // ==================================================
-    // הודעה
-    // ==================================================
+    if (challengeMessage) {
 
-    if (
-        challengeMessage
-    ) {
-
-        if (
-            completed === 7
-        ) {
+        if (completed === 7) {
 
             challengeMessage.textContent =
                 "🎉 כל הכבוד! השלמת את האתגר השבועי!";
 
         }
-
-        else if (
-            completed >= 5
-        ) {
+        else if (completed >= 5) {
 
             challengeMessage.textContent =
                 "🌟 את ממש קרובה לסיום!";
 
         }
-
-        else if (
-            completed >= 3
-        ) {
+        else if (completed >= 3) {
 
             challengeMessage.textContent =
                 "💪 את בדרך הנכונה!";
 
         }
-
-        else if (
-            completed >= 1
-        ) {
+        else if (completed >= 1) {
 
             challengeMessage.textContent =
                 "🌸 התחלת — ממשיכים קדימה!";
 
         }
-
         else {
 
             challengeMessage.textContent =
@@ -570,7 +618,7 @@ function updateProgress() {
 
 
 // ==================================================
-// הפעלה ראשונית
+// הפעלה
 // ==================================================
 
 updateProgress();

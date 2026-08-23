@@ -1,4 +1,3 @@
-
 // ==================================================
 // הגדרות
 // ==================================================
@@ -11,35 +10,16 @@ const DAILY_ACTIVITY_TARGET = 20;
 // אלמנטים
 // ==================================================
 
-const calendar =
-    document.getElementById("calendar");
+const calendar = document.getElementById("calendar");
+const monthTitle = document.getElementById("monthTitle");
+const prevMonth = document.getElementById("prevMonth");
+const nextMonth = document.getElementById("nextMonth");
 
-const monthTitle =
-    document.getElementById("monthTitle");
-
-const prevMonth =
-    document.getElementById("prevMonth");
-
-const nextMonth =
-    document.getElementById("nextMonth");
-
-
-// חלונית
-
-const dayModal =
-    document.getElementById("dayModal");
-
-const closeModal =
-    document.getElementById("closeModal");
-
-const modalDate =
-    document.getElementById("modalDate");
-
-const modalTasks =
-    document.getElementById("modalTasks");
-
-const modalScore =
-    document.getElementById("modalScore");
+const dayModal = document.getElementById("dayModal");
+const closeModal = document.getElementById("closeModal");
+const modalDate = document.getElementById("modalDate");
+const modalTasks = document.getElementById("modalTasks");
+const modalScore = document.getElementById("modalScore");
 
 
 // ==================================================
@@ -47,32 +27,23 @@ const modalScore =
 // ==================================================
 
 const dietData =
-    JSON.parse(
-        localStorage.getItem("dietData")
-    ) || {};
+    JSON.parse(localStorage.getItem("dietData")) || {};
 
 const foodData =
-    JSON.parse(
-        localStorage.getItem("foodData")
-    ) || {};
+    JSON.parse(localStorage.getItem("foodData")) || {};
 
 const activityData =
-    JSON.parse(
-        localStorage.getItem("activityData")
-    ) || {};
+    JSON.parse(localStorage.getItem("activityData")) || {};
 
 const finishDayData =
-    JSON.parse(
-        localStorage.getItem("finishDayData")
-    ) || {};
+    JSON.parse(localStorage.getItem("finishDayData")) || {};
 
 
 // ==================================================
 // החודש שמוצג
 // ==================================================
 
-let displayedDate =
-    new Date();
+let displayedDate = new Date();
 
 
 // ==================================================
@@ -80,7 +51,6 @@ let displayedDate =
 // ==================================================
 
 const monthNames = [
-
     "ינואר",
     "פברואר",
     "מרץ",
@@ -93,26 +63,19 @@ const monthNames = [
     "אוקטובר",
     "נובמבר",
     "דצמבר"
-
 ];
 
 
 // ==================================================
-// יצירת מפתח לתאריך
+// יצירת מפתח תאריך
 // ==================================================
 
-function getDateKey(
-    year,
-    month,
-    day
-) {
+function getDateKey(year, month, day) {
 
     return (
         year +
         "-" +
-        String(
-            month + 1
-        ).padStart(2, "0") +
+        String(month + 1).padStart(2, "0") +
         "-" +
         String(day).padStart(2, "0")
     );
@@ -121,10 +84,11 @@ function getDateKey(
 
 
 // ==================================================
-// תאריך היום בישראל
+// היום של האתר
+// 06:00 = תחילת יום חדש
 // ==================================================
 
-function getIsraelToday() {
+function getSiteToday() {
 
     const parts =
         new Intl.DateTimeFormat(
@@ -133,40 +97,56 @@ function getIsraelToday() {
                 timeZone: "Asia/Jerusalem",
                 year: "numeric",
                 month: "2-digit",
-                day: "2-digit"
+                day: "2-digit",
+                hour: "2-digit",
+                hour12: false
             }
-        ).formatToParts(
-            new Date()
+        ).formatToParts(new Date());
+
+
+    let year =
+        Number(
+            parts.find(x => x.type === "year").value
+        );
+
+    let month =
+        Number(
+            parts.find(x => x.type === "month").value
+        ) - 1;
+
+    let day =
+        Number(
+            parts.find(x => x.type === "day").value
+        );
+
+    const hour =
+        Number(
+            parts.find(x => x.type === "hour").value
         );
 
 
-    return new Date(
+    if (hour < 6) {
 
-        Number(
-            parts.find(
-                x => x.type === "year"
-            ).value
-        ),
+        const previousDay =
+            new Date(year, month, day);
 
-        Number(
-            parts.find(
-                x => x.type === "month"
-            ).value
-        ) - 1,
+        previousDay.setDate(
+            previousDay.getDate() - 1
+        );
 
-        Number(
-            parts.find(
-                x => x.type === "day"
-            ).value
-        )
+        year = previousDay.getFullYear();
+        month = previousDay.getMonth();
+        day = previousDay.getDate();
+    }
 
-    );
+
+    return new Date(year, month, day);
 
 }
 
 
 // ==================================================
-// חישוב קלוריות של יום
+// קלוריות
 // ==================================================
 
 function getCalories(dateKey) {
@@ -176,17 +156,9 @@ function getCalories(dateKey) {
 
 
     return foods.reduce(
-        (
-            total,
-            food
-        ) => {
-
-            return (
-                total +
-                Number(food.calories)
-            );
-
-        },
+        (total, food) =>
+            total +
+            Number(food.calories || 0),
         0
     );
 
@@ -194,29 +166,19 @@ function getCalories(dateKey) {
 
 
 // ==================================================
-// חישוב דקות פעילות
+// דקות פעילות
 // ==================================================
 
-function getActivityMinutes(
-    dateKey
-) {
+function getActivityMinutes(dateKey) {
 
     const activities =
         activityData[dateKey] || [];
 
 
     return activities.reduce(
-        (
-            total,
-            activity
-        ) => {
-
-            return (
-                total +
-                Number(activity.minutes)
-            );
-
-        },
+        (total, activity) =>
+            total +
+            Number(activity.minutes || 0),
         0
     );
 
@@ -224,30 +186,21 @@ function getActivityMinutes(
 
 
 // ==================================================
-// האם התזונה הצליחה
+// הצלחת תזונה
 // ==================================================
 
-function isFoodSuccess(
-    dateKey
-) {
+function isFoodSuccess(dateKey) {
 
-    // חייבים לסיים את היום
     if (
         !finishDayData[dateKey] ||
         finishDayData[dateKey].finished !== true
     ) {
-
         return false;
-
     }
 
 
-    const calories =
-        getCalories(dateKey);
-
-
     return (
-        calories <=
+        getCalories(dateKey) <=
         DAILY_CALORIE_TARGET
     );
 
@@ -255,19 +208,13 @@ function isFoodSuccess(
 
 
 // ==================================================
-// האם הפעילות הצליחה
+// הצלחת פעילות
 // ==================================================
 
-function isActivitySuccess(
-    dateKey
-) {
-
-    const minutes =
-        getActivityMinutes(dateKey);
-
+function isActivitySuccess(dateKey) {
 
     return (
-        minutes >=
+        getActivityMinutes(dateKey) >=
         DAILY_ACTIVITY_TARGET
     );
 
@@ -275,12 +222,10 @@ function isActivitySuccess(
 
 
 // ==================================================
-// האם האתגר הצליח
+// הצלחת אתגר
 // ==================================================
 
-function isChallengeSuccess(
-    dateKey
-) {
+function isChallengeSuccess(dateKey) {
 
     return !!(
         dietData[dateKey] &&
@@ -291,44 +236,539 @@ function isChallengeSuccess(
 
 
 // ==================================================
-// ציון היום
+// ציון
 // ==================================================
 
-function getScore(
-    dateKey
-) {
+function getScore(dateKey) {
 
     let score = 0;
 
 
-    if (
-        isFoodSuccess(dateKey)
-    ) {
-
+    if (isFoodSuccess(dateKey)) {
         score++;
-
     }
 
 
-    if (
-        isActivitySuccess(dateKey)
-    ) {
-
+    if (isActivitySuccess(dateKey)) {
         score++;
-
     }
 
 
-    if (
-        isChallengeSuccess(dateKey)
-    ) {
-
+    if (isChallengeSuccess(dateKey)) {
         score++;
-
     }
 
 
     return score;
+
+}
+
+
+// ==================================================
+// יצירת שורת כותרת לתזונה
+// ==================================================
+
+function createFoodDetails(dateKey) {
+
+    const foods =
+        foodData[dateKey] || [];
+
+    const totalCalories =
+        getCalories(dateKey);
+
+
+    // --------------------------------------------------
+    // עטיפה
+    // --------------------------------------------------
+
+    const container =
+        document.createElement("div");
+
+    container.className =
+        "modal-expand-container";
+
+
+    // --------------------------------------------------
+    // שורת הכותרת
+    // --------------------------------------------------
+
+    const header =
+        document.createElement("div");
+
+    header.className =
+        "modal-task";
+
+
+    header.innerHTML = `
+
+        <span class="modal-expand-title">
+            🍽️ תזונה
+        </span>
+
+        <span class="modal-task-status">
+            ${
+                isFoodSuccess(dateKey)
+                    ? "✓"
+                    : "○"
+            }
+        </span>
+
+        <span
+            class="modal-expand-arrow"
+            role="button"
+            tabindex="0"
+            aria-label="פתח פירוט תזונה"
+            aria-expanded="false">
+
+            ▾
+
+        </span>
+
+    `;
+
+
+    // --------------------------------------------------
+    // פירוט
+    // --------------------------------------------------
+
+    const details =
+        document.createElement("div");
+
+    details.className =
+        "modal-expandable-details";
+
+
+    details.style.display =
+        "none";
+
+
+    // --------------------------------------------------
+    // אין מאכלים
+    // --------------------------------------------------
+
+    if (foods.length === 0) {
+
+        details.innerHTML = `
+
+            <div class="modal-empty-detail">
+
+                לא נאכלו מאכלים ביום הזה 🌸
+
+            </div>
+
+        `;
+
+    }
+
+    // --------------------------------------------------
+    // יש מאכלים
+    // --------------------------------------------------
+
+    else {
+
+        foods.forEach(food => {
+
+            const row =
+                document.createElement("div");
+
+            row.className =
+                "modal-food-row";
+
+
+            row.innerHTML = `
+
+                <div class="modal-food-name">
+
+                    <span>
+                        ${food.emoji || "🍽️"}
+                    </span>
+
+                    <span>
+                        ${escapeHtml(food.name)}
+                    </span>
+
+                </div>
+
+
+                <div class="modal-food-amount">
+
+                    ${escapeHtml(food.amount || "")}
+
+                </div>
+
+
+                <div class="modal-food-calories">
+
+                    ${Number(food.calories || 0)}
+                    קלוריות
+
+                </div>
+
+            `;
+
+
+            details.appendChild(row);
+
+        });
+
+
+        const total =
+            document.createElement("div");
+
+        total.className =
+            "modal-food-total";
+
+
+        total.innerHTML = `
+
+            <strong>
+                סה״כ: ${totalCalories} קלוריות
+            </strong>
+
+        `;
+
+
+        details.appendChild(total);
+
+    }
+
+
+    // --------------------------------------------------
+    // חץ
+    // --------------------------------------------------
+
+    const arrow =
+        header.querySelector(
+            ".modal-expand-arrow"
+        );
+
+
+    function toggleDetails() {
+
+        const isOpen =
+            details.style.display !== "none";
+
+
+        if (isOpen) {
+
+            details.style.display =
+                "none";
+
+            arrow.textContent =
+                "▾";
+
+            arrow.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+
+        }
+
+        else {
+
+            details.style.display =
+                "block";
+
+            arrow.textContent =
+                "▴";
+
+            arrow.setAttribute(
+                "aria-expanded",
+                "true"
+            );
+
+        }
+
+    }
+
+
+    arrow.addEventListener(
+        "click",
+        function(event) {
+
+            event.stopPropagation();
+
+            toggleDetails();
+
+        }
+    );
+
+
+    arrow.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (
+                event.key === "Enter" ||
+                event.key === " "
+            ) {
+
+                event.preventDefault();
+
+                toggleDetails();
+
+            }
+
+        }
+    );
+
+
+    container.appendChild(header);
+    container.appendChild(details);
+
+
+    return container;
+
+}
+
+
+// ==================================================
+// יצירת שורת פעילות
+// ==================================================
+
+function createActivityDetails(dateKey) {
+
+    const activities =
+        activityData[dateKey] || [];
+
+    const totalMinutes =
+        getActivityMinutes(dateKey);
+
+
+    // --------------------------------------------------
+    // עטיפה
+    // --------------------------------------------------
+
+    const container =
+        document.createElement("div");
+
+    container.className =
+        "modal-expand-container";
+
+
+    // --------------------------------------------------
+    // שורת הכותרת
+    // --------------------------------------------------
+
+    const header =
+        document.createElement("div");
+
+    header.className =
+        "modal-task";
+
+
+    header.innerHTML = `
+
+        <span class="modal-expand-title">
+            🏃 פעילות
+        </span>
+
+        <span class="modal-task-status">
+            ${
+                isActivitySuccess(dateKey)
+                    ? "✓"
+                    : "○"
+            }
+        </span>
+
+        <span
+            class="modal-expand-arrow"
+            role="button"
+            tabindex="0"
+            aria-label="פתח פירוט פעילות"
+            aria-expanded="false">
+
+            ▾
+
+        </span>
+
+    `;
+
+
+    // --------------------------------------------------
+    // פירוט
+    // --------------------------------------------------
+
+    const details =
+        document.createElement("div");
+
+    details.className =
+        "modal-expandable-details";
+
+
+    details.style.display =
+        "none";
+
+
+    // --------------------------------------------------
+    // אין פעילות
+    // --------------------------------------------------
+
+    if (activities.length === 0) {
+
+        details.innerHTML = `
+
+            <div class="modal-empty-detail">
+
+                לא נרשמה פעילות ביום הזה 🌸
+
+            </div>
+
+        `;
+
+    }
+
+    // --------------------------------------------------
+    // יש פעילות
+    // --------------------------------------------------
+
+    else {
+
+        activities.forEach(activity => {
+
+            const row =
+                document.createElement("div");
+
+            row.className =
+                "modal-activity-row";
+
+
+            row.innerHTML = `
+
+                <div class="modal-activity-name">
+
+                    <span>
+                        ${activity.emoji || "🏃"}
+                    </span>
+
+                    <span>
+                        ${escapeHtml(activity.name)}
+                    </span>
+
+                </div>
+
+
+                <div class="modal-activity-minutes">
+
+                    ${Number(activity.minutes || 0)}
+                    דקות
+
+                </div>
+
+            `;
+
+
+            details.appendChild(row);
+
+        });
+
+
+        const total =
+            document.createElement("div");
+
+        total.className =
+            "modal-activity-total";
+
+
+        total.innerHTML = `
+
+            <strong>
+                סה״כ: ${totalMinutes} דקות
+            </strong>
+
+        `;
+
+
+        details.appendChild(total);
+
+    }
+
+
+    // --------------------------------------------------
+    // חץ
+    // --------------------------------------------------
+
+    const arrow =
+        header.querySelector(
+            ".modal-expand-arrow"
+        );
+
+
+    function toggleDetails() {
+
+        const isOpen =
+            details.style.display !== "none";
+
+
+        if (isOpen) {
+
+            details.style.display =
+                "none";
+
+            arrow.textContent =
+                "▾";
+
+            arrow.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+
+        }
+
+        else {
+
+            details.style.display =
+                "block";
+
+            arrow.textContent =
+                "▴";
+
+            arrow.setAttribute(
+                "aria-expanded",
+                "true"
+            );
+
+        }
+
+    }
+
+
+    arrow.addEventListener(
+        "click",
+        function(event) {
+
+            event.stopPropagation();
+
+            toggleDetails();
+
+        }
+    );
+
+
+    arrow.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (
+                event.key === "Enter" ||
+                event.key === " "
+            ) {
+
+                event.preventDefault();
+
+                toggleDetails();
+
+            }
+
+        }
+    );
+
+
+    container.appendChild(header);
+    container.appendChild(details);
+
+
+    return container;
 
 }
 
@@ -339,8 +779,7 @@ function getScore(
 
 function renderCalendar() {
 
-    calendar.innerHTML =
-        "";
+    calendar.innerHTML = "";
 
 
     const year =
@@ -354,40 +793,21 @@ function renderCalendar() {
         `${monthNames[month]} ${year}`;
 
 
-    // ----------------------------------------------
-    // היום הראשון בחודש
-    // ----------------------------------------------
-
     const firstDay =
-        new Date(
-            year,
-            month,
-            1
-        );
+        new Date(year, month, 1);
 
-
-    // ----------------------------------------------
-    // היום האחרון בחודש
-    // ----------------------------------------------
 
     const lastDay =
-        new Date(
-            year,
-            month + 1,
-            0
-        );
+        new Date(year, month + 1, 0);
 
-
-    // 0 = ראשון
-    // ולכן אין צורך להזיז
 
     const startingDay =
         firstDay.getDay();
 
 
-    // ----------------------------------------------
+    // --------------------------------------------------
     // תאים ריקים
-    // ----------------------------------------------
+    // --------------------------------------------------
 
     for (
         let i = 0;
@@ -396,35 +816,29 @@ function renderCalendar() {
     ) {
 
         const emptyDay =
-            document.createElement(
-                "div"
-            );
-
+            document.createElement("div");
 
         emptyDay.classList.add(
             "calendar-day",
             "empty"
         );
 
-
-        calendar.appendChild(
-            emptyDay
-        );
+        calendar.appendChild(emptyDay);
 
     }
 
 
-    // ----------------------------------------------
-    // היום בישראל
-    // ----------------------------------------------
+    // --------------------------------------------------
+    // היום
+    // --------------------------------------------------
 
     const today =
-        getIsraelToday();
+        getSiteToday();
 
 
-    // ----------------------------------------------
-    // ימי החודש
-    // ----------------------------------------------
+    // --------------------------------------------------
+    // ימים
+    // --------------------------------------------------
 
     for (
         let day = 1;
@@ -445,9 +859,7 @@ function renderCalendar() {
 
 
         const dayElement =
-            document.createElement(
-                "div"
-            );
+            document.createElement("div");
 
 
         dayElement.classList.add(
@@ -456,26 +868,16 @@ function renderCalendar() {
         );
 
 
-        // ------------------------------------------
-        // היום הנוכחי
-        // ------------------------------------------
-
         if (
             day === today.getDate() &&
             month === today.getMonth() &&
             year === today.getFullYear()
         ) {
 
-            dayElement.classList.add(
-                "today"
-            );
+            dayElement.classList.add("today");
 
         }
 
-
-        // ------------------------------------------
-        // תוכן
-        // ------------------------------------------
 
         dayElement.innerHTML = `
 
@@ -490,13 +892,9 @@ function renderCalendar() {
         `;
 
 
-        // ------------------------------------------
-        // לחיצה
-        // ------------------------------------------
-
         dayElement.addEventListener(
             "click",
-            () => {
+            function() {
 
                 openDayModal(
                     dateKey,
@@ -507,9 +905,7 @@ function renderCalendar() {
         );
 
 
-        calendar.appendChild(
-            dayElement
-        );
+        calendar.appendChild(dayElement);
 
     }
 
@@ -520,10 +916,7 @@ function renderCalendar() {
 // פתיחת חלונית יום
 // ==================================================
 
-function openDayModal(
-    dateKey,
-    day
-) {
+function openDayModal(dateKey, day) {
 
     const month =
         displayedDate.getMonth();
@@ -544,14 +937,6 @@ function openDayModal(
         getActivityMinutes(dateKey);
 
 
-    const foodSuccess =
-        isFoodSuccess(dateKey);
-
-
-    const activitySuccess =
-        isActivitySuccess(dateKey);
-
-
     const challengeSuccess =
         isChallengeSuccess(dateKey);
 
@@ -560,60 +945,28 @@ function openDayModal(
         getScore(dateKey);
 
 
-    // ----------------------------------------------
-    // תוכן החלונית
-    // ----------------------------------------------
-
-    modalTasks.innerHTML =
-        "";
+    modalTasks.innerHTML = "";
 
 
-    // ----------------------------------------------
+    // ==================================================
     // תזונה
-    // ----------------------------------------------
+    // ==================================================
 
-    const foodElement =
+    const foodWrapper =
         document.createElement("div");
 
-
-    foodElement.className =
-        "modal-task";
-
-
-    foodElement.innerHTML = `
-
-        <span>
-            🍽️ תזונה
-        </span>
-
-        <span
-            class="modal-task-status">
-
-            ${
-                foodSuccess
-                    ? "✓"
-                    : "○"
-            }
-
-        </span>
-
-    `;
+    foodWrapper.className =
+        "modal-task-wrapper";
 
 
-    modalTasks.appendChild(
-        foodElement
-    );
+    const foodExpand =
+        createFoodDetails(dateKey);
 
 
-    // ----------------------------------------------
-    // פרטי קלוריות
-    // ----------------------------------------------
-
-    const calorieInfo =
+    const foodCalories =
         document.createElement("div");
 
-
-    calorieInfo.className =
+    foodCalories.className =
         "modal-detail";
 
 
@@ -622,73 +975,63 @@ function openDayModal(
         DAILY_CALORIE_TARGET
     ) {
 
-        calorieInfo.innerHTML = `
-            ${calories} / ${DAILY_CALORIE_TARGET} קלוריות
+        foodCalories.innerHTML = `
+
+            ${calories} /
+            ${DAILY_CALORIE_TARGET}
+            קלוריות
+
             <span class="modal-warning">
+
                 ⚠️ חריגה של
                 ${calories - DAILY_CALORIE_TARGET}
                 קלוריות
+
             </span>
-        `;
 
-    } else {
-
-        calorieInfo.innerHTML = `
-            ${calories} / ${DAILY_CALORIE_TARGET} קלוריות
         `;
 
     }
 
+    else {
 
-    modalTasks.appendChild(
-        calorieInfo
+        foodCalories.textContent =
+            `${calories} / ${DAILY_CALORIE_TARGET} קלוריות`;
+
+    }
+
+
+    foodWrapper.appendChild(
+        foodExpand
+    );
+
+    foodWrapper.appendChild(
+        foodCalories
     );
 
 
-    // ----------------------------------------------
-    // פעילות
-    // ----------------------------------------------
+    modalTasks.appendChild(
+        foodWrapper
+    );
 
-    const activityElement =
+
+    // ==================================================
+    // פעילות
+    // ==================================================
+
+    const activityWrapper =
         document.createElement("div");
 
-
-    activityElement.className =
-        "modal-task";
-
-
-    activityElement.innerHTML = `
-
-        <span>
-            🏃 פעילות
-        </span>
-
-        <span
-            class="modal-task-status">
-
-            ${
-                activitySuccess
-                    ? "✓"
-                    : "○"
-            }
-
-        </span>
-
-    `;
+    activityWrapper.className =
+        "modal-task-wrapper";
 
 
-    modalTasks.appendChild(
-        activityElement
-    );
+    const activityExpand =
+        createActivityDetails(dateKey);
 
-
-    // ----------------------------------------------
-    // פרטי פעילות
-    // ----------------------------------------------
 
     const activityInfo =
         document.createElement("div");
-
 
     activityInfo.className =
         "modal-detail";
@@ -698,18 +1041,26 @@ function openDayModal(
         `${activityMinutes} / ${DAILY_ACTIVITY_TARGET} דקות`;
 
 
-    modalTasks.appendChild(
+    activityWrapper.appendChild(
+        activityExpand
+    );
+
+    activityWrapper.appendChild(
         activityInfo
     );
 
 
-    // ----------------------------------------------
+    modalTasks.appendChild(
+        activityWrapper
+    );
+
+
+    // ==================================================
     // אתגר
-    // ----------------------------------------------
+    // ==================================================
 
     const challengeElement =
         document.createElement("div");
-
 
     challengeElement.className =
         "modal-task";
@@ -721,8 +1072,7 @@ function openDayModal(
             🎯 אתגר
         </span>
 
-        <span
-            class="modal-task-status">
+        <span class="modal-task-status">
 
             ${
                 challengeSuccess
@@ -740,21 +1090,19 @@ function openDayModal(
     );
 
 
-    // ----------------------------------------------
-    // הציון
-    // ----------------------------------------------
+    // ==================================================
+    // ציון
+    // ==================================================
 
     modalScore.textContent =
         `${score} / 3`;
 
 
-    // ----------------------------------------------
-    // הצגת החלונית
-    // ----------------------------------------------
+    // ==================================================
+    // הצגה
+    // ==================================================
 
-    dayModal.classList.add(
-        "show"
-    );
+    dayModal.classList.add("show");
 
 }
 
@@ -765,12 +1113,11 @@ function openDayModal(
 
 prevMonth.addEventListener(
     "click",
-    () => {
+    function() {
 
         displayedDate.setMonth(
             displayedDate.getMonth() - 1
         );
-
 
         renderCalendar();
 
@@ -784,12 +1131,11 @@ prevMonth.addEventListener(
 
 nextMonth.addEventListener(
     "click",
-    () => {
+    function() {
 
         displayedDate.setMonth(
             displayedDate.getMonth() + 1
         );
-
 
         renderCalendar();
 
@@ -798,16 +1144,14 @@ nextMonth.addEventListener(
 
 
 // ==================================================
-// סגירת חלונית
+// סגירת החלונית
 // ==================================================
 
 closeModal.addEventListener(
     "click",
-    () => {
+    function() {
 
-        dayModal.classList.remove(
-            "show"
-        );
+        dayModal.classList.remove("show");
 
     }
 );
@@ -819,16 +1163,13 @@ closeModal.addEventListener(
 
 dayModal.addEventListener(
     "click",
-    event => {
+    function(event) {
 
         if (
-            event.target ===
-            dayModal
+            event.target === dayModal
         ) {
 
-            dayModal.classList.remove(
-                "show"
-            );
+            dayModal.classList.remove("show");
 
         }
 
@@ -837,20 +1178,18 @@ dayModal.addEventListener(
 
 
 // ==================================================
-// סגירה עם ESC
+// ESC
 // ==================================================
 
 document.addEventListener(
     "keydown",
-    event => {
+    function(event) {
 
         if (
             event.key === "Escape"
         ) {
 
-            dayModal.classList.remove(
-                "show"
-            );
+            dayModal.classList.remove("show");
 
         }
 
@@ -859,7 +1198,23 @@ document.addEventListener(
 
 
 // ==================================================
-// הפעלה ראשונית
+// אבטחת טקסט
+// ==================================================
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+// ==================================================
+// הפעלה
 // ==================================================
 
 renderCalendar();

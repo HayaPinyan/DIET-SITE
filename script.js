@@ -2,12 +2,12 @@
 // הגדרות
 // ==================================================
 
-const DAILY_CALORIE_TARGET = 1500;
+const DAILY_CALORIE_TARGET = 1800;
 const DAILY_ACTIVITY_TARGET = 20;
 
 
 // ==================================================
-// אלמנטים בדף
+// אלמנטים
 // ==================================================
 
 const taskButtons =
@@ -28,9 +28,6 @@ const todayDate =
 const todayProgressFill =
     document.getElementById("todayProgressFill");
 
-
-// כרטיס תזונה
-
 const foodCalories =
     document.getElementById("foodCalories");
 
@@ -43,9 +40,6 @@ const foodProgressFill =
 const foodProgressPercent =
     document.getElementById("foodProgressPercent");
 
-
-// כרטיס פעילות
-
 const activityMinutes =
     document.getElementById("activityMinutes");
 
@@ -55,9 +49,6 @@ const activityProgressFill =
 const activityProgressPercent =
     document.getElementById("activityProgressPercent");
 
-
-// כפתור סיום היום
-
 const finishDayButton =
     document.getElementById("finishDayButton");
 
@@ -66,10 +57,12 @@ const finishDayMessage =
 
 
 // ==================================================
-// תאריך היום בישראל
+// היום של האתר
+// 06:00 -> יום חדש
+// לפני 06:00 -> עדיין היום הקודם
 // ==================================================
 
-function getIsraelToday() {
+function getSiteToday() {
 
     const parts =
         new Intl.DateTimeFormat(
@@ -78,42 +71,84 @@ function getIsraelToday() {
                 timeZone: "Asia/Jerusalem",
                 year: "numeric",
                 month: "2-digit",
-                day: "2-digit"
+                day: "2-digit",
+                hour: "2-digit",
+                hour12: false
             }
         ).formatToParts(new Date());
 
 
-    return new Date(
-
+    let year =
         Number(
             parts.find(
                 x => x.type === "year"
             ).value
-        ),
+        );
 
+    let month =
         Number(
             parts.find(
                 x => x.type === "month"
             ).value
-        ) - 1,
+        ) - 1;
 
+    let day =
         Number(
             parts.find(
                 x => x.type === "day"
             ).value
-        )
+        );
 
+    const hour =
+        Number(
+            parts.find(
+                x => x.type === "hour"
+            ).value
+        );
+
+
+    if (hour < 6) {
+
+        const previousDay =
+            new Date(
+                year,
+                month,
+                day
+            );
+
+
+        previousDay.setDate(
+            previousDay.getDate() - 1
+        );
+
+
+        year =
+            previousDay.getFullYear();
+
+        month =
+            previousDay.getMonth();
+
+        day =
+            previousDay.getDate();
+
+    }
+
+
+    return new Date(
+        year,
+        month,
+        day
     );
 
 }
 
 
 const today =
-    getIsraelToday();
+    getSiteToday();
 
 
 // ==================================================
-// מפתח תאריך
+// מפתח התאריך
 // ==================================================
 
 const dateKey =
@@ -137,18 +172,15 @@ const savedData =
         localStorage.getItem("dietData")
     ) || {};
 
-
 const foodData =
     JSON.parse(
         localStorage.getItem("foodData")
     ) || {};
 
-
 const activityData =
     JSON.parse(
         localStorage.getItem("activityData")
     ) || {};
-
 
 const finishDayData =
     JSON.parse(
@@ -157,7 +189,7 @@ const finishDayData =
 
 
 // ==================================================
-// יצירת נתוני היום
+// נתוני היום
 // ==================================================
 
 if (!savedData[dateKey]) {
@@ -229,7 +261,7 @@ if (todayDate) {
 
 
 // ==================================================
-// חישוב קלוריות
+// קלוריות
 // ==================================================
 
 function getTodayCalories() {
@@ -242,14 +274,9 @@ function getTodayCalories() {
         (
             total,
             food
-        ) => {
-
-            return (
-                total +
-                Number(food.calories || 0)
-            );
-
-        },
+        ) =>
+            total +
+            Number(food.calories || 0),
         0
     );
 
@@ -257,7 +284,7 @@ function getTodayCalories() {
 
 
 // ==================================================
-// חישוב פעילות
+// פעילות
 // ==================================================
 
 function getTodayActivityMinutes() {
@@ -270,14 +297,9 @@ function getTodayActivityMinutes() {
         (
             total,
             activity
-        ) => {
-
-            return (
-                total +
-                Number(activity.minutes || 0)
-            );
-
-        },
+        ) =>
+            total +
+            Number(activity.minutes || 0),
         0
     );
 
@@ -285,7 +307,7 @@ function getTodayActivityMinutes() {
 
 
 // ==================================================
-// ציון יומי
+// ציון
 // ==================================================
 
 function getTodayScore() {
@@ -329,12 +351,12 @@ function getTodayScore() {
 
 
 // ==================================================
-// האם היום סומן כסיום
+// האם היום הסתיים
 // ==================================================
 
 function isDayFinished() {
 
-    return (
+    return !!(
         finishDayData[dateKey] &&
         finishDayData[dateKey].finished === true
     );
@@ -373,7 +395,7 @@ function celebratePerfectDay() {
 
 
 // ==================================================
-// עדכון תזונה
+// תזונה
 // ==================================================
 
 function updateFoodCalories() {
@@ -420,22 +442,10 @@ function updateFoodCalories() {
 
     if (foodCard) {
 
-        if (
-            total >
-            DAILY_CALORIE_TARGET
-        ) {
-
-            foodCard.classList.add(
-                "calorie-over"
-            );
-
-        } else {
-
-            foodCard.classList.remove(
-                "calorie-over"
-            );
-
-        }
+        foodCard.classList.toggle(
+            "calorie-over",
+            total > DAILY_CALORIE_TARGET
+        );
 
     }
 
@@ -443,7 +453,7 @@ function updateFoodCalories() {
 
 
 // ==================================================
-// עדכון פעילות
+// פעילות
 // ==================================================
 
 function updateActivityMinutes() {
@@ -513,7 +523,7 @@ function syncActivityTask() {
 
 
 // ==================================================
-// ניקוי צבע כפתור סיום
+// צבע כפתור סיום
 // ==================================================
 
 function clearFinishButtonColor() {
@@ -536,7 +546,7 @@ function clearFinishButtonColor() {
 
 
 // ==================================================
-// עדכון כפתור סיום היום
+// כפתור סיום
 // ==================================================
 
 function updateFinishDayButton() {
@@ -576,35 +586,33 @@ function updateFinishDayButton() {
     );
 
 
-    if (finishDayMessage) {
+    if (!finishDayMessage) {
+        return;
+    }
 
-        if (score === 0) {
 
-            finishDayMessage.textContent =
-                "חבל...";
+    if (score === 0) {
 
-        }
+        finishDayMessage.textContent =
+            "חבל...";
 
-        else if (score === 1) {
+    }
+    else if (score === 1) {
 
-            finishDayMessage.textContent =
-                "💪 ממשיכים קדימה!";
+        finishDayMessage.textContent =
+            "💪 ממשיכים קדימה!";
 
-        }
+    }
+    else if (score === 2) {
 
-        else if (score === 2) {
+        finishDayMessage.textContent =
+            "🌟 כמעט מושלם!";
 
-            finishDayMessage.textContent =
-                "🌟 כמעט מושלם!";
+    }
+    else {
 
-        }
-
-        else {
-
-            finishDayMessage.textContent =
-                "🎉 כל הכבוד! היום הושלם בהצלחה!";
-
-        }
+        finishDayMessage.textContent =
+            "🎉 כל הכבוד! היום הושלם בהצלחה!";
 
     }
 
@@ -612,7 +620,7 @@ function updateFinishDayButton() {
 
 
 // ==================================================
-// מצב ציון קודם לצורך אנימציה
+// ציון קודם
 // ==================================================
 
 let previousDailyScore =
@@ -620,7 +628,7 @@ let previousDailyScore =
 
 
 // ==================================================
-// עדכון הציון
+// עדכון ציון
 // ==================================================
 
 function updateScore() {
@@ -653,8 +661,6 @@ function updateScore() {
     }
 
 
-    // אם עברנו לראשונה ל־3/3
-
     if (
         completed === 3 &&
         previousDailyScore < 3
@@ -679,6 +685,10 @@ function loadToday() {
 
     syncActivityTask();
 
+    updateFoodCalories();
+
+    updateActivityMinutes();
+
 
     taskButtons.forEach(
         button => {
@@ -687,30 +697,17 @@ function loadToday() {
                 button.dataset.task;
 
 
-            if (
-                savedData[dateKey] &&
-                savedData[dateKey][taskName]
-            ) {
-
-                button.classList.add(
-                    "completed"
-                );
-
-            } else {
-
-                button.classList.remove(
-                    "completed"
-                );
-
-            }
+            button.classList.toggle(
+                "completed",
+                !!(
+                    savedData[dateKey] &&
+                    savedData[dateKey][taskName]
+                )
+            );
 
         }
     );
 
-
-    updateFoodCalories();
-
-    updateActivityMinutes();
 
     updateScore();
 
@@ -720,18 +717,15 @@ function loadToday() {
 
 
 // ==================================================
-// לחיצה על האתגר
+// אתגר
 // ==================================================
 
 taskButtons.forEach(
     button => {
 
-        const taskName =
-            button.dataset.task;
-
-
         if (
-            taskName !== "challenge"
+            button.dataset.task !==
+            "challenge"
         ) {
 
             return;
@@ -786,7 +780,7 @@ taskButtons.forEach(
 
 
 // ==================================================
-// כפתור סיום היום
+// סיום היום
 // ==================================================
 
 if (finishDayButton) {
@@ -795,20 +789,17 @@ if (finishDayButton) {
         "click",
         () => {
 
-            // ביטול סיום
-
             if (isDayFinished()) {
 
-                const previousFood =
-                    finishDayData[dateKey]
-                        .previousFood;
-
-
                 savedData[dateKey].food =
-                    previousFood;
+                    finishDayData[
+                        dateKey
+                    ].previousFood;
 
 
-                finishDayData[dateKey].finished =
+                finishDayData[
+                    dateKey
+                ].finished =
                     false;
 
 
@@ -820,7 +811,9 @@ if (finishDayButton) {
 
                 localStorage.setItem(
                     "finishDayData",
-                    JSON.stringify(finishDayData)
+                    JSON.stringify(
+                        finishDayData
+                    )
                 );
 
 
@@ -836,8 +829,6 @@ if (finishDayButton) {
             }
 
 
-            // שמירת מצב התזונה הקודם
-
             const previousFood =
                 savedData[dateKey].food;
 
@@ -845,13 +836,6 @@ if (finishDayButton) {
             const calories =
                 getTodayCalories();
 
-
-            const withinLimit =
-                calories <=
-                DAILY_CALORIE_TARGET;
-
-
-            // שמירת סיום
 
             finishDayData[dateKey] = {
 
@@ -863,10 +847,8 @@ if (finishDayButton) {
             };
 
 
-            // תזונה תקינה
-
             savedData[dateKey].food =
-                withinLimit;
+                calories <= DAILY_CALORIE_TARGET;
 
 
             localStorage.setItem(
@@ -877,7 +859,9 @@ if (finishDayButton) {
 
             localStorage.setItem(
                 "finishDayData",
-                JSON.stringify(finishDayData)
+                JSON.stringify(
+                    finishDayData
+                )
             );
 
 
@@ -895,7 +879,7 @@ if (finishDayButton) {
 
 
 // ==================================================
-// ברכה לפי שעה
+// ברכה
 // ==================================================
 
 const greeting =
@@ -928,7 +912,7 @@ if (
 ) {
 
     if (
-        israelHour >= 5 &&
+        israelHour >= 6 &&
         israelHour < 12
     ) {
 
@@ -939,7 +923,6 @@ if (
             "יום חדש, הזדמנות חדשה להתקדם 🌸";
 
     }
-
     else if (
         israelHour >= 12 &&
         israelHour < 17
@@ -952,7 +935,6 @@ if (
             "גם היום אפשר לבחור לעשות משהו טוב בשביל עצמך 💛";
 
     }
-
     else if (
         israelHour >= 17 &&
         israelHour < 21
@@ -965,14 +947,13 @@ if (
             "עוד יום עבר — בואי נראה כמה התקדמת היום ✨";
 
     }
-
     else {
 
         greeting.textContent =
             "לילה טוב! 🌙";
 
         timeMessage.textContent =
-            "אפשר לסיים את היום בגאווה ולהתחיל מחדש מחר 🌙";
+            "היום באתר עדיין נמשך עד 06:00 🌙";
 
     }
 
@@ -1019,10 +1000,6 @@ const homeChallengeDays =
     );
 
 
-// ==================================================
-// עדכון האתגר בדף הבית
-// ==================================================
-
 function updateHomeChallenge() {
 
     if (
@@ -1039,14 +1016,11 @@ function updateHomeChallenge() {
     homeChallengeName.textContent =
         currentChallenge.name;
 
-
     homeChallengeDescription.textContent =
         currentChallenge.description;
 
-
     homeChallengeIcon.textContent =
         currentChallenge.icon;
-
 
     homeWeekNumber.textContent =
         `שבוע ${currentWeek}`;
@@ -1069,7 +1043,6 @@ function updateHomeChallenge() {
 
 
     const dayNames = [
-
         "א׳",
         "ב׳",
         "ג׳",
@@ -1077,7 +1050,6 @@ function updateHomeChallenge() {
         "ה׳",
         "ו׳",
         "ש׳"
-
     ];
 
 
@@ -1104,15 +1076,9 @@ function updateHomeChallenge() {
 
 
         const challengeDateKey =
-            date.getFullYear() +
-            "-" +
-            String(
-                date.getMonth() + 1
-            ).padStart(2, "0") +
-            "-" +
-            String(
-                date.getDate()
-            ).padStart(2, "0");
+            getDateKeyFromDate(
+                date
+            );
 
 
         const day =
@@ -1130,8 +1096,12 @@ function updateHomeChallenge() {
 
 
         if (
-            savedData[challengeDateKey] &&
-            savedData[challengeDateKey].challenge
+            savedData[
+                challengeDateKey
+            ] &&
+            savedData[
+                challengeDateKey
+            ].challenge
         ) {
 
             day.classList.add(
@@ -1193,9 +1163,7 @@ function updateHomeChallenge() {
 
 
                     window.dispatchEvent(
-                        new Event(
-                            "xpDataChanged"
-                        )
+                        new Event("xpDataChanged")
                     );
 
 
@@ -1214,7 +1182,8 @@ function updateHomeChallenge() {
                 }
             );
 
-        } else {
+        }
+        else {
 
             day.style.opacity =
                 "0.5";
@@ -1235,21 +1204,31 @@ function updateHomeChallenge() {
     homeChallengeScore.textContent =
         `${completed} מתוך 7 ימים`;
 
-
     homeChallengeProgress.style.width =
         `${(completed / 7) * 100}%`;
 
 }
 
 
-// ==================================================
-// שמירה ראשונית
-// ==================================================
+function getDateKeyFromDate(
+    date
+) {
 
-localStorage.setItem(
-    "dietData",
-    JSON.stringify(savedData)
-);
+    return (
+
+        date.getFullYear() +
+        "-" +
+        String(
+            date.getMonth() + 1
+        ).padStart(2, "0") +
+        "-" +
+        String(
+            date.getDate()
+        ).padStart(2, "0")
+
+    );
+
+}
 
 
 // ==================================================
@@ -1285,34 +1264,26 @@ const countdownTarget =
 
 function updateCountdown() {
 
-    const now =
-        new Date();
-
-
     const difference =
         countdownTarget -
-        now;
+        new Date();
 
 
     if (
         difference <= 0
     ) {
 
-        if (countdownDays) {
+        if (countdownDays)
             countdownDays.textContent = "0";
-        }
 
-        if (countdownHours) {
+        if (countdownHours)
             countdownHours.textContent = "00";
-        }
 
-        if (countdownMinutes) {
+        if (countdownMinutes)
             countdownMinutes.textContent = "00";
-        }
 
-        if (countdownSeconds) {
+        if (countdownSeconds)
             countdownSeconds.textContent = "00";
-        }
 
         return;
 
@@ -1328,27 +1299,23 @@ function updateCountdown() {
     const days =
         Math.floor(
             totalSeconds /
-            (24 * 60 * 60)
+            86400
         );
 
 
     const hours =
         Math.floor(
             (
-                totalSeconds %
-                (24 * 60 * 60)
-            ) /
-            (60 * 60)
+                totalSeconds % 86400
+            ) / 3600
         );
 
 
     const minutes =
         Math.floor(
             (
-                totalSeconds %
-                (60 * 60)
-            ) /
-            60
+                totalSeconds % 3600
+            ) / 60
         );
 
 
@@ -1356,48 +1323,25 @@ function updateCountdown() {
         totalSeconds % 60;
 
 
-    if (countdownDays) {
+    if (countdownDays)
+        countdownDays.textContent = days;
 
-        countdownDays.textContent =
-            days;
-
-    }
-
-
-    if (countdownHours) {
-
+    if (countdownHours)
         countdownHours.textContent =
-            String(
-                hours
-            ).padStart(2, "0");
+            String(hours).padStart(2, "0");
 
-    }
-
-
-    if (countdownMinutes) {
-
+    if (countdownMinutes)
         countdownMinutes.textContent =
-            String(
-                minutes
-            ).padStart(2, "0");
+            String(minutes).padStart(2, "0");
 
-    }
-
-
-    if (countdownSeconds) {
-
+    if (countdownSeconds)
         countdownSeconds.textContent =
-            String(
-                seconds
-            ).padStart(2, "0");
-
-    }
+            String(seconds).padStart(2, "0");
 
 }
 
 
 updateCountdown();
-
 
 setInterval(
     updateCountdown,
@@ -1406,8 +1350,14 @@ setInterval(
 
 
 // ==================================================
-// הפעלה ראשונית
+// שמירה והפעלה
 // ==================================================
+
+localStorage.setItem(
+    "dietData",
+    JSON.stringify(savedData)
+);
+
 
 loadToday();
 

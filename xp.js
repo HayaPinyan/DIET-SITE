@@ -78,14 +78,11 @@ function getXPCalories(
         (
             total,
             food
-        ) => {
-
-            return (
-                total +
-                Number(food.calories)
-            );
-
-        },
+        ) =>
+            total +
+            Number(
+                food.calories || 0
+            ),
         0
     );
 
@@ -109,14 +106,11 @@ function getXPActivity(
         (
             total,
             activity
-        ) => {
-
-            return (
-                total +
-                Number(activity.minutes)
-            );
-
-        },
+        ) =>
+            total +
+            Number(
+                activity.minutes || 0
+            ),
         0
     );
 
@@ -124,219 +118,7 @@ function getXPActivity(
 
 
 // ==================================================
-// הישגים
-// ==================================================
-
-const xpAchievements = [
-
-    {
-        id: "first_active_day",
-        xp: 50,
-        unlocked: data =>
-            data.activeDays >= 1
-    },
-
-    {
-        id: "first_finished_day",
-        xp: 50,
-        unlocked: data =>
-            data.finishedDays >= 1
-    },
-
-    {
-        id: "three_active_days",
-        xp: 50,
-        unlocked: data =>
-            data.activeDays >= 3
-    },
-
-    {
-        id: "three_perfect_streak",
-        xp: 100,
-        unlocked: data =>
-            data.currentStreak >= 3
-    },
-
-    {
-        id: "seven_perfect_streak",
-        xp: 200,
-        unlocked: data =>
-            data.currentStreak >= 7
-    },
-
-    {
-        id: "fourteen_perfect_streak",
-        xp: 200,
-        unlocked: data =>
-            data.currentStreak >= 14
-    },
-
-    {
-        id: "thirty_perfect_streak",
-        xp: 500,
-        unlocked: data =>
-            data.currentStreak >= 30
-    },
-
-    {
-        id: "five_perfect_days",
-        xp: 100,
-        unlocked: data =>
-            data.perfectDays >= 5
-    },
-
-    {
-        id: "ten_perfect_days",
-        xp: 100,
-        unlocked: data =>
-            data.perfectDays >= 10
-    },
-
-    {
-        id: "twenty_perfect_days",
-        xp: 200,
-        unlocked: data =>
-            data.perfectDays >= 20
-    },
-
-    {
-        id: "thirty_perfect_days",
-        xp: 200,
-        unlocked: data =>
-            data.perfectDays >= 30
-    },
-
-    {
-        id: "fifty_perfect_days",
-        xp: 500,
-        unlocked: data =>
-            data.perfectDays >= 50
-    },
-
-    {
-        id: "one_hundred_perfect_days",
-        xp: 500,
-        unlocked: data =>
-            data.perfectDays >= 100
-    },
-
-    {
-        id: "first_activity_day",
-        xp: 50,
-        unlocked: data =>
-            data.activitySuccessDays >= 1
-    },
-
-    {
-        id: "ten_activity_days",
-        xp: 100,
-        unlocked: data =>
-            data.activitySuccessDays >= 10
-    },
-
-    {
-        id: "twenty_five_activity_days",
-        xp: 200,
-        unlocked: data =>
-            data.activitySuccessDays >= 25
-    },
-
-    {
-        id: "first_calorie_success",
-        xp: 50,
-        unlocked: data =>
-            data.calorieSuccessDays >= 1
-    },
-
-    {
-        id: "ten_calorie_success",
-        xp: 100,
-        unlocked: data =>
-            data.calorieSuccessDays >= 10
-    },
-
-    {
-        id: "twenty_five_calorie_success",
-        xp: 200,
-        unlocked: data =>
-            data.calorieSuccessDays >= 25
-    },
-
-    {
-        id: "first_challenge_day",
-        xp: 50,
-        unlocked: data =>
-            data.challengeDays >= 1
-    },
-
-    {
-        id: "ten_challenge_days",
-        xp: 100,
-        unlocked: data =>
-            data.challengeDays >= 10
-    },
-
-    {
-        id: "twenty_five_challenge_days",
-        xp: 200,
-        unlocked: data =>
-            data.challengeDays >= 25
-    },
-
-    {
-        id: "one_hundred_activity_minutes",
-        xp: 50,
-        unlocked: data =>
-            data.totalActivityMinutes >= 100
-    },
-
-    {
-        id: "five_hundred_activity_minutes",
-        xp: 100,
-        unlocked: data =>
-            data.totalActivityMinutes >= 500
-    },
-
-    {
-        id: "one_thousand_activity_minutes",
-        xp: 200,
-        unlocked: data =>
-            data.totalActivityMinutes >= 1000
-    },
-
-    {
-        id: "ten_active_days",
-        xp: 100,
-        unlocked: data =>
-            data.activeDays >= 10
-    },
-
-    {
-        id: "thirty_active_days",
-        xp: 200,
-        unlocked: data =>
-            data.activeDays >= 30
-    },
-
-    {
-        id: "fifty_active_days",
-        xp: 200,
-        unlocked: data =>
-            data.activeDays >= 50
-    },
-
-    {
-        id: "one_hundred_active_days",
-        xp: 500,
-        unlocked: data =>
-            data.activeDays >= 100
-    }
-
-];
-
-
-// ==================================================
-// חישוב סטטיסטיקות
+// סטטיסטיקות
 // ==================================================
 
 function calculateXPStats() {
@@ -400,10 +182,10 @@ function calculateXPStats() {
 
 
             const foodSuccess =
-                (
+                !!(
                     finishDayData[dateKey] &&
                     finishDayData[dateKey].finished === true &&
-                    calories <= 1500
+                    calories <= 1800
                 );
 
 
@@ -426,26 +208,14 @@ function calculateXPStats() {
             }
 
 
-            if (foodSuccess) {
-
+            if (foodSuccess)
                 calorieSuccessDays++;
 
-            }
-
-
-            if (activitySuccess) {
-
+            if (activitySuccess)
                 activitySuccessDays++;
 
-            }
-
-
-            if (challengeSuccess) {
-
+            if (challengeSuccess)
                 challengeDays++;
-
-            }
-
 
             if (
                 finishDayData[dateKey] &&
@@ -476,7 +246,7 @@ function calculateXPStats() {
 
 
     // ----------------------------------------------
-    // רצף
+    // רצף לפי יום האתר
     // ----------------------------------------------
 
     const parts =
@@ -486,38 +256,81 @@ function calculateXPStats() {
                 timeZone: "Asia/Jerusalem",
                 year: "numeric",
                 month: "2-digit",
-                day: "2-digit"
+                day: "2-digit",
+                hour: "2-digit",
+                hour12: false
             }
-        ).formatToParts(
-            new Date()
+        ).formatToParts(new Date());
+
+
+    let year =
+        Number(
+            parts.find(
+                x => x.type === "year"
+            ).value
+        );
+
+    let month =
+        Number(
+            parts.find(
+                x => x.type === "month"
+            ).value
+        ) - 1;
+
+    let day =
+        Number(
+            parts.find(
+                x => x.type === "day"
+            ).value
         );
 
 
-    const today =
+    const hour =
+        Number(
+            parts.find(
+                x => x.type === "hour"
+            ).value
+        );
+
+
+    if (hour < 6) {
+
+        const previousDay =
+            new Date(
+                year,
+                month,
+                day
+            );
+
+
+        previousDay.setDate(
+            previousDay.getDate() - 1
+        );
+
+
+        year =
+            previousDay.getFullYear();
+
+        month =
+            previousDay.getMonth();
+
+        day =
+            previousDay.getDate();
+
+    }
+
+
+    let checkDate =
         new Date(
-
-            Number(
-                parts.find(
-                    x => x.type === "year"
-                ).value
-            ),
-
-            Number(
-                parts.find(
-                    x => x.type === "month"
-                ).value
-            ) - 1,
-
-            Number(
-                parts.find(
-                    x => x.type === "day"
-                ).value
-            )
-
+            year,
+            month,
+            day
         );
 
 
-    function getDateKey(date) {
+    function getDateKey(
+        date
+    ) {
 
         return (
             date.getFullYear() +
@@ -534,43 +347,40 @@ function calculateXPStats() {
     }
 
 
-    function isPerfectDay(dateKey) {
+    function isPerfectDay(
+        key
+    ) {
 
-        const day =
-            dietData[dateKey] || {};
+        const dayData =
+            dietData[key] || {};
 
 
         const calories =
             getXPCalories(
                 foodData,
-                dateKey
+                key
             );
 
 
         const activityMinutes =
             getXPActivity(
                 activityData,
-                dateKey
+                key
             );
 
 
-        return (
-
-            finishDayData[dateKey] &&
-            finishDayData[dateKey].finished === true &&
-            calories <= 1500 &&
+        return !!(
+            finishDayData[key] &&
+            finishDayData[key].finished === true &&
+            calories <= 1800 &&
             activityMinutes >= 20 &&
-            day.challenge === true
-
+            dayData.challenge === true
         );
 
     }
 
 
     let currentStreak = 0;
-
-    let checkDate =
-        new Date(today);
 
 
     while (
@@ -664,10 +474,10 @@ function calculateTaskXP() {
 
 
             const foodSuccess =
-                (
+                !!(
                     finishDayData[dateKey] &&
                     finishDayData[dateKey].finished === true &&
-                    calories <= 1500
+                    calories <= 1800
                 );
 
 
@@ -679,7 +489,7 @@ function calculateTaskXP() {
                 day.challenge === true;
 
 
-            let completedTasks = 0;
+            let tasks = 0;
 
 
             if (foodSuccess) {
@@ -687,7 +497,7 @@ function calculateTaskXP() {
                 totalXP +=
                     XP_CALORIE_SUCCESS;
 
-                completedTasks++;
+                tasks++;
 
             }
 
@@ -697,7 +507,7 @@ function calculateTaskXP() {
                 totalXP +=
                     XP_ACTIVITY_SUCCESS;
 
-                completedTasks++;
+                tasks++;
 
             }
 
@@ -707,14 +517,12 @@ function calculateTaskXP() {
                 totalXP +=
                     XP_CHALLENGE_SUCCESS;
 
-                completedTasks++;
+                tasks++;
 
             }
 
 
-            if (
-                completedTasks === 3
-            ) {
+            if (tasks === 3) {
 
                 totalXP +=
                     XP_PERFECT_DAY_BONUS;
@@ -731,58 +539,58 @@ function calculateTaskXP() {
 
 
 // ==================================================
-// XP של הישגים שהושגו כרגע
+// XP הישגים
 // ==================================================
 
 function calculateCurrentAchievementXP() {
+
+    if (
+        typeof achievementCatalog ===
+        "undefined"
+    ) {
+
+        return 0;
+
+    }
+
 
     const stats =
         calculateXPStats();
 
 
-    let totalXP = 0;
+    return achievementCatalog.reduce(
+        (
+            total,
+            achievement
+        ) => {
 
-
-    xpAchievements.forEach(
-        achievement => {
-
-            if (
-                achievement.unlocked(
-                    stats
+            return (
+                total +
+                (
+                    achievement.unlocked(stats)
+                        ? Number(
+                            achievement.xp || 0
+                        )
+                        : 0
                 )
-            ) {
+            );
 
-                totalXP +=
-                    achievement.xp;
-
-            }
-
-        }
+        },
+        0
     );
-
-
-    return totalXP;
 
 }
 
 
 // ==================================================
-// סך XP
+// סך הכול
 // ==================================================
 
 function calculateTotalXP() {
 
-    const taskXP =
-        calculateTaskXP();
-
-
-    const achievementXP =
-        calculateCurrentAchievementXP();
-
-
     return (
-        taskXP +
-        achievementXP
+        calculateTaskXP() +
+        calculateCurrentAchievementXP()
     );
 
 }
@@ -792,7 +600,9 @@ function calculateTotalXP() {
 // רמות
 // ==================================================
 
-function getLevelInfo(xp) {
+function getLevelInfo(
+    xp
+) {
 
     const levels = [
 
@@ -915,7 +725,8 @@ function getLevelInfo(xp) {
             currentIndex =
                 i;
 
-        } else {
+        }
+        else {
 
             break;
 
@@ -924,24 +735,14 @@ function getLevelInfo(xp) {
     }
 
 
-    const currentLevel =
+    const current =
         levels[currentIndex];
 
 
-    const nextLevel =
+    const next =
         levels[
             currentIndex + 1
         ];
-
-
-    const previousThreshold =
-        currentLevel.threshold;
-
-
-    const nextThreshold =
-        nextLevel
-            ? nextLevel.threshold
-            : previousThreshold + 5000;
 
 
     return {
@@ -950,11 +751,15 @@ function getLevelInfo(xp) {
             currentIndex + 1,
 
         levelName:
-            currentLevel.name,
+            current.name,
 
-        previousThreshold,
+        previousThreshold:
+            current.threshold,
 
-        nextThreshold
+        nextThreshold:
+            next
+                ? next.threshold
+                : current.threshold + 5000
 
     };
 
@@ -962,7 +767,7 @@ function getLevelInfo(xp) {
 
 
 // ==================================================
-// עדכון התצוגה
+// תצוגה
 // ==================================================
 
 function updateXPDisplay() {
@@ -1068,19 +873,11 @@ function refreshXP() {
 updateXPDisplay();
 
 
-// ==================================================
-// אירוע שינוי
-// ==================================================
-
 window.addEventListener(
     "xpDataChanged",
     refreshXP
 );
 
-
-// ==================================================
-// בדיקה אוטומטית
-// ==================================================
 
 setInterval(
     refreshXP,

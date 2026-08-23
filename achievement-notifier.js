@@ -2,278 +2,15 @@
 // הגדרות
 // ==================================================
 
-const NOTIFIER_CALORIE_TARGET = 1500;
+const NOTIFIER_CALORIE_TARGET = 1800;
 const NOTIFIER_ACTIVITY_TARGET = 20;
 
 
 // ==================================================
-// רשימת ההישגים
+// תור הישגים
 // ==================================================
 
-const notifierAchievements = [
-
-    {
-        id: "first_active_day",
-        icon: "🌱",
-        name: "הצעד הראשון",
-        xp: 50,
-        unlocked: data =>
-            data.activeDays >= 1
-    },
-
-    {
-        id: "first_finished_day",
-        icon: "🎯",
-        name: "סיימתי יום",
-        xp: 50,
-        unlocked: data =>
-            data.finishedDays >= 1
-    },
-
-    {
-        id: "three_active_days",
-        icon: "🥳",
-        name: "התחלה טובה",
-        xp: 50,
-        unlocked: data =>
-            data.activeDays >= 3
-    },
-
-    {
-        id: "three_perfect_streak",
-        icon: "🔥",
-        name: "מתחילים להתחמם",
-        xp: 100,
-        unlocked: data =>
-            data.currentStreak >= 3
-    },
-
-    {
-        id: "seven_perfect_streak",
-        icon: "🌟",
-        name: "שבוע שלם",
-        xp: 200,
-        unlocked: data =>
-            data.currentStreak >= 7
-    },
-
-    {
-        id: "fourteen_perfect_streak",
-        icon: "💪",
-        name: "שבועיים ברצף",
-        xp: 200,
-        unlocked: data =>
-            data.currentStreak >= 14
-    },
-
-    {
-        id: "thirty_perfect_streak",
-        icon: "🏆",
-        name: "חודש חזק",
-        xp: 500,
-        unlocked: data =>
-            data.currentStreak >= 30
-    },
-
-    {
-        id: "five_perfect_days",
-        icon: "⭐",
-        name: "5 ימים מושלמים",
-        xp: 100,
-        unlocked: data =>
-            data.perfectDays >= 5
-    },
-
-    {
-        id: "ten_perfect_days",
-        icon: "🌟",
-        name: "10 ימים מושלמים",
-        xp: 100,
-        unlocked: data =>
-            data.perfectDays >= 10
-    },
-
-    {
-        id: "twenty_perfect_days",
-        icon: "🏅",
-        name: "20 ימים מושלמים",
-        xp: 200,
-        unlocked: data =>
-            data.perfectDays >= 20
-    },
-
-    {
-        id: "thirty_perfect_days",
-        icon: "🥇",
-        name: "30 ימים מושלמים",
-        xp: 200,
-        unlocked: data =>
-            data.perfectDays >= 30
-    },
-
-    {
-        id: "fifty_perfect_days",
-        icon: "💎",
-        name: "50 ימים מושלמים",
-        xp: 500,
-        unlocked: data =>
-            data.perfectDays >= 50
-    },
-
-    {
-        id: "one_hundred_perfect_days",
-        icon: "👑",
-        name: "100 ימים מושלמים",
-        xp: 500,
-        unlocked: data =>
-            data.perfectDays >= 100
-    },
-
-    {
-        id: "first_activity_day",
-        icon: "🏃",
-        name: "מתחילים לזוז",
-        xp: 50,
-        unlocked: data =>
-            data.activitySuccessDays >= 1
-    },
-
-    {
-        id: "ten_activity_days",
-        icon: "⚡",
-        name: "10 אימונים מוצלחים",
-        xp: 100,
-        unlocked: data =>
-            data.activitySuccessDays >= 10
-    },
-
-    {
-        id: "twenty_five_activity_days",
-        icon: "🏃‍♀️",
-        name: "25 ימי תנועה",
-        xp: 200,
-        unlocked: data =>
-            data.activitySuccessDays >= 25
-    },
-
-    {
-        id: "first_calorie_success",
-        icon: "🍎",
-        name: "בשליטה",
-        xp: 50,
-        unlocked: data =>
-            data.calorieSuccessDays >= 1
-    },
-
-    {
-        id: "ten_calorie_success",
-        icon: "🥗",
-        name: "10 ימים בשליטה",
-        xp: 100,
-        unlocked: data =>
-            data.calorieSuccessDays >= 10
-    },
-
-    {
-        id: "twenty_five_calorie_success",
-        icon: "🌿",
-        name: "25 ימים בשליטה",
-        xp: 200,
-        unlocked: data =>
-            data.calorieSuccessDays >= 25
-    },
-
-    {
-        id: "first_challenge_day",
-        icon: "🎯",
-        name: "אתגר ראשון",
-        xp: 50,
-        unlocked: data =>
-            data.challengeDays >= 1
-    },
-
-    {
-        id: "ten_challenge_days",
-        icon: "🔥",
-        name: "10 ימי אתגר",
-        xp: 100,
-        unlocked: data =>
-            data.challengeDays >= 10
-    },
-
-    {
-        id: "twenty_five_challenge_days",
-        icon: "🏆",
-        name: "25 ימי אתגר",
-        xp: 200,
-        unlocked: data =>
-            data.challengeDays >= 25
-    },
-
-    {
-        id: "one_hundred_activity_minutes",
-        icon: "⏱️",
-        name: "100 דקות",
-        xp: 50,
-        unlocked: data =>
-            data.totalActivityMinutes >= 100
-    },
-
-    {
-        id: "five_hundred_activity_minutes",
-        icon: "🚀",
-        name: "500 דקות",
-        xp: 100,
-        unlocked: data =>
-            data.totalActivityMinutes >= 500
-    },
-
-    {
-        id: "one_thousand_activity_minutes",
-        icon: "🌈",
-        name: "1000 דקות",
-        xp: 200,
-        unlocked: data =>
-            data.totalActivityMinutes >= 1000
-    },
-
-    {
-        id: "ten_active_days",
-        icon: "📅",
-        name: "10 ימים פעילים",
-        xp: 100,
-        unlocked: data =>
-            data.activeDays >= 10
-    },
-
-    {
-        id: "thirty_active_days",
-        icon: "📅",
-        name: "30 ימים פעילים",
-        xp: 200,
-        unlocked: data =>
-            data.activeDays >= 30
-    },
-
-    {
-        id: "fifty_active_days",
-        icon: "🌸",
-        name: "50 ימים פעילים",
-        xp: 200,
-        unlocked: data =>
-            data.activeDays >= 50
-    },
-
-    {
-        id: "one_hundred_active_days",
-        icon: "👑",
-        name: "100 ימים פעילים",
-        xp: 500,
-        unlocked: data =>
-            data.activeDays >= 100
-    }
-
-];
+let achievementQueue = [];
 
 
 // ==================================================
@@ -286,22 +23,30 @@ function loadNotifierData() {
 
         dietData:
             JSON.parse(
-                localStorage.getItem("dietData")
+                localStorage.getItem(
+                    "dietData"
+                )
             ) || {},
 
         foodData:
             JSON.parse(
-                localStorage.getItem("foodData")
+                localStorage.getItem(
+                    "foodData"
+                )
             ) || {},
 
         activityData:
             JSON.parse(
-                localStorage.getItem("activityData")
+                localStorage.getItem(
+                    "activityData"
+                )
             ) || {},
 
         finishDayData:
             JSON.parse(
-                localStorage.getItem("finishDayData")
+                localStorage.getItem(
+                    "finishDayData"
+                )
             ) || {}
 
     };
@@ -328,7 +73,7 @@ function notifierGetCalories(
             food
         ) =>
             total +
-            Number(food.calories),
+            Number(food.calories || 0),
         0
     );
 
@@ -354,7 +99,7 @@ function notifierGetActivity(
             activity
         ) =>
             total +
-            Number(activity.minutes),
+            Number(activity.minutes || 0),
         0
     );
 
@@ -362,10 +107,10 @@ function notifierGetActivity(
 
 
 // ==================================================
-// תאריך ישראל
+// יום האתר
 // ==================================================
 
-function notifierToday() {
+function getSiteToday() {
 
     const parts =
         new Intl.DateTimeFormat(
@@ -374,39 +119,82 @@ function notifierToday() {
                 timeZone: "Asia/Jerusalem",
                 year: "numeric",
                 month: "2-digit",
-                day: "2-digit"
+                day: "2-digit",
+                hour: "2-digit",
+                hour12: false
             }
-        ).formatToParts(
-            new Date()
-        );
+        ).formatToParts(new Date());
 
 
-    return new Date(
-
+    let year =
         Number(
             parts.find(
                 x => x.type === "year"
             ).value
-        ),
+        );
 
+    let month =
         Number(
             parts.find(
                 x => x.type === "month"
             ).value
-        ) - 1,
+        ) - 1;
 
+    let day =
         Number(
             parts.find(
                 x => x.type === "day"
             ).value
-        )
+        );
 
+
+    const hour =
+        Number(
+            parts.find(
+                x => x.type === "hour"
+            ).value
+        );
+
+
+    if (hour < 6) {
+
+        const previousDay =
+            new Date(
+                year,
+                month,
+                day
+            );
+
+
+        previousDay.setDate(
+            previousDay.getDate() - 1
+        );
+
+
+        year =
+            previousDay.getFullYear();
+
+        month =
+            previousDay.getMonth();
+
+        day =
+            previousDay.getDate();
+
+    }
+
+
+    return new Date(
+        year,
+        month,
+        day
     );
 
 }
 
 
-function notifierDateKey(date) {
+function notifierDateKey(
+    date
+) {
 
     return (
         date.getFullYear() +
@@ -438,17 +226,20 @@ function notifierIsPerfectDay(
     const day =
         dietData[dateKey] || {};
 
+
     const calories =
         notifierGetCalories(
             foodData,
             dateKey
         );
 
+
     const activityMinutes =
         notifierGetActivity(
             activityData,
             dateKey
         );
+
 
     const foodSuccess =
         !!(
@@ -457,9 +248,11 @@ function notifierIsPerfectDay(
             calories <= NOTIFIER_CALORIE_TARGET
         );
 
+
     const activitySuccess =
         activityMinutes >=
         NOTIFIER_ACTIVITY_TARGET;
+
 
     const challengeSuccess =
         day.challenge === true;
@@ -482,6 +275,7 @@ function calculateNotifierStats() {
 
     const data =
         loadNotifierData();
+
 
     const dietData =
         data.dietData;
@@ -522,17 +316,20 @@ function calculateNotifierStats() {
             const day =
                 dietData[dateKey] || {};
 
+
             const calories =
                 notifierGetCalories(
                     foodData,
                     dateKey
                 );
 
+
             const activityMinutes =
                 notifierGetActivity(
                     activityData,
                     dateKey
                 );
+
 
             const foodSuccess =
                 !!(
@@ -541,9 +338,11 @@ function calculateNotifierStats() {
                     calories <= NOTIFIER_CALORIE_TARGET
                 );
 
+
             const activitySuccess =
                 activityMinutes >=
                 NOTIFIER_ACTIVITY_TARGET;
+
 
             const challengeSuccess =
                 day.challenge === true;
@@ -560,26 +359,14 @@ function calculateNotifierStats() {
             }
 
 
-            if (foodSuccess) {
-
+            if (foodSuccess)
                 calorieSuccessDays++;
 
-            }
-
-
-            if (activitySuccess) {
-
+            if (activitySuccess)
                 activitySuccessDays++;
 
-            }
-
-
-            if (challengeSuccess) {
-
+            if (challengeSuccess)
                 challengeDays++;
-
-            }
-
 
             if (
                 finishDayData[dateKey] &&
@@ -613,15 +400,11 @@ function calculateNotifierStats() {
     // רצף
     // ----------------------------------------------
 
-    const today =
-        notifierToday();
+    let checkDate =
+        getSiteToday();
 
 
     let currentStreak = 0;
-
-
-    let checkDate =
-        new Date(today);
 
 
     while (
@@ -673,9 +456,7 @@ function createAchievementPopup() {
 
 
     if (popup) {
-
         return popup;
-
     }
 
 
@@ -750,8 +531,6 @@ function createAchievementPopup() {
     );
 
 
-    // כפתור X
-
     document.getElementById(
         "globalAchievementClose"
     ).addEventListener(
@@ -760,8 +539,6 @@ function createAchievementPopup() {
     );
 
 
-    // כפתור אישור
-
     document.getElementById(
         "globalAchievementButton"
     ).addEventListener(
@@ -769,8 +546,6 @@ function createAchievementPopup() {
         handleAchievementClose
     );
 
-
-    // לחיצה על הרקע
 
     popup.addEventListener(
         "click",
@@ -794,13 +569,6 @@ function createAchievementPopup() {
 
 
 // ==================================================
-// תור הישגים
-// ==================================================
-
-let achievementQueue = [];
-
-
-// ==================================================
 // האם חלונית פתוחה
 // ==================================================
 
@@ -814,14 +582,16 @@ function isAchievementPopupOpen() {
 
     return !!(
         popup &&
-        popup.classList.contains("show")
+        popup.classList.contains(
+            "show"
+        )
     );
 
 }
 
 
 // ==================================================
-// הצגת הישג מהתור
+// הבא
 // ==================================================
 
 function showNextAchievement() {
@@ -829,18 +599,14 @@ function showNextAchievement() {
     if (
         achievementQueue.length === 0
     ) {
-
         return;
-
     }
 
 
     if (
         isAchievementPopupOpen()
     ) {
-
         return;
-
     }
 
 
@@ -886,7 +652,7 @@ function showGlobalAchievement(
     if (icon) {
 
         icon.textContent =
-            achievement.icon;
+            achievement.icon || "🏆";
 
     }
 
@@ -924,7 +690,7 @@ function showGlobalAchievement(
 
 
 // ==================================================
-// סגירת חלונית
+// סגירה
 // ==================================================
 
 function handleAchievementClose() {
@@ -936,9 +702,7 @@ function handleAchievementClose() {
 
 
     if (!popup) {
-
         return;
-
     }
 
 
@@ -946,9 +710,6 @@ function handleAchievementClose() {
         "show"
     );
 
-
-    // מחכים שהחלונית תיעלם
-    // ואז פותחים את ההישג הבא
 
     setTimeout(
         () => {
@@ -963,7 +724,42 @@ function handleAchievementClose() {
 
 
 // ==================================================
-// עדכון כרטיסי ההישגים
+// בדיקה
+// ==================================================
+
+const ACHIEVEMENT_SNAPSHOT_KEY =
+    "achievementSnapshotV6";
+
+
+function getAchievementSnapshot() {
+
+    return (
+        JSON.parse(
+            localStorage.getItem(
+                ACHIEVEMENT_SNAPSHOT_KEY
+            )
+        ) || {}
+    );
+
+}
+
+
+function saveAchievementSnapshot(
+    snapshot
+) {
+
+    localStorage.setItem(
+        ACHIEVEMENT_SNAPSHOT_KEY,
+        JSON.stringify(
+            snapshot
+        )
+    );
+
+}
+
+
+// ==================================================
+// כרטיסי הישגים
 // ==================================================
 
 function updateAchievementCards(
@@ -986,24 +782,25 @@ function updateAchievementCards(
 
 
             if (!title) {
-
                 return;
-
             }
 
 
             const achievement =
-                notifierAchievements.find(
-                    item =>
-                        item.name ===
-                        title.textContent.trim()
-                );
+                (
+                    typeof achievementCatalog !==
+                    "undefined"
+                )
+                    ? achievementCatalog.find(
+                        item =>
+                            item.name ===
+                            title.textContent.trim()
+                    )
+                    : null;
 
 
             if (!achievement) {
-
                 return;
-
             }
 
 
@@ -1015,20 +812,14 @@ function updateAchievementCards(
                 );
 
 
-            if (!unlocked) {
-
-                return;
-
-            }
-
-
-            card.classList.remove(
-                "locked"
+            card.classList.toggle(
+                "locked",
+                !unlocked
             );
 
-
-            card.classList.add(
-                "unlocked"
+            card.classList.toggle(
+                "unlocked",
+                unlocked
             );
 
 
@@ -1041,7 +832,9 @@ function updateAchievementCards(
             if (icon) {
 
                 icon.textContent =
-                    achievement.icon;
+                    unlocked
+                        ? achievement.icon
+                        : "🔒";
 
             }
 
@@ -1055,7 +848,9 @@ function updateAchievementCards(
             if (status) {
 
                 status.textContent =
-                    "✓ הושג";
+                    unlocked
+                        ? "✓ הושג"
+                        : "עוד לא הושג";
 
             }
 
@@ -1066,43 +861,20 @@ function updateAchievementCards(
 
 
 // ==================================================
-// צילום מצב
-// ==================================================
-
-const ACHIEVEMENT_SNAPSHOT_KEY =
-    "achievementSnapshotV5";
-
-
-function getAchievementSnapshot() {
-
-    return JSON.parse(
-        localStorage.getItem(
-            ACHIEVEMENT_SNAPSHOT_KEY
-        )
-    ) || {};
-
-}
-
-
-function saveAchievementSnapshot(
-    snapshot
-) {
-
-    localStorage.setItem(
-        ACHIEVEMENT_SNAPSHOT_KEY,
-        JSON.stringify(
-            snapshot
-        )
-    );
-
-}
-
-
-// ==================================================
 // בדיקת הישגים
 // ==================================================
 
 function checkForNewAchievements() {
+
+    if (
+        typeof achievementCatalog ===
+        "undefined"
+    ) {
+
+        return;
+
+    }
+
 
     const stats =
         calculateNotifierStats();
@@ -1124,7 +896,7 @@ function checkForNewAchievements() {
         [];
 
 
-    notifierAchievements.forEach(
+    achievementCatalog.forEach(
         achievement => {
 
             const unlocked =
@@ -1169,29 +941,19 @@ function checkForNewAchievements() {
     );
 
 
-    // מעדכנים את הכרטיסים
-
     updateAchievementCards(
         currentlyUnlocked
     );
 
-
-    // שומרים צילום מצב
 
     saveAchievementSnapshot(
         currentSnapshot
     );
 
 
-    // ----------------------------------------------
-    // הוספת הישגים חדשים לתור
-    // ----------------------------------------------
-
     if (
         newlyUnlocked.length > 0
     ) {
-
-        // לא להוסיף הישג שכבר נמצא בתור
 
         newlyUnlocked.forEach(
             achievement => {
@@ -1218,9 +980,6 @@ function checkForNewAchievements() {
         );
 
 
-        // אם אין כרגע חלונית
-        // מציגים מיד את הראשון
-
         showNextAchievement();
 
     }
@@ -1232,44 +991,51 @@ function checkForNewAchievements() {
 // אתחול
 // ==================================================
 
-const existingSnapshot =
-    localStorage.getItem(
-        ACHIEVEMENT_SNAPSHOT_KEY
-    );
+if (
+    typeof achievementCatalog !==
+    "undefined"
+) {
+
+    const existingSnapshot =
+        localStorage.getItem(
+            ACHIEVEMENT_SNAPSHOT_KEY
+        );
 
 
-if (!existingSnapshot) {
+    if (!existingSnapshot) {
 
-    const stats =
-        calculateNotifierStats();
-
-
-    const initialSnapshot =
-        {};
+        const stats =
+            calculateNotifierStats();
 
 
-    notifierAchievements.forEach(
-        achievement => {
-
-            initialSnapshot[
-                achievement.id
-            ] =
-                achievement.unlocked(
-                    stats
-                );
-
-        }
-    );
+        const initialSnapshot =
+            {};
 
 
-    saveAchievementSnapshot(
-        initialSnapshot
-    );
+        achievementCatalog.forEach(
+            achievement => {
 
-}
-else {
+                initialSnapshot[
+                    achievement.id
+                ] =
+                    achievement.unlocked(
+                        stats
+                    );
 
-    checkForNewAchievements();
+            }
+        );
+
+
+        saveAchievementSnapshot(
+            initialSnapshot
+        );
+
+    }
+    else {
+
+        checkForNewAchievements();
+
+    }
 
 }
 

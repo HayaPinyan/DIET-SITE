@@ -44,10 +44,152 @@ const emptyActivityMessage =
 
 
 // ==================================================
-// הגדרות
+// יעד
 // ==================================================
 
 const DAILY_ACTIVITY_TARGET = 20;
+
+
+// ==================================================
+// היום באתר
+// ==================================================
+
+function getSiteToday() {
+
+    const parts =
+        new Intl.DateTimeFormat(
+            "en-CA",
+            {
+                timeZone: "Asia/Jerusalem",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                hour12: false
+            }
+        ).formatToParts(new Date());
+
+
+    let year =
+        Number(
+            parts.find(
+                x => x.type === "year"
+            ).value
+        );
+
+    let month =
+        Number(
+            parts.find(
+                x => x.type === "month"
+            ).value
+        ) - 1;
+
+    let day =
+        Number(
+            parts.find(
+                x => x.type === "day"
+            ).value
+        );
+
+
+    const hour =
+        Number(
+            parts.find(
+                x => x.type === "hour"
+            ).value
+        );
+
+
+    if (hour < 6) {
+
+        const previousDay =
+            new Date(
+                year,
+                month,
+                day
+            );
+
+
+        previousDay.setDate(
+            previousDay.getDate() - 1
+        );
+
+
+        year =
+            previousDay.getFullYear();
+
+        month =
+            previousDay.getMonth();
+
+        day =
+            previousDay.getDate();
+
+    }
+
+
+    return new Date(
+        year,
+        month,
+        day
+    );
+
+}
+
+
+const today =
+    getSiteToday();
+
+
+const dateKey =
+    today.getFullYear() +
+    "-" +
+    String(
+        today.getMonth() + 1
+    ).padStart(2, "0") +
+    "-" +
+    String(
+        today.getDate()
+    ).padStart(2, "0");
+
+
+// ==================================================
+// נתונים
+// ==================================================
+
+const allActivityData =
+    JSON.parse(
+        localStorage.getItem(
+            "activityData"
+        )
+    ) || {};
+
+
+if (!allActivityData[dateKey]) {
+
+    allActivityData[dateKey] = [];
+
+}
+
+
+const dietData =
+    JSON.parse(
+        localStorage.getItem(
+            "dietData"
+        )
+    ) || {};
+
+
+if (!dietData[dateKey]) {
+
+    dietData[dateKey] = {
+
+        food: false,
+        activity: false,
+        challenge: false
+
+    };
+
+}
 
 
 // ==================================================
@@ -110,118 +252,7 @@ const activities = [
 
 
 // ==================================================
-// תאריך ישראל
-// ==================================================
-
-function getIsraelToday() {
-
-    const parts =
-        new Intl.DateTimeFormat(
-            "en-CA",
-            {
-                timeZone: "Asia/Jerusalem",
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit"
-            }
-        ).formatToParts(
-            new Date()
-        );
-
-
-    return new Date(
-
-        Number(
-            parts.find(
-                x => x.type === "year"
-            ).value
-        ),
-
-        Number(
-            parts.find(
-                x => x.type === "month"
-            ).value
-        ) - 1,
-
-        Number(
-            parts.find(
-                x => x.type === "day"
-            ).value
-        )
-
-    );
-
-}
-
-
-const today =
-    getIsraelToday();
-
-
-const dateKey =
-    today.getFullYear() +
-    "-" +
-    String(
-        today.getMonth() + 1
-    ).padStart(
-        2,
-        "0"
-    ) +
-    "-" +
-    String(
-        today.getDate()
-    ).padStart(
-        2,
-        "0"
-    );
-
-
-// ==================================================
-// נתוני פעילות
-// ==================================================
-
-const allActivityData =
-    JSON.parse(
-        localStorage.getItem(
-            "activityData"
-        )
-    ) || {};
-
-
-if (!allActivityData[dateKey]) {
-
-    allActivityData[dateKey] = [];
-
-}
-
-
-// ==================================================
-// נתוני משימות
-// ==================================================
-
-const dietData =
-    JSON.parse(
-        localStorage.getItem(
-            "dietData"
-        )
-    ) || {};
-
-
-if (!dietData[dateKey]) {
-
-    dietData[dateKey] = {
-
-        food: false,
-        activity: false,
-        challenge: false
-
-    };
-
-}
-
-
-// ==================================================
-// מצב יעד פעילות
+// מצב יעד
 // ==================================================
 
 let activityWasSuccessful =
@@ -240,16 +271,11 @@ function getTodayActivityMinutes() {
             (
                 total,
                 activity
-            ) => {
-
-                return (
-                    total +
-                    Number(
-                        activity.minutes || 0
-                    )
-                );
-
-            },
+            ) =>
+                total +
+                Number(
+                    activity.minutes || 0
+                ),
             0
         );
 
@@ -273,7 +299,7 @@ function saveActivityData() {
 
 
 // ==================================================
-// אנימציית הצלחה
+// אנימציה
 // ==================================================
 
 function celebrateActivity() {
@@ -305,7 +331,7 @@ function celebrateActivity() {
 
 
 // ==================================================
-// סנכרון משימת פעילות
+// משימת פעילות
 // ==================================================
 
 function updateActivityTask() {
@@ -319,8 +345,7 @@ function updateActivityTask() {
 
 
     const isSuccessful =
-        total >=
-        DAILY_ACTIVITY_TARGET;
+        total >= DAILY_ACTIVITY_TARGET;
 
 
     dietData[dateKey].activity =
@@ -334,8 +359,6 @@ function updateActivityTask() {
         )
     );
 
-
-    // אנימציה רק במעבר מ־לא הושלם להושלם
 
     if (
         isSuccessful &&
@@ -354,7 +377,7 @@ function updateActivityTask() {
 
 
 // ==================================================
-// הצעות פעילות
+// הצעות
 // ==================================================
 
 function showSuggestions(
@@ -369,13 +392,8 @@ function showSuggestions(
     activitySuggestions.innerHTML =
         "";
 
-
-    if (customActivityBox) {
-
-        customActivityBox.style.display =
-            "none";
-
-    }
+    customActivityBox.style.display =
+        "none";
 
 
     const searchText =
@@ -435,13 +453,8 @@ function showSuggestions(
                     );
 
 
-                    if (activitySearch) {
-
-                        activitySearch.value =
-                            "";
-
-                    }
-
+                    activitySearch.value =
+                        "";
 
                     activitySuggestions.innerHTML =
                         "";
@@ -459,17 +472,11 @@ function showSuggestions(
 
 
     if (
-        matches.length === 0 &&
-        customActivityBox
+        matches.length === 0
     ) {
 
-        if (customActivityText) {
-
-            customActivityText.textContent =
-                `הפעילות "${searchText}" לא נמצאה במאגר.`;
-
-        }
-
+        customActivityText.textContent =
+            `הפעילות "${searchText}" לא נמצאה במאגר.`;
 
         customActivityBox.style.display =
             "block";
@@ -533,11 +540,6 @@ if (addCustomActivity) {
         "click",
         () => {
 
-            if (!activitySearch) {
-                return;
-            }
-
-
             const name =
                 activitySearch.value.trim();
 
@@ -556,21 +558,11 @@ if (addCustomActivity) {
             activitySearch.value =
                 "";
 
+            activitySuggestions.innerHTML =
+                "";
 
-            if (activitySuggestions) {
-
-                activitySuggestions.innerHTML =
-                    "";
-
-            }
-
-
-            if (customActivityBox) {
-
-                customActivityBox.style.display =
-                    "none";
-
-            }
+            customActivityBox.style.display =
+                "none";
 
         }
     );
@@ -600,30 +592,18 @@ function updateMinutes(
     }
 
 
-    let minutes =
-        Number(value);
-
-
-    if (
-        Number.isNaN(minutes) ||
-        minutes < 0
-    ) {
-
-        minutes = 0;
-
-    }
-
-
     activity.minutes =
-        minutes;
+        (
+            value === ""
+                ? 0
+                : Math.max(
+                    0,
+                    Number(value) || 0
+                )
+        );
 
 
     saveActivityData();
-
-
-    // חשוב:
-    // כאן לא קוראים ל־renderActivityTable()
-    // כדי לא לאבד את הפוקוס מתיבת הקלט.
 
     updateActivityTask();
 
@@ -640,7 +620,7 @@ function updateMinutes(
 
 
 // ==================================================
-// מחיקת פעילות
+// מחיקה
 // ==================================================
 
 function deleteActivity(
@@ -674,7 +654,7 @@ function deleteActivity(
 
 
 // ==================================================
-// בניית הטבלה
+// טבלה
 // ==================================================
 
 function renderActivityTable() {
@@ -737,8 +717,7 @@ function renderActivityTable() {
                         type="number"
                         min="0"
                         value="${activity.minutes}"
-                        class="minutes-input"
-                    >
+                        class="minutes-input">
 
                 </td>
 
@@ -809,7 +788,7 @@ function renderActivityTable() {
 
 
 // ==================================================
-// סך הכול
+// סה"כ
 // ==================================================
 
 function updateTotal() {
@@ -819,12 +798,8 @@ function updateTotal() {
     }
 
 
-    const total =
-        getTodayActivityMinutes();
-
-
     activityTotal.textContent =
-        total;
+        getTodayActivityMinutes();
 
 }
 

@@ -3,240 +3,101 @@
 // ==================================================
 
 const foodSearch =
-    document.getElementById(
-        "foodSearch"
-    );
+    document.getElementById("foodSearch");
 
 const foodSuggestions =
-    document.getElementById(
-        "foodSuggestions"
-    );
+    document.getElementById("foodSuggestions");
 
 const customFoodBox =
-    document.getElementById(
-        "customFoodBox"
-    );
+    document.getElementById("customFoodBox");
 
 const customFoodText =
-    document.getElementById(
-        "customFoodText"
-    );
+    document.getElementById("customFoodText");
 
 const addCustomFood =
-    document.getElementById(
-        "addCustomFood"
-    );
+    document.getElementById("addCustomFood");
 
 const foodTableBody =
-    document.getElementById(
-        "foodTableBody"
-    );
+    document.getElementById("foodTableBody");
 
 const foodTotal =
-    document.getElementById(
-        "foodTotal"
-    );
+    document.getElementById("foodTotal");
 
 const emptyFoodMessage =
-    document.getElementById(
-        "emptyFoodMessage"
-    );
+    document.getElementById("emptyFoodMessage");
 
 
 // ==================================================
-// מפתח מאגר המאכלים
+// מאגר אישי
 // ==================================================
 
 const FOOD_CATALOG_KEY =
     "foodCatalog";
 
 
-// ==================================================
-// מאכלים מובנים - רק לצורך אימוג'י
-// ==================================================
-
 const builtInFoodEmoji = {
 
-    "תפוח":
-        "🍎",
-
-    "תפוח אדום":
-        "🍎",
-
-    "תפוח ירוק":
-        "🍏",
-
-    "תפוח אדמה":
-        "🥔",
-
-    "בננה":
-        "🍌",
-
-    "תפוז":
-        "🍊",
-
-    "לימון":
-        "🍋",
-
-    "אבטיח":
-        "🍉",
-
-    "ענבים":
-        "🍇",
-
-    "תות":
-        "🍓",
-
-    "תותים":
-        "🍓",
-
-    "אפרסק":
-        "🍑",
-
-    "אננס":
-        "🍍",
-
-    "קוקוס":
-        "🥥",
-
-    "אבוקדו":
-        "🥑",
-
-    "עגבנייה":
-        "🍅",
-
-    "עגבניה":
-        "🍅",
-
-    "חציל":
-        "🍆",
-
-    "גזר":
-        "🥕",
-
-    "תירס":
-        "🌽",
-
-    "פלפל":
-        "🌶️",
-
-    "מלפפון":
-        "🥒",
-
-    "חסה":
-        "🥬",
-
-    "ברוקולי":
-        "🥦",
-
-    "פטריות":
-        "🍄",
-
-    "לחם":
-        "🍞",
-
-    "קרואסון":
-        "🥐",
-
-    "בייגלה":
-        "🥨",
-
-    "פיצה":
-        "🍕",
-
-    "המבורגר":
-        "🍔",
-
-    "צ'יפס":
-        "🍟",
-
-    "נקניקייה":
-        "🌭",
-
-    "טאקו":
-        "🌮",
-
-    "סנדוויץ'":
-        "🥪",
-
-    "פסטה":
-        "🍝",
-
-    "אורז":
-        "🍚",
-
-    "מרק":
-        "🍲",
-
-    "ביצה":
-        "🥚",
-
-    "חלב":
-        "🥛",
-
-    "גבינה":
-        "🧀",
-
-    "יוגורט":
-        "🥣",
-
-    "עוף":
-        "🍗",
-
-    "בשר":
-        "🥩",
-
-    "דג":
-        "🐟",
-
-    "עוגה":
-        "🍰",
-
-    "עוגייה":
-        "🍪",
-
-    "שוקולד":
-        "🍫",
-
-    "ופלים":
-        "🧇",
-
-    "סוכרייה":
-        "🍬",
-
-    "גלידה":
-        "🍦",
-
-    "קפה":
-        "☕",
-
-    "תה":
-        "🍵",
-
-    "מיץ":
-        "🥤",
-
-    "אייס קפה":
-        "🧋",
-
-    "פופקורן":
-        "🍿",
-
-    "קרקר":
-        "🫓",
-
-    "פריכיות":
-        "🍘",
-
-    "חביתה":
-        "🍳"
+    "תפוח": "🍎",
+    "תפוח אדום": "🍎",
+    "תפוח ירוק": "🍏",
+    "תפוח אדמה": "🥔",
+    "בננה": "🍌",
+    "תפוז": "🍊",
+    "לימון": "🍋",
+    "אבטיח": "🍉",
+    "ענבים": "🍇",
+    "תות": "🍓",
+    "תותים": "🍓",
+    "אפרסק": "🍑",
+    "אננס": "🍍",
+    "קוקוס": "🥥",
+    "אבוקדו": "🥑",
+    "עגבנייה": "🍅",
+    "עגבניה": "🍅",
+    "חציל": "🍆",
+    "גזר": "🥕",
+    "תירס": "🌽",
+    "פלפל": "🌶️",
+    "מלפפון": "🥒",
+    "חסה": "🥬",
+    "ברוקולי": "🥦",
+    "פטריות": "🍄",
+    "לחם": "🍞",
+    "קרואסון": "🥐",
+    "בייגלה": "🥨",
+    "פיצה": "🍕",
+    "המבורגר": "🍔",
+    "צ'יפס": "🍟",
+    "נקניקייה": "🌭",
+    "טאקו": "🌮",
+    "סנדוויץ'": "🥪",
+    "פסטה": "🍝",
+    "אורז": "🍚",
+    "מרק": "🍲",
+    "ביצה": "🥚",
+    "חלב": "🥛",
+    "גבינה": "🧀",
+    "יוגורט": "🥣",
+    "עוף": "🍗",
+    "בשר": "🥩",
+    "דג": "🐟",
+    "עוגה": "🍰",
+    "עוגייה": "🍪",
+    "שוקולד": "🍫",
+    "ופלים": "🧇",
+    "סוכרייה": "🍬",
+    "גלידה": "🍦",
+    "קפה": "☕",
+    "תה": "🍵",
+    "מיץ": "🥤",
+    "אייס קפה": "🧋",
+    "פופקורן": "🍿",
+    "קרקר": "🫓",
+    "פריכיות": "🍘",
+    "חביתה": "🍳"
 
 };
 
-
-// ==================================================
-// מאגר אישי
-// ==================================================
 
 function loadFoodCatalog() {
 
@@ -256,11 +117,93 @@ let foodCatalog =
 
 
 // ==================================================
-// נתוני היום
+// היום באתר
 // ==================================================
 
+function getSiteToday() {
+
+    const parts =
+        new Intl.DateTimeFormat(
+            "en-CA",
+            {
+                timeZone: "Asia/Jerusalem",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                hour12: false
+            }
+        ).formatToParts(new Date());
+
+
+    let year =
+        Number(
+            parts.find(
+                x => x.type === "year"
+            ).value
+        );
+
+    let month =
+        Number(
+            parts.find(
+                x => x.type === "month"
+            ).value
+        ) - 1;
+
+    let day =
+        Number(
+            parts.find(
+                x => x.type === "day"
+            ).value
+        );
+
+
+    const hour =
+        Number(
+            parts.find(
+                x => x.type === "hour"
+            ).value
+        );
+
+
+    if (hour < 6) {
+
+        const previousDay =
+            new Date(
+                year,
+                month,
+                day
+            );
+
+
+        previousDay.setDate(
+            previousDay.getDate() - 1
+        );
+
+
+        year =
+            previousDay.getFullYear();
+
+        month =
+            previousDay.getMonth();
+
+        day =
+            previousDay.getDate();
+
+    }
+
+
+    return new Date(
+        year,
+        month,
+        day
+    );
+
+}
+
+
 const today =
-    new Date();
+    getSiteToday();
 
 
 const dateKey =
@@ -268,21 +211,15 @@ const dateKey =
     "-" +
     String(
         today.getMonth() + 1
-    ).padStart(
-        2,
-        "0"
-    ) +
+    ).padStart(2, "0") +
     "-" +
     String(
         today.getDate()
-    ).padStart(
-        2,
-        "0"
-    );
+    ).padStart(2, "0");
 
 
 // ==================================================
-// טעינת האוכל ששמור
+// נתוני היום
 // ==================================================
 
 const allFoodData =
@@ -293,9 +230,7 @@ const allFoodData =
     ) || {};
 
 
-if (
-    !allFoodData[dateKey]
-) {
+if (!allFoodData[dateKey]) {
 
     allFoodData[dateKey] = [];
 
@@ -303,7 +238,7 @@ if (
 
 
 // ==================================================
-// שמירת נתוני היום
+// שמירה
 // ==================================================
 
 function saveFoodData() {
@@ -312,22 +247,6 @@ function saveFoodData() {
         "foodData",
         JSON.stringify(
             allFoodData
-        )
-    );
-
-}
-
-
-// ==================================================
-// שמירת המאגר
-// ==================================================
-
-function saveFoodCatalog() {
-
-    localStorage.setItem(
-        FOOD_CATALOG_KEY,
-        JSON.stringify(
-            foodCatalog
         )
     );
 
@@ -391,7 +310,7 @@ function getFoodEmoji(
 
 
 // ==================================================
-// חיפוש במאגר
+// התאמות למאגר
 // ==================================================
 
 function findCatalogMatches(
@@ -403,9 +322,7 @@ function findCatalogMatches(
 
 
     if (!cleanSearch) {
-
         return [];
-
     }
 
 
@@ -440,9 +357,7 @@ function showSuggestions(
 
 
     if (!searchText) {
-
         return;
-
     }
 
 
@@ -451,10 +366,6 @@ function showSuggestions(
             searchText
         );
 
-
-    // ----------------------------------------------
-    // הצעות מהמאגר האישי
-    // ----------------------------------------------
 
     matches.forEach(
         food => {
@@ -486,13 +397,18 @@ function showSuggestions(
                     </strong>
 
                     <small>
+
                         ${escapeHtml(food.amount || "")}
+
                         ${
                             food.amount
                                 ? " · "
                                 : ""
                         }
-                        ${Number(food.calories || 0)} קלוריות
+
+                        ${Number(food.calories || 0)}
+                        קלוריות
+
                     </small>
 
                 </span>
@@ -507,6 +423,7 @@ function showSuggestions(
                     addFoodFromCatalog(
                         food
                     );
+
 
                     foodSearch.value =
                         "";
@@ -526,10 +443,6 @@ function showSuggestions(
     );
 
 
-    // ----------------------------------------------
-    // מאכל חופשי
-    // ----------------------------------------------
-
     if (
         matches.length === 0
     ) {
@@ -546,7 +459,7 @@ function showSuggestions(
 
 
 // ==================================================
-// הוספת מאכל מהמאגר
+// הוספה מהמאגר
 // ==================================================
 
 function addFoodFromCatalog(
@@ -584,16 +497,19 @@ function addFoodFromCatalog(
 
     updateTotal();
 
+
+    window.dispatchEvent(
+        new Event("xpDataChanged")
+    );
+
 }
 
 
 // ==================================================
-// הוספת מאכל חופשי
+// מאכל חופשי
 // ==================================================
 
-if (
-    addCustomFood
-) {
+if (addCustomFood) {
 
     addCustomFood.addEventListener(
         "click",
@@ -604,9 +520,7 @@ if (
 
 
             if (!name) {
-
                 return;
-
             }
 
 
@@ -632,7 +546,7 @@ if (
 
 
 // ==================================================
-// הוספת מאכל ידני
+// הוספת מאכל
 // ==================================================
 
 function addFood(
@@ -666,6 +580,11 @@ function addFood(
 
     updateTotal();
 
+
+    window.dispatchEvent(
+        new Event("xpDataChanged")
+    );
+
 }
 
 
@@ -679,18 +598,15 @@ function updateAmount(
 ) {
 
     const food =
-        allFoodData[
-            dateKey
-        ].find(
-            item =>
-                item.id === id
-        );
+        allFoodData[dateKey]
+            .find(
+                item =>
+                    item.id === id
+            );
 
 
     if (!food) {
-
         return;
-
     }
 
 
@@ -713,61 +629,34 @@ function updateCalories(
 ) {
 
     const food =
-        allFoodData[
-            dateKey
-        ].find(
-            item =>
-                item.id === id
-        );
+        allFoodData[dateKey]
+            .find(
+                item =>
+                    item.id === id
+            );
 
 
     if (!food) {
-
         return;
-
     }
 
 
-    if (
+    food.calories =
         value === ""
-    ) {
-
-        food.calories =
-            "";
-
-    }
-    else {
-
-        let calories =
-            Number(value);
-
-
-        if (
-            Number.isNaN(
-                calories
-            ) ||
-            calories < 0
-        ) {
-
-            calories = 0;
-
-        }
-
-
-        food.calories =
-            calories;
-
-    }
+            ? ""
+            : Math.max(
+                0,
+                Number(value) || 0
+            );
 
 
     saveFoodData();
 
     updateTotal();
 
+
     window.dispatchEvent(
-        new Event(
-            "xpDataChanged"
-        )
+        new Event("xpDataChanged")
     );
 
 }
@@ -782,12 +671,11 @@ function deleteFood(
 ) {
 
     allFoodData[dateKey] =
-        allFoodData[
-            dateKey
-        ].filter(
-            item =>
-                item.id !== id
-        );
+        allFoodData[dateKey]
+            .filter(
+                item =>
+                    item.id !== id
+            );
 
 
     saveFoodData();
@@ -796,11 +684,16 @@ function deleteFood(
 
     updateTotal();
 
+
+    window.dispatchEvent(
+        new Event("xpDataChanged")
+    );
+
 }
 
 
 // ==================================================
-// בניית הטבלה
+// טבלה
 // ==================================================
 
 function renderFoodTable() {
@@ -810,25 +703,13 @@ function renderFoodTable() {
 
 
     const todayFoods =
-        allFoodData[
-            dateKey
-        ];
+        allFoodData[dateKey];
 
 
-    if (
+    emptyFoodMessage.style.display =
         todayFoods.length === 0
-    ) {
-
-        emptyFoodMessage.style.display =
-            "block";
-
-    }
-    else {
-
-        emptyFoodMessage.style.display =
-            "none";
-
-    }
+            ? "block"
+            : "none";
 
 
     todayFoods.forEach(
@@ -867,8 +748,7 @@ function renderFoodTable() {
                         type="text"
                         value="${escapeHtml(food.amount || "")}"
                         placeholder="כמות"
-                        class="amount-input"
-                        readonly>
+                        class="amount-input">
 
                 </td>
 
@@ -905,23 +785,24 @@ function renderFoodTable() {
             `;
 
 
-            // ------------------------------------------
-            // כמות
-            // ------------------------------------------
-
             const amountInput =
                 row.querySelector(
                     ".amount-input"
                 );
 
 
-            // הכמות לקריאה בלבד
-            // אין אפשרות לערוך אותה מהטבלה
+            amountInput.addEventListener(
+                "input",
+                () => {
 
+                    updateAmount(
+                        food.id,
+                        amountInput.value
+                    );
 
-            // ------------------------------------------
-            // קלוריות
-            // ------------------------------------------
+                }
+            );
+
 
             const calorieInput =
                 row.querySelector(
@@ -941,10 +822,6 @@ function renderFoodTable() {
                 }
             );
 
-
-            // ------------------------------------------
-            // מחיקה
-            // ------------------------------------------
 
             const deleteButton =
                 row.querySelector(
@@ -978,30 +855,24 @@ function renderFoodTable() {
 
 
 // ==================================================
-// חישוב סה"כ
+// סה"כ
 // ==================================================
 
 function updateTotal() {
 
     const total =
-        allFoodData[
-            dateKey
-        ].reduce(
-            (
-                sum,
-                food
-            ) => {
-
-                return (
+        allFoodData[dateKey]
+            .reduce(
+                (
+                    sum,
+                    food
+                ) =>
                     sum +
                     Number(
                         food.calories || 0
-                    )
-                );
-
-            },
-            0
-        );
+                    ),
+                0
+            );
 
 
     foodTotal.textContent =
@@ -1014,9 +885,7 @@ function updateTotal() {
 // חיפוש
 // ==================================================
 
-if (
-    foodSearch
-) {
+if (foodSearch) {
 
     foodSearch.addEventListener(
         "input",
@@ -1033,7 +902,7 @@ if (
 
 
 // ==================================================
-// סגירת הצעות בלחיצה בחוץ
+// סגירת הצעות
 // ==================================================
 
 document.addEventListener(
@@ -1061,7 +930,7 @@ document.addEventListener(
 
 
 // ==================================================
-// עזר לבטיחות HTML
+// עזר
 // ==================================================
 
 function escapeHtml(

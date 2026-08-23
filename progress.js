@@ -1,4 +1,3 @@
-
 // ==================================================
 // הגדרות
 // ==================================================
@@ -43,7 +42,7 @@ function getCalories(dateKey) {
             food
         ) =>
             total +
-            Number(food.calories),
+            Number(food.calories || 0),
         0
     );
 
@@ -66,7 +65,7 @@ function getActivityMinutes(dateKey) {
             activity
         ) =>
             total +
-            Number(activity.minutes),
+            Number(activity.minutes || 0),
         0
     );
 
@@ -208,17 +207,23 @@ allDateKeys.forEach(
 
 
         if (foodSuccess) {
+
             score++;
+
         }
 
 
         if (activitySuccess) {
+
             score++;
+
         }
 
 
         if (challengeSuccess) {
+
             score++;
+
         }
 
 
@@ -241,7 +246,9 @@ allDateKeys.forEach(
         // יום מושלם
         // ------------------------------------------
 
-        if (score === 3) {
+        if (
+            score === 3
+        ) {
 
             completedDays++;
 
@@ -283,7 +290,9 @@ let averageCalories = 0;
 let averageActivity = 0;
 
 
-if (calorieDays > 0) {
+if (
+    calorieDays > 0
+) {
 
     averageCalories =
         Math.round(
@@ -294,7 +303,9 @@ if (calorieDays > 0) {
 }
 
 
-if (activityDays > 0) {
+if (
+    activityDays > 0
+) {
 
     averageActivity =
         Math.round(
@@ -306,10 +317,10 @@ if (activityDays > 0) {
 
 
 // ==================================================
-// תאריך היום בישראל
+// תאריך היום באתר
 // ==================================================
 
-function getIsraelToday() {
+function getSiteToday() {
 
     const parts =
         new Intl.DateTimeFormat(
@@ -318,33 +329,80 @@ function getIsraelToday() {
                 timeZone: "Asia/Jerusalem",
                 year: "numeric",
                 month: "2-digit",
-                day: "2-digit"
+                day: "2-digit",
+                hour: "2-digit",
+                hour12: false
             }
         ).formatToParts(
             new Date()
         );
 
 
-    return new Date(
-
+    let year =
         Number(
             parts.find(
                 x => x.type === "year"
             ).value
-        ),
+        );
 
+
+    let month =
         Number(
             parts.find(
                 x => x.type === "month"
             ).value
-        ) - 1,
+        ) - 1;
 
+
+    let day =
         Number(
             parts.find(
                 x => x.type === "day"
             ).value
-        )
+        );
 
+
+    const hour =
+        Number(
+            parts.find(
+                x => x.type === "hour"
+            ).value
+        );
+
+
+    if (
+        hour < 6
+    ) {
+
+        const previousDay =
+            new Date(
+                year,
+                month,
+                day
+            );
+
+
+        previousDay.setDate(
+            previousDay.getDate() - 1
+        );
+
+
+        year =
+            previousDay.getFullYear();
+
+        month =
+            previousDay.getMonth();
+
+        day =
+            previousDay.getDate();
+
+    }
+
+
+    return new Date(
+        year,
+        month,
+        day
     );
 
 }
@@ -357,15 +415,26 @@ function getIsraelToday() {
 function getDateKey(date) {
 
     return (
+
         date.getFullYear() +
         "-" +
+
         String(
             date.getMonth() + 1
-        ).padStart(2, "0") +
+        ).padStart(
+            2,
+            "0"
+        ) +
+
         "-" +
+
         String(
             date.getDate()
-        ).padStart(2, "0")
+        ).padStart(
+            2,
+            "0"
+        )
+
     );
 
 }
@@ -376,19 +445,24 @@ function getDateKey(date) {
 // ==================================================
 
 const today =
-    getIsraelToday();
+    getSiteToday();
 
 
 let currentStreak = 0;
+
 
 let checkDate =
     new Date(today);
 
 
-while (true) {
+while (
+    true
+) {
 
     const dateKey =
-        getDateKey(checkDate);
+        getDateKey(
+            checkDate
+        );
 
 
     const day =
@@ -402,8 +476,7 @@ while (true) {
     const activitySuccess =
         getActivityMinutes(
             dateKey
-        ) >=
-        DAILY_ACTIVITY_TARGET;
+        ) >= DAILY_ACTIVITY_TARGET;
 
 
     const challengeSuccess =
@@ -423,7 +496,8 @@ while (true) {
             checkDate.getDate() - 1
         );
 
-    } else {
+    }
+    else {
 
         break;
 
@@ -501,7 +575,9 @@ const progressMessage =
 // הצגת הנתונים
 // ==================================================
 
-if (currentStreakElement) {
+if (
+    currentStreakElement
+) {
 
     currentStreakElement.textContent =
         currentStreak;
@@ -509,7 +585,9 @@ if (currentStreakElement) {
 }
 
 
-if (perfectDaysElement) {
+if (
+    perfectDaysElement
+) {
 
     perfectDaysElement.textContent =
         completedDays;
@@ -517,7 +595,9 @@ if (perfectDaysElement) {
 }
 
 
-if (activeDaysElement) {
+if (
+    activeDaysElement
+) {
 
     activeDaysElement.textContent =
         activeDays;
@@ -525,7 +605,9 @@ if (activeDaysElement) {
 }
 
 
-if (completedDaysElement) {
+if (
+    completedDaysElement
+) {
 
     completedDaysElement.textContent =
         completedDays;
@@ -533,7 +615,9 @@ if (completedDaysElement) {
 }
 
 
-if (partialDaysElement) {
+if (
+    partialDaysElement
+) {
 
     partialDaysElement.textContent =
         partialDays;
@@ -541,7 +625,9 @@ if (partialDaysElement) {
 }
 
 
-if (emptyDaysElement) {
+if (
+    emptyDaysElement
+) {
 
     emptyDaysElement.textContent =
         "0";
@@ -549,7 +635,9 @@ if (emptyDaysElement) {
 }
 
 
-if (averageCaloriesElement) {
+if (
+    averageCaloriesElement
+) {
 
     averageCaloriesElement.textContent =
         averageCalories;
@@ -557,7 +645,9 @@ if (averageCaloriesElement) {
 }
 
 
-if (averageActivityElement) {
+if (
+    averageActivityElement
+) {
 
     averageActivityElement.textContent =
         `${averageActivity} דקות`;
@@ -565,7 +655,9 @@ if (averageActivityElement) {
 }
 
 
-if (challengeDaysElement) {
+if (
+    challengeDaysElement
+) {
 
     challengeDaysElement.textContent =
         challengeDays;
@@ -580,7 +672,9 @@ if (challengeDaysElement) {
 let percentage = 0;
 
 
-if (totalTasks > 0) {
+if (
+    totalTasks > 0
+) {
 
     percentage =
         Math.round(
@@ -593,7 +687,9 @@ if (totalTasks > 0) {
 }
 
 
-if (overallPercentageElement) {
+if (
+    overallPercentageElement
+) {
 
     overallPercentageElement.textContent =
         `${percentage}%`;
@@ -601,7 +697,9 @@ if (overallPercentageElement) {
 }
 
 
-if (overallProgressFill) {
+if (
+    overallProgressFill
+) {
 
     overallProgressFill.style.width =
         `${percentage}%`;
@@ -613,23 +711,31 @@ if (overallProgressFill) {
 // הודעה
 // ==================================================
 
-if (progressMessage) {
+if (
+    progressMessage
+) {
 
-    if (currentStreak >= 7) {
+    if (
+        currentStreak >= 7
+    ) {
 
         progressMessage.textContent =
             "🔥 שבוע שלם! את פשוט תותחית!";
 
     }
 
-    else if (currentStreak >= 3) {
+    else if (
+        currentStreak >= 3
+    ) {
 
         progressMessage.textContent =
             "🌟 שלושה ימים ברצף! ממשיכים!";
 
     }
 
-    else if (completedDays >= 1) {
+    else if (
+        completedDays >= 1
+    ) {
 
         progressMessage.textContent =
             "💪 התחלת את המסע — כל יום נחשב!";

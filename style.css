@@ -3673,3 +3673,530 @@ button:active {
     }
 
 }
+/* ==================================================
+   חלונית פירוט היום
+   ================================================== */
+
+.day-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    justify-content: center;
+    align-items: center;
+
+    z-index: 1000;
+
+    padding: 20px;
+}
+
+
+.day-modal.show {
+    display: flex;
+}
+
+
+/* ==================================================
+   תוכן החלונית
+   ================================================== */
+
+.day-modal-content {
+    position: relative;
+
+    width: min(500px, 100%);
+
+    max-height: 90vh;
+    overflow-y: auto;
+
+    background: #ffffff;
+
+    border-radius: 18px;
+
+    padding: 28px;
+
+    box-shadow:
+        0 15px 45px rgba(0, 0, 0, 0.18);
+
+    box-sizing: border-box;
+}
+
+
+/* ==================================================
+   כפתור סגירה
+   ================================================== */
+
+.close-modal {
+    position: absolute;
+
+    top: 12px;
+    left: 15px;
+
+    width: 34px;
+    height: 34px;
+
+    border: none;
+
+    background: transparent;
+
+    color: #777;
+
+    font-size: 28px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    border-radius: 50%;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.close-modal:hover {
+    background: #f5f1ee;
+    color: #333;
+}
+
+
+/* ==================================================
+   כותרת התאריך
+   ================================================== */
+
+#modalDate {
+    text-align: center;
+
+    margin:
+        0 35px 24px;
+
+    color: #5f5149;
+
+    font-size: 24px;
+}
+
+
+/* ==================================================
+   שורות המשימות
+   ================================================== */
+
+.modal-task-wrapper {
+    margin-bottom: 14px;
+}
+
+
+/* ==================================================
+   תזונה / פעילות / אתגר
+   אותו קונספט עיצובי
+   ================================================== */
+
+.modal-task {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    min-height: 54px;
+
+    padding: 12px 16px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #e7ddd7;
+
+    border-radius: 10px;
+
+    background: #fffdfc;
+
+    color: #5b4d45;
+
+    font-size: 17px;
+
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+
+/* ==================================================
+   שם תזונה / פעילות
+   ================================================== */
+
+.modal-expand-title {
+    flex: 1;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    white-space: nowrap;
+}
+
+
+/* ==================================================
+   ✓ / ○
+   ================================================== */
+
+.modal-task-status {
+    flex-shrink: 0;
+
+    width: 22px;
+
+    text-align: center;
+
+    font-size: 18px;
+
+    color: #8c7b70;
+}
+
+
+/* ==================================================
+   החץ
+   ================================================== */
+
+.modal-expand-arrow {
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 24px;
+    height: 24px;
+
+    margin-right: 2px;
+
+    color: #75645b;
+
+    font-size: 19px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    user-select: none;
+
+    border-radius: 5px;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+/* ==================================================
+   במעבר עכבר על החץ
+   ================================================== */
+
+.modal-expand-arrow:hover {
+    background: #f1e9e4;
+
+    color: #4f4038;
+}
+
+
+/* ==================================================
+   כשהחץ מקבל פוקוס
+   ================================================== */
+
+.modal-expand-arrow:focus {
+    outline: none;
+
+    background: #f1e9e4;
+
+    color: #4f4038;
+}
+
+
+/* ==================================================
+   מידע: קלוריות / דקות
+   ================================================== */
+
+.modal-detail {
+    padding: 9px 16px 4px;
+
+    color: #85776f;
+
+    font-size: 14px;
+
+    text-align: right;
+}
+
+
+/* ==================================================
+   חריגה בקלוריות
+   ================================================== */
+
+.modal-warning {
+    display: block;
+
+    margin-top: 4px;
+
+    color: #b36b5d;
+
+    font-size: 13px;
+}
+
+
+/* ==================================================
+   אזור הפירוט שנפתח
+   ================================================== */
+
+.modal-expandable-details {
+    margin-top: 7px;
+
+    padding: 10px 12px;
+
+    border: 1px solid #eee4df;
+
+    border-radius: 9px;
+
+    background: #faf7f5;
+
+    box-sizing: border-box;
+}
+
+
+/* ==================================================
+   שורה של מאכל
+   ================================================== */
+
+.modal-food-row {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto
+        auto;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 9px 4px;
+
+    border-bottom: 1px solid #eee5e0;
+
+    font-size: 14px;
+}
+
+
+.modal-food-row:last-child {
+    border-bottom: none;
+}
+
+
+.modal-food-name {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    min-width: 0;
+}
+
+
+.modal-food-name span:last-child {
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+.modal-food-amount {
+    color: #8b7d75;
+
+    white-space: nowrap;
+}
+
+
+.modal-food-calories {
+    color: #6f625b;
+
+    white-space: nowrap;
+}
+
+
+/* ==================================================
+   סה"כ אוכל
+   ================================================== */
+
+.modal-food-total {
+    padding-top: 11px;
+
+    margin-top: 5px;
+
+    border-top: 1px solid #e4d9d3;
+
+    text-align: right;
+
+    color: #665850;
+
+    font-size: 14px;
+}
+
+
+/* ==================================================
+   שורה של פעילות
+   ================================================== */
+
+.modal-activity-row {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding: 9px 4px;
+
+    border-bottom: 1px solid #eee5e0;
+
+    font-size: 14px;
+}
+
+
+.modal-activity-row:last-child {
+    border-bottom: none;
+}
+
+
+.modal-activity-name {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+}
+
+
+.modal-activity-minutes {
+    color: #6f625b;
+
+    white-space: nowrap;
+}
+
+
+/* ==================================================
+   סה"כ פעילות
+   ================================================== */
+
+.modal-activity-total {
+    padding-top: 11px;
+
+    margin-top: 5px;
+
+    border-top: 1px solid #e4d9d3;
+
+    text-align: right;
+
+    color: #665850;
+
+    font-size: 14px;
+}
+
+
+/* ==================================================
+   אין נתונים
+   ================================================== */
+
+.modal-empty-detail {
+    padding: 8px;
+
+    color: #94857c;
+
+    font-size: 14px;
+
+    text-align: center;
+}
+
+
+/* ==================================================
+   הציון
+   ================================================== */
+
+.modal-score {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    margin-top: 22px;
+
+    padding: 13px;
+
+    border-top: 1px solid #eee5e0;
+
+    color: #665850;
+
+    font-size: 16px;
+}
+
+
+.modal-score strong {
+    font-size: 20px;
+
+    color: #5b4d45;
+}
+
+
+/* ==================================================
+   התאמה למסך קטן
+   ================================================== */
+
+@media (max-width: 600px) {
+
+    .day-modal-content {
+        padding: 22px 16px;
+    }
+
+
+    #modalDate {
+        font-size: 21px;
+
+        margin-bottom: 20px;
+    }
+
+
+    .modal-task {
+        min-height: 50px;
+
+        padding: 10px 12px;
+
+        font-size: 16px;
+    }
+
+
+    .modal-food-row {
+        grid-template-columns: 1fr auto;
+
+        gap: 5px;
+    }
+
+
+    .modal-food-calories {
+        grid-column: 2;
+    }
+
+
+    .modal-food-amount {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+}

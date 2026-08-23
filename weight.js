@@ -1,23 +1,109 @@
 // ==================================================
-// הגנה על דף המשקל
-// ==================================================
-
-if (
-    localStorage.getItem(
-        "weightAccess"
-    ) !== "true"
-) {
-
-    window.location.href =
-        "weight-login.html";
-
-}
-
-// ==================================================
 // הגדרות
 // ==================================================
 
 const WEIGHT_LOSS_GOAL = 50;
+
+
+// ==================================================
+// היום של האתר
+// ==================================================
+
+function getSiteToday() {
+
+    const parts =
+        new Intl.DateTimeFormat(
+            "en-CA",
+            {
+                timeZone: "Asia/Jerusalem",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                hour12: false
+            }
+        ).formatToParts(new Date());
+
+
+    let year =
+        Number(
+            parts.find(
+                x => x.type === "year"
+            ).value
+        );
+
+    let month =
+        Number(
+            parts.find(
+                x => x.type === "month"
+            ).value
+        ) - 1;
+
+    let day =
+        Number(
+            parts.find(
+                x => x.type === "day"
+            ).value
+        );
+
+
+    const hour =
+        Number(
+            parts.find(
+                x => x.type === "hour"
+            ).value
+        );
+
+
+    if (hour < 6) {
+
+        const previousDay =
+            new Date(
+                year,
+                month,
+                day
+            );
+
+
+        previousDay.setDate(
+            previousDay.getDate() - 1
+        );
+
+
+        year =
+            previousDay.getFullYear();
+
+        month =
+            previousDay.getMonth();
+
+        day =
+            previousDay.getDate();
+
+    }
+
+
+    return new Date(
+        year,
+        month,
+        day
+    );
+
+}
+
+
+const today =
+    getSiteToday();
+
+
+const currentMonthKey =
+    today.getFullYear() +
+    "-" +
+    String(
+        today.getMonth() + 1
+    ).padStart(
+        2,
+        "0"
+    );
 
 
 // ==================================================
@@ -84,76 +170,6 @@ const weightData =
 
 
 // ==================================================
-// תאריך ישראל
-// ==================================================
-
-function getIsraelToday() {
-
-    const parts =
-        new Intl.DateTimeFormat(
-            "en-CA",
-            {
-                timeZone: "Asia/Jerusalem",
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit"
-            }
-        ).formatToParts(
-            new Date()
-        );
-
-
-    return new Date(
-
-        Number(
-            parts.find(
-                x => x.type === "year"
-            ).value
-        ),
-
-        Number(
-            parts.find(
-                x => x.type === "month"
-            ).value
-        ) - 1,
-
-        Number(
-            parts.find(
-                x => x.type === "day"
-            ).value
-        )
-
-    );
-
-}
-
-
-const today =
-    getIsraelToday();
-
-
-// ==================================================
-// מפתח חודש
-// ==================================================
-
-function getMonthKey(date) {
-
-    return (
-        date.getFullYear() +
-        "-" +
-        String(
-            date.getMonth() + 1
-        ).padStart(2, "0")
-    );
-
-}
-
-
-const currentMonthKey =
-    getMonthKey(today);
-
-
-// ==================================================
 // שמירה
 // ==================================================
 
@@ -170,7 +186,7 @@ function saveWeightData() {
 
 
 // ==================================================
-// כמה ירדו
+// ירידה
 // ==================================================
 
 function getWeightLost() {
@@ -223,42 +239,30 @@ function getWeightLost() {
 
 
 // ==================================================
-// כמה נשארו
+// נשאר
 // ==================================================
 
 function getWeightRemaining() {
 
-    const lost =
-        getWeightLost();
-
-
     return Math.max(
         0,
         WEIGHT_LOSS_GOAL -
-        lost
+        getWeightLost()
     );
 
 }
 
 
 // ==================================================
-// הצגת סיכום
+// סיכום
 // ==================================================
 
 function updateSummary() {
 
-    const lost =
-        getWeightLost();
-
-
-    const remaining =
-        getWeightRemaining();
-
-
     if (weightLost) {
 
         weightLost.textContent =
-            `${lost.toFixed(1)} ק״ג`;
+            `${getWeightLost().toFixed(1)} ק״ג`;
 
     }
 
@@ -266,7 +270,7 @@ function updateSummary() {
     if (weightRemaining) {
 
         weightRemaining.textContent =
-            `${remaining.toFixed(1)} ק״ג`;
+            `${getWeightRemaining().toFixed(1)} ק״ג`;
 
     }
 
@@ -274,21 +278,7 @@ function updateSummary() {
 
 
 // ==================================================
-// האם השקילה החודשית בוצעה
-// ==================================================
-
-function hasCurrentMonthWeighIn() {
-
-    return Object.prototype.hasOwnProperty.call(
-        weightData.weighIns,
-        currentMonthKey
-    );
-
-}
-
-
-// ==================================================
-// תאריך השקילה הבאה
+// השקילה הבאה
 // ==================================================
 
 function getNextWeighInDate() {
@@ -300,21 +290,16 @@ function getNextWeighInDate() {
         today.getMonth();
 
 
-    // אם השקילה של החודש כבר בוצעה
-    // או שהיום כבר עבר את ה-1
+    month++;
+
 
     if (
-        today.getDate() >= 1
+        month > 11
     ) {
 
-        month++;
+        month = 0;
 
-        if (month > 11) {
-
-            month = 0;
-            year++;
-
-        }
+        year++;
 
     }
 
@@ -329,8 +314,18 @@ function getNextWeighInDate() {
 
 
 // ==================================================
-// הצגת הודעת השקילה
+// הודעה
 // ==================================================
+
+function hasCurrentMonthWeighIn() {
+
+    return Object.prototype.hasOwnProperty.call(
+        weightData.weighIns,
+        currentMonthKey
+    );
+
+}
+
 
 function updateWeighInMessage() {
 
@@ -353,19 +348,19 @@ function updateWeighInMessage() {
         hasCurrentMonthWeighIn()
     ) {
 
-        const nextWeighIn =
-            getNextWeighInDate();
-
-
         const nextDate =
-            nextWeighIn.toLocaleDateString(
-                "he-IL",
-                {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric"
-                }
-            );
+            getNextWeighInDate()
+                .toLocaleDateString(
+                    "he-IL",
+                    {
+                        day:
+                            "2-digit",
+                        month:
+                            "2-digit",
+                        year:
+                            "numeric"
+                    }
+                );
 
 
         weighInMessage.textContent =
@@ -383,32 +378,34 @@ function updateWeighInMessage() {
         weighInMessage.textContent =
             "⚖️ היום הוא יום השקילה החודשי שלך!";
 
+
         weighInCard.classList.add(
             "weigh-in-today"
         );
+
 
         return;
 
     }
 
 
-    const nextWeighIn =
+    const nextDate =
         new Date(
             today.getFullYear(),
             today.getMonth() + 1,
             1
-        );
-
-
-    const nextDate =
-        nextWeighIn.toLocaleDateString(
-            "he-IL",
-            {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric"
-            }
-        );
+        )
+            .toLocaleDateString(
+                "he-IL",
+                {
+                    day:
+                        "2-digit",
+                    month:
+                        "2-digit",
+                    year:
+                        "numeric"
+                }
+            );
 
 
     weighInMessage.textContent =
@@ -447,12 +444,9 @@ if (saveWeightButton) {
             }
 
 
-            // --------------------------------------
-            // השקילה הראשונה = משקל התחלתי
-            // --------------------------------------
-
             if (
-                weightData.startWeight === null
+                weightData.startWeight ===
+                null
             ) {
 
                 weightData.startWeight =
@@ -460,10 +454,6 @@ if (saveWeightButton) {
 
             }
 
-
-            // --------------------------------------
-            // שמירת השקילה לחודש הנוכחי
-            // --------------------------------------
 
             weightData.weighIns[
                 currentMonthKey
@@ -478,23 +468,6 @@ if (saveWeightButton) {
 
 
             updateAll();
-
-
-            if (weighInMessage) {
-
-                weighInMessage.textContent =
-                    "✅ השקילה נשמרה בהצלחה!";
-
-            }
-
-
-            if (weighInCard) {
-
-                weighInCard.classList.remove(
-                    "weigh-in-today"
-                );
-
-            }
 
         }
     );
@@ -546,10 +519,6 @@ function drawChart() {
     }
 
 
-    // ----------------------------------------------
-    // מידות
-    // ----------------------------------------------
-
     const width = 800;
     const height = 400;
 
@@ -568,12 +537,6 @@ function drawChart() {
         top -
         bottom;
 
-
-    // ----------------------------------------------
-    // המרה של "כמה נשאר" למיקום בגרף
-    // 50 למעלה
-    // 0 למטה
-    // ----------------------------------------------
 
     function getY(
         remaining
@@ -604,10 +567,6 @@ function drawChart() {
     }
 
 
-    // ----------------------------------------------
-    // קווי רקע
-    // ----------------------------------------------
-
     for (
         let value = 0;
         value <= WEIGHT_LOSS_GOAL;
@@ -630,18 +589,15 @@ function drawChart() {
             left
         );
 
-
         line.setAttribute(
             "x2",
             width - right
         );
 
-
         line.setAttribute(
             "y1",
             y
         );
-
 
         line.setAttribute(
             "y2",
@@ -671,12 +627,10 @@ function drawChart() {
             left - 12
         );
 
-
         label.setAttribute(
             "y",
             y + 4
         );
-
 
         label.setAttribute(
             "text-anchor",
@@ -699,10 +653,6 @@ function drawChart() {
 
     }
 
-
-    // ----------------------------------------------
-    // יצירת נקודות
-    // ----------------------------------------------
 
     const points =
         months.map(
@@ -760,7 +710,6 @@ function drawChart() {
 
                     month,
                     weight,
-                    lost,
                     remaining,
                     x,
                     y
@@ -770,10 +719,6 @@ function drawChart() {
             }
         );
 
-
-    // ----------------------------------------------
-    // קו
-    // ----------------------------------------------
 
     if (
         points.length > 1
@@ -809,15 +754,8 @@ function drawChart() {
     }
 
 
-    // ----------------------------------------------
-    // נקודות + תוויות
-    // ----------------------------------------------
-
     points.forEach(
-        (
-            point,
-            index
-        ) => {
+        point => {
 
             const circle =
                 document.createElementNS(
@@ -831,12 +769,10 @@ function drawChart() {
                 point.x
             );
 
-
             circle.setAttribute(
                 "cy",
                 point.y
             );
-
 
             circle.setAttribute(
                 "r",
@@ -854,10 +790,6 @@ function drawChart() {
             );
 
 
-            // --------------------------------------
-            // משקל ליד הנקודה
-            // --------------------------------------
-
             const weightLabel =
                 document.createElementNS(
                     "http://www.w3.org/2000/svg",
@@ -870,12 +802,10 @@ function drawChart() {
                 point.x
             );
 
-
             weightLabel.setAttribute(
                 "y",
                 point.y - 12
             );
-
 
             weightLabel.setAttribute(
                 "text-anchor",
@@ -897,10 +827,6 @@ function drawChart() {
             );
 
 
-            // --------------------------------------
-            // חודש
-            // --------------------------------------
-
             const monthLabel =
                 document.createElementNS(
                     "http://www.w3.org/2000/svg",
@@ -913,12 +839,10 @@ function drawChart() {
                 point.x
             );
 
-
             monthLabel.setAttribute(
                 "y",
                 height - 20
             );
-
 
             monthLabel.setAttribute(
                 "text-anchor",
@@ -946,7 +870,7 @@ function drawChart() {
 
 
 // ==================================================
-// היסטוריית שקילות
+// היסטוריה
 // ==================================================
 
 function renderHistory() {
@@ -1039,24 +963,20 @@ function renderHistory() {
             `;
 
 
-            const deleteButton =
-                row.querySelector(
-                    ".delete-weight-button"
-                );
-
-
-            deleteButton.addEventListener(
+            row.querySelector(
+                ".delete-weight-button"
+            ).addEventListener(
                 "click",
                 () => {
 
-                    const confirmed =
-                        confirm(
+                    if (
+                        !confirm(
                             `למחוק את השקילה של ${month}?`
-                        );
+                        )
+                    ) {
 
-
-                    if (!confirmed) {
                         return;
+
                     }
 
 
@@ -1064,9 +984,6 @@ function renderHistory() {
                         month
                     ];
 
-
-                    // אם לא נשארה שום שקילה,
-                    // מאפסים גם את משקל ההתחלה
 
                     if (
                         Object.keys(
@@ -1099,7 +1016,7 @@ function renderHistory() {
 
 
 // ==================================================
-// עדכון הכול
+// הכול
 // ==================================================
 
 function updateAll() {
@@ -1114,9 +1031,5 @@ function updateAll() {
 
 }
 
-
-// ==================================================
-// הפעלה
-// ==================================================
 
 updateAll();
