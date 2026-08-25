@@ -2,27 +2,8 @@
 // הגדרות
 // ==================================================
 
-const DAILY_CALORIE_TARGET = 1500;
+const DAILY_CALORIE_TARGET = 1800;
 const DAILY_ACTIVITY_TARGET = 20;
-
-
-// ==================================================
-// EMAILJS
-// ==================================================
-
-const EMAILJS_SERVICE_ID = "service_8s7fe3a";
-const EMAILJS_TEMPLATE_ID = "template_tcts9d9";
-const EMAILJS_PUBLIC_KEY = "phMCkJwty8w7XBDoJ";
-
-
-// אתחול EmailJS
-if (typeof emailjs !== "undefined") {
-
-    emailjs.init({
-        publicKey: EMAILJS_PUBLIC_KEY
-    });
-
-}
 
 
 // ==================================================
@@ -104,7 +85,6 @@ function getSiteToday() {
             ).value
         );
 
-
     let month =
         Number(
             parts.find(
@@ -112,14 +92,12 @@ function getSiteToday() {
             ).value
         ) - 1;
 
-
     let day =
         Number(
             parts.find(
                 x => x.type === "day"
             ).value
         );
-
 
     const hour =
         Number(
@@ -170,30 +148,19 @@ const today =
 
 
 // ==================================================
-// יצירת מפתח תאריך
+// מפתח התאריך
 // ==================================================
 
-function getDateKeyFromDate(date) {
-
-    return (
-
-        date.getFullYear() +
-        "-" +
-        String(
-            date.getMonth() + 1
-        ).padStart(2, "0") +
-        "-" +
-        String(
-            date.getDate()
-        ).padStart(2, "0")
-
-    );
-
-}
-
-
 const dateKey =
-    getDateKeyFromDate(today);
+    today.getFullYear() +
+    "-" +
+    String(
+        today.getMonth() + 1
+    ).padStart(2, "0") +
+    "-" +
+    String(
+        today.getDate()
+    ).padStart(2, "0");
 
 
 // ==================================================
@@ -205,18 +172,15 @@ const savedData =
         localStorage.getItem("dietData")
     ) || {};
 
-
 const foodData =
     JSON.parse(
         localStorage.getItem("foodData")
     ) || {};
 
-
 const activityData =
     JSON.parse(
         localStorage.getItem("activityData")
     ) || {};
-
 
 const finishDayData =
     JSON.parse(
@@ -297,7 +261,7 @@ if (todayDate) {
 
 
 // ==================================================
-// קלוריות היום
+// קלוריות
 // ==================================================
 
 function getTodayCalories() {
@@ -312,9 +276,7 @@ function getTodayCalories() {
             food
         ) =>
             total +
-            Number(
-                food.calories || 0
-            ),
+            Number(food.calories || 0),
         0
     );
 
@@ -322,7 +284,7 @@ function getTodayCalories() {
 
 
 // ==================================================
-// פעילות היום
+// פעילות
 // ==================================================
 
 function getTodayActivityMinutes() {
@@ -337,9 +299,7 @@ function getTodayActivityMinutes() {
             activity
         ) =>
             total +
-            Number(
-                activity.minutes || 0
-            ),
+            Number(activity.minutes || 0),
         0
     );
 
@@ -347,7 +307,7 @@ function getTodayActivityMinutes() {
 
 
 // ==================================================
-// ציון היום
+// ציון
 // ==================================================
 
 function getTodayScore() {
@@ -820,1061 +780,14 @@ taskButtons.forEach(
 
 
 // ==================================================
-// עזר - HTML בטוח
-// ==================================================
-
-function escapeHtml(value) {
-
-    return String(
-        value ?? ""
-    )
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-}
-
-
-// ==================================================
-// יצירת רשימת מאכלים למייל
-// ==================================================
-
-function createFoodEmailText(
-    targetDateKey
-) {
-
-    const foods =
-        foodData[targetDateKey] || [];
-
-
-    if (foods.length === 0) {
-
-        return "לא נרשמו מאכלים.";
-
-    }
-
-
-    return foods.map(
-        food => {
-
-            const emoji =
-                food.emoji || "🍽️";
-
-            const name =
-                escapeHtml(food.name || "מאכל");
-
-            const amount =
-                escapeHtml(food.amount || "");
-
-            const calories =
-                Number(
-                    food.calories || 0
-                );
-
-
-            return (
-                `${emoji} ${name}` +
-                (amount
-                    ? ` | כמות: ${amount}`
-                    : "") +
-                ` | ${calories} קלוריות`
-            );
-
-        }
-    ).join("\n");
-
-}
-
-
-// ==================================================
-// יצירת רשימת פעילות למייל
-// ==================================================
-
-function createActivityEmailText(
-    targetDateKey
-) {
-
-    const activities =
-        activityData[targetDateKey] || [];
-
-
-    if (activities.length === 0) {
-
-        return "לא נרשמה פעילות.";
-
-    }
-
-
-    return activities.map(
-        activity => {
-
-            const emoji =
-                activity.emoji || "🏃";
-
-            const name =
-                escapeHtml(
-                    activity.name || "פעילות"
-                );
-
-            const minutes =
-                Number(
-                    activity.minutes || 0
-                );
-
-
-            return (
-                `${emoji} ${name}` +
-                ` | ${minutes} דקות`
-            );
-
-        }
-    ).join("\n");
-
-}
-
-
-// ==================================================
-// שליחת מייל יומי
-// ==================================================
-
-async function sendDailyEmail() {
-
-    if (
-        typeof emailjs ===
-        "undefined"
-    ) {
-
-        console.error(
-            "EmailJS לא נטען."
-        );
-
-        return false;
-
-    }
-
-
-    const calories =
-        getTodayCalories();
-
-
-    const minutes =
-        getTodayActivityMinutes();
-
-
-    const score =
-        getTodayScore();
-
-
-    const challengeCompleted =
-        !!(
-            savedData[dateKey] &&
-            savedData[dateKey].challenge
-        );
-
-
-    const foodsText =
-        createFoodEmailText(
-            dateKey
-        );
-
-
-    const activitiesText =
-        createActivityEmailText(
-            dateKey
-        );
-
-
-    const caloriesStatus =
-        calories <=
-        DAILY_CALORIE_TARGET
-            ? "✓ עמדתי ביעד"
-            : `⚠️ חריגה של ${
-                calories -
-                DAILY_CALORIE_TARGET
-            } קלוריות`;
-
-
-    const activityStatus =
-        minutes >=
-        DAILY_ACTIVITY_TARGET
-            ? "✓ עמדתי ביעד"
-            : `נותרו ${
-                DAILY_ACTIVITY_TARGET -
-                minutes
-            } דקות`;
-
-
-    const challengeStatus =
-        challengeCompleted
-            ? "✓ הושלם"
-            : "○ לא הושלם";
-
-
-    const templateParams = {
-
-        report_type:
-            "סיכום יומי",
-
-        report_title:
-            "🌸 סיכום היום שלי",
-
-        report_date:
-            `${today.getDate()} ב${months[today.getMonth()]} ${today.getFullYear()}`,
-
-        day_name:
-            `יום ${daysOfWeek[today.getDay()]}`,
-
-        calories:
-            calories,
-
-        calorie_target:
-            DAILY_CALORIE_TARGET,
-
-        calories_status:
-            caloriesStatus,
-
-        foods:
-            foodsText,
-
-        activity_minutes:
-            minutes,
-
-        activity_target:
-            DAILY_ACTIVITY_TARGET,
-
-        activity_status:
-            activityStatus,
-
-        activities:
-            activitiesText,
-
-        challenge:
-            challengeStatus,
-
-        challenge_completed:
-            challengeCompleted
-                ? "כן"
-                : "לא",
-
-        score:
-            `${score} / 3`
-
-    };
-
-
-    try {
-
-        await emailjs.send(
-            EMAILJS_SERVICE_ID,
-            EMAILJS_TEMPLATE_ID,
-            templateParams
-        );
-
-
-        console.log(
-            "המייל היומי נשלח בהצלחה"
-        );
-
-
-        return true;
-
-    }
-    catch (error) {
-
-        console.error(
-            "שגיאה בשליחת המייל:",
-            error
-        );
-
-
-        return false;
-
-    }
-
-}
-
-
-// ==================================================
-// קבלת רשימת תאריכים בטווח
-// ==================================================
-
-function getDatesBetween(
-    startDate,
-    endDate
-) {
-
-    const dates = [];
-
-    const current =
-        new Date(startDate);
-
-
-    while (
-        current <= endDate
-    ) {
-
-        dates.push(
-            getDateKeyFromDate(
-                current
-            )
-        );
-
-
-        current.setDate(
-            current.getDate() + 1
-        );
-
-    }
-
-
-    return dates;
-
-}
-
-
-// ==================================================
-// סיכום נתונים לטווח
-// ==================================================
-
-function createPeriodSummary(
-    startDate,
-    endDate
-) {
-
-    const dateKeys =
-        getDatesBetween(
-            startDate,
-            endDate
-        );
-
-
-    let totalCalories = 0;
-    let totalActivity = 0;
-
-    let successfulFoodDays = 0;
-    let successfulActivityDays = 0;
-    let successfulChallengeDays = 0;
-
-
-    const foodLines = [];
-    const activityLines = [];
-    const challengeLines = [];
-
-
-    dateKeys.forEach(
-        key => {
-
-            const foods =
-                foodData[key] || [];
-
-
-            const activities =
-                activityData[key] || [];
-
-
-            const dayCalories =
-                foods.reduce(
-                    (
-                        total,
-                        food
-                    ) =>
-                        total +
-                        Number(
-                            food.calories || 0
-                        ),
-                    0
-                );
-
-
-            const dayActivity =
-                activities.reduce(
-                    (
-                        total,
-                        activity
-                    ) =>
-                        total +
-                        Number(
-                            activity.minutes || 0
-                        ),
-                    0
-                );
-
-
-            const challengeCompleted =
-                !!(
-                    savedData[key] &&
-                    savedData[key].challenge
-                );
-
-
-            totalCalories +=
-                dayCalories;
-
-
-            totalActivity +=
-                dayActivity;
-
-
-            const dayFoodSuccess =
-                !!(
-                    finishDayData[key] &&
-                    finishDayData[key].finished === true &&
-                    dayCalories <=
-                    DAILY_CALORIE_TARGET
-                );
-
-
-            const dayActivitySuccess =
-                dayActivity >=
-                DAILY_ACTIVITY_TARGET;
-
-
-            if (dayFoodSuccess) {
-
-                successfulFoodDays++;
-
-            }
-
-
-            if (dayActivitySuccess) {
-
-                successfulActivityDays++;
-
-            }
-
-
-            if (challengeCompleted) {
-
-                successfulChallengeDays++;
-
-            }
-
-
-            if (
-                foods.length > 0
-            ) {
-
-                foods.forEach(
-                    food => {
-
-                        foodLines.push(
-                            `${key} | ${
-                                food.emoji || "🍽️"
-                            } ${
-                                food.name || "מאכל"
-                            } | ${
-                                food.amount || ""
-                            } | ${
-                                Number(
-                                    food.calories || 0
-                                )
-                            } קלוריות`
-                        );
-
-                    }
-                );
-
-            }
-
-
-            if (
-                activities.length > 0
-            ) {
-
-                activities.forEach(
-                    activity => {
-
-                        activityLines.push(
-                            `${key} | ${
-                                activity.emoji || "🏃"
-                            } ${
-                                activity.name || "פעילות"
-                            } | ${
-                                Number(
-                                    activity.minutes || 0
-                                )
-                            } דקות`
-                        );
-
-                    }
-                );
-
-            }
-
-
-            challengeLines.push(
-                `${key} | ${
-                    challengeCompleted
-                        ? "✓ הושלם"
-                        : "○ לא הושלם"
-                }`
-            );
-
-        }
-    );
-
-
-    return {
-
-        totalDays:
-            dateKeys.length,
-
-        totalCalories,
-
-        totalActivity,
-
-        successfulFoodDays,
-
-        successfulActivityDays,
-
-        successfulChallengeDays,
-
-        foodLines:
-            foodLines.length > 0
-                ? foodLines.join("\n")
-                : "לא נרשמו מאכלים.",
-
-        activityLines:
-            activityLines.length > 0
-                ? activityLines.join("\n")
-                : "לא נרשמה פעילות.",
-
-        challengeLines:
-            challengeLines.join("\n")
-
-    };
-
-}
-
-
-// ==================================================
-// האם היום שבת?
-// ==================================================
-
-function isSaturday() {
-
-    return today.getDay() === 6;
-
-}
-
-
-// ==================================================
-// האם היום האחרון בחודש?
-// ==================================================
-
-function isLastDayOfMonth() {
-
-    const tomorrow =
-        new Date(today);
-
-
-    tomorrow.setDate(
-        tomorrow.getDate() + 1
-    );
-
-
-    return (
-        tomorrow.getMonth() !==
-        today.getMonth()
-    );
-
-}
-
-
-// ==================================================
-// האם היום האחרון בשנה?
-// ==================================================
-
-function isLastDayOfYear() {
-
-    return (
-        today.getMonth() === 11 &&
-        today.getDate() === 31
-    );
-
-}
-
-
-// ==================================================
-// תאריך תחילת שבוע
-// ראשון עד שבת
-// ==================================================
-
-function getStartOfWeek(
-    date
-) {
-
-    const result =
-        new Date(date);
-
-
-    result.setDate(
-        result.getDate() -
-        result.getDay()
-    );
-
-
-    return result;
-
-}
-
-
-// ==================================================
-// שליחת סיכום תקופתי
-// ==================================================
-
-async function sendPeriodEmail(
-    type,
-    startDate,
-    endDate
-) {
-
-    if (
-        typeof emailjs ===
-        "undefined"
-    ) {
-
-        console.error(
-            "EmailJS לא נטען."
-        );
-
-        return false;
-
-    }
-
-
-    const summary =
-        createPeriodSummary(
-            startDate,
-            endDate
-        );
-
-
-    let title = "";
-
-
-    if (type === "שבועי") {
-
-        title =
-            "📅 סיכום שבועי";
-
-    }
-    else if (type === "חודשי") {
-
-        title =
-            "🗓️ סיכום חודשי";
-
-    }
-    else {
-
-        title =
-            "🏆 סיכום שנתי";
-
-    }
-
-
-    const templateParams = {
-
-        report_type:
-            `סיכום ${type}`,
-
-        report_title:
-            title,
-
-        report_date:
-            `${getDateKeyFromDate(startDate)} עד ${getDateKeyFromDate(endDate)}`,
-
-        day_name:
-            "",
-
-        calories:
-            summary.totalCalories,
-
-        calorie_target:
-            DAILY_CALORIE_TARGET,
-
-        calories_status:
-            "",
-
-        foods:
-            summary.foodLines,
-
-        activity_minutes:
-            summary.totalActivity,
-
-        activity_target:
-            DAILY_ACTIVITY_TARGET,
-
-        activity_status:
-            "",
-
-        activities:
-            summary.activityLines,
-
-        challenge:
-            "",
-
-        challenge_completed:
-            `${summary.successfulChallengeDays} ימים`,
-
-        score:
-            "",
-
-        total_days:
-            summary.totalDays,
-
-        successful_food_days:
-            summary.successfulFoodDays,
-
-        successful_activity_days:
-            summary.successfulActivityDays,
-
-        successful_challenge_days:
-            summary.successfulChallengeDays
-
-    };
-
-
-    try {
-
-        await emailjs.send(
-            EMAILJS_SERVICE_ID,
-            EMAILJS_TEMPLATE_ID,
-            templateParams
-        );
-
-
-        console.log(
-            `המייל ה${type} נשלח בהצלחה`
-        );
-
-
-        return true;
-
-    }
-    catch (error) {
-
-        console.error(
-            `שגיאה בשליחת המייל ה${type}:`,
-            error
-        );
-
-
-        return false;
-
-    }
-
-}
-
-
-// ==================================================
-// שליחת מיילים בסיום היום
-// ==================================================
-
-async function sendRelevantEmails() {
-
-    // ------------------------------------------------
-    // מייל יומי
-    // ------------------------------------------------
-
-    await sendDailyEmail();
-
-
-    // ------------------------------------------------
-    // מייל שבועי בסוף שבת
-    // ------------------------------------------------
-
-    if (isSaturday()) {
-
-        const weekStart =
-            getStartOfWeek(
-                today
-            );
-
-
-        const weekEnd =
-            new Date(today);
-
-
-        await sendPeriodEmail(
-            "שבועי",
-            weekStart,
-            weekEnd
-        );
-
-    }
-
-
-    // ------------------------------------------------
-    // מייל חודשי
-    // ------------------------------------------------
-
-    if (
-        isLastDayOfMonth()
-    ) {
-
-        const monthStart =
-            new Date(
-                today.getFullYear(),
-                today.getMonth(),
-                1
-            );
-
-
-        const monthEnd =
-            new Date(today);
-
-
-        await sendPeriodEmail(
-            "חודשי",
-            monthStart,
-            monthEnd
-        );
-
-    }
-
-
-    // ------------------------------------------------
-    // מייל שנתי
-    // ------------------------------------------------
-
-    if (
-        isLastDayOfYear()
-    ) {
-
-        const yearStart =
-            new Date(
-                today.getFullYear(),
-                0,
-                1
-            );
-
-
-        const yearEnd =
-            new Date(today);
-
-
-        await sendPeriodEmail(
-            "שנתי",
-            yearStart,
-            yearEnd
-        );
-
-    }
-
-}
-
-
-// ==================================================
-// מניעת שליחה כפולה
-// ==================================================
-
-function getEmailSentKey(
-    type
-) {
-
-    return (
-        "emailSent_" +
-        type +
-        "_" +
-        dateKey
-    );
-
-}
-
-
-function wasEmailSent(
-    type
-) {
-
-    return (
-        localStorage.getItem(
-            getEmailSentKey(type)
-        ) === "true"
-    );
-
-}
-
-
-function markEmailSent(
-    type
-) {
-
-    localStorage.setItem(
-        getEmailSentKey(type),
-        "true"
-    );
-
-}
-
-
-// ==================================================
-// שליחת המיילים בצורה בטוחה
-// ==================================================
-
-async function sendEmailsOnce() {
-
-    // ----------------------------------------------
-    // מייל יומי
-    // ----------------------------------------------
-
-    if (
-        !wasEmailSent("daily")
-    ) {
-
-        const success =
-            await sendDailyEmail();
-
-
-        if (success) {
-
-            markEmailSent(
-                "daily"
-            );
-
-        }
-
-    }
-
-
-    // ----------------------------------------------
-    // מייל שבועי
-    // ----------------------------------------------
-
-    if (
-        isSaturday() &&
-        !wasEmailSent("weekly")
-    ) {
-
-        const weekStart =
-            getStartOfWeek(
-                today
-            );
-
-
-        const success =
-            await sendPeriodEmail(
-                "שבועי",
-                weekStart,
-                today
-            );
-
-
-        if (success) {
-
-            markEmailSent(
-                "weekly"
-            );
-
-        }
-
-    }
-
-
-    // ----------------------------------------------
-    // מייל חודשי
-    // ----------------------------------------------
-
-    if (
-        isLastDayOfMonth() &&
-        !wasEmailSent("monthly")
-    ) {
-
-        const monthStart =
-            new Date(
-                today.getFullYear(),
-                today.getMonth(),
-                1
-            );
-
-
-        const success =
-            await sendPeriodEmail(
-                "חודשי",
-                monthStart,
-                today
-            );
-
-
-        if (success) {
-
-            markEmailSent(
-                "monthly"
-            );
-
-        }
-
-    }
-
-
-    // ----------------------------------------------
-    // מייל שנתי
-    // ----------------------------------------------
-
-    if (
-        isLastDayOfYear() &&
-        !wasEmailSent("yearly")
-    ) {
-
-        const yearStart =
-            new Date(
-                today.getFullYear(),
-                0,
-                1
-            );
-
-
-        const success =
-            await sendPeriodEmail(
-                "שנתי",
-                yearStart,
-                today
-            );
-
-
-        if (success) {
-
-            markEmailSent(
-                "yearly"
-            );
-
-        }
-
-    }
-
-}
-
-
-// ==================================================
-// כפתור סיום היום
+// סיום היום
 // ==================================================
 
 if (finishDayButton) {
 
     finishDayButton.addEventListener(
         "click",
-        async () => {
-
-            // ----------------------------------------
-            // אם היום כבר הסתיים — ביטול הסיום
-            // ----------------------------------------
+        () => {
 
             if (isDayFinished()) {
 
@@ -1905,9 +818,7 @@ if (finishDayButton) {
 
 
                 window.dispatchEvent(
-                    new Event(
-                        "xpDataChanged"
-                    )
+                    new Event("xpDataChanged")
                 );
 
 
@@ -1918,25 +829,13 @@ if (finishDayButton) {
             }
 
 
-            // ----------------------------------------
-            // שמירת המצב הקודם
-            // ----------------------------------------
-
             const previousFood =
                 savedData[dateKey].food;
 
 
-            // ----------------------------------------
-            // קלוריות
-            // ----------------------------------------
-
             const calories =
                 getTodayCalories();
 
-
-            // ----------------------------------------
-            // שמירת סיום היום
-            // ----------------------------------------
 
             finishDayData[dateKey] = {
 
@@ -1949,8 +848,7 @@ if (finishDayButton) {
 
 
             savedData[dateKey].food =
-                calories <=
-                DAILY_CALORIE_TARGET;
+                calories <= DAILY_CALORIE_TARGET;
 
 
             localStorage.setItem(
@@ -1968,68 +866,11 @@ if (finishDayButton) {
 
 
             window.dispatchEvent(
-                new Event(
-                    "xpDataChanged"
-                )
+                new Event("xpDataChanged")
             );
 
 
             loadToday();
-
-
-            // ----------------------------------------
-            // שליחת מיילים
-            // ----------------------------------------
-
-            if (finishDayMessage) {
-
-                finishDayMessage.textContent =
-                    "📧 שולחת את סיכום היום...";
-
-            }
-
-
-            await sendEmailsOnce();
-
-
-            // ----------------------------------------
-            // הודעה למשתמשת
-            // ----------------------------------------
-
-            if (finishDayMessage) {
-
-                if (
-                    isLastDayOfYear()
-                ) {
-
-                    finishDayMessage.textContent =
-                        "🎉 היום הסתיים! נשלחו הסיכומים היומי, השבועי, החודשי והשנתי.";
-
-                }
-                else if (
-                    isLastDayOfMonth()
-                ) {
-
-                    finishDayMessage.textContent =
-                        "🌸 היום הסתיים! נשלחו הסיכומים היומי, השבועי והחודשי.";
-
-                }
-                else if (
-                    isSaturday()
-                ) {
-
-                    finishDayMessage.textContent =
-                        "🌸 היום הסתיים! נשלחו הסיכום היומי והשבועי.";
-
-                }
-                else {
-
-                    finishDayMessage.textContent =
-                        "📧 היום הסתיים והסיכום נשלח במייל.";
-
-                }
-
-            }
 
         }
     );
@@ -2045,7 +886,6 @@ const greeting =
     document.getElementById(
         "greeting"
     );
-
 
 const timeMessage =
     document.getElementById(
@@ -2129,36 +969,30 @@ const homeChallengeName =
         "homeChallengeName"
     );
 
-
 const homeChallengeDescription =
     document.getElementById(
         "homeChallengeDescription"
     );
-
 
 const homeChallengeIcon =
     document.getElementById(
         "homeChallengeIcon"
     );
 
-
 const homeWeekNumber =
     document.getElementById(
         "homeWeekNumber"
     );
-
 
 const homeChallengeProgress =
     document.getElementById(
         "homeChallengeProgress"
     );
 
-
 const homeChallengeScore =
     document.getElementById(
         "homeChallengeScore"
     );
-
 
 const homeChallengeDays =
     document.getElementById(
@@ -2182,14 +1016,11 @@ function updateHomeChallenge() {
     homeChallengeName.textContent =
         currentChallenge.name;
 
-
     homeChallengeDescription.textContent =
         currentChallenge.description;
 
-
     homeChallengeIcon.textContent =
         currentChallenge.icon;
-
 
     homeWeekNumber.textContent =
         `שבוע ${currentWeek}`;
@@ -2212,7 +1043,6 @@ function updateHomeChallenge() {
 
 
     const dayNames = [
-
         "א׳",
         "ב׳",
         "ג׳",
@@ -2220,7 +1050,6 @@ function updateHomeChallenge() {
         "ה׳",
         "ו׳",
         "ש׳"
-
     ];
 
 
@@ -2334,9 +1163,7 @@ function updateHomeChallenge() {
 
 
                     window.dispatchEvent(
-                        new Event(
-                            "xpDataChanged"
-                        )
+                        new Event("xpDataChanged")
                     );
 
 
@@ -2377,9 +1204,29 @@ function updateHomeChallenge() {
     homeChallengeScore.textContent =
         `${completed} מתוך 7 ימים`;
 
-
     homeChallengeProgress.style.width =
         `${(completed / 7) * 100}%`;
+
+}
+
+
+function getDateKeyFromDate(
+    date
+) {
+
+    return (
+
+        date.getFullYear() +
+        "-" +
+        String(
+            date.getMonth() + 1
+        ).padStart(2, "0") +
+        "-" +
+        String(
+            date.getDate()
+        ).padStart(2, "0")
+
+    );
 
 }
 
@@ -2393,18 +1240,15 @@ const countdownDays =
         "countdownDays"
     );
 
-
 const countdownHours =
     document.getElementById(
         "countdownHours"
     );
 
-
 const countdownMinutes =
     document.getElementById(
         "countdownMinutes"
     );
-
 
 const countdownSeconds =
     document.getElementById(
@@ -2430,24 +1274,16 @@ function updateCountdown() {
     ) {
 
         if (countdownDays)
-            countdownDays.textContent =
-                "0";
-
+            countdownDays.textContent = "0";
 
         if (countdownHours)
-            countdownHours.textContent =
-                "00";
-
+            countdownHours.textContent = "00";
 
         if (countdownMinutes)
-            countdownMinutes.textContent =
-                "00";
-
+            countdownMinutes.textContent = "00";
 
         if (countdownSeconds)
-            countdownSeconds.textContent =
-                "00";
-
+            countdownSeconds.textContent = "00";
 
         return;
 
@@ -2488,32 +1324,24 @@ function updateCountdown() {
 
 
     if (countdownDays)
-        countdownDays.textContent =
-            days;
-
+        countdownDays.textContent = days;
 
     if (countdownHours)
         countdownHours.textContent =
-            String(hours)
-                .padStart(2, "0");
-
+            String(hours).padStart(2, "0");
 
     if (countdownMinutes)
         countdownMinutes.textContent =
-            String(minutes)
-                .padStart(2, "0");
-
+            String(minutes).padStart(2, "0");
 
     if (countdownSeconds)
         countdownSeconds.textContent =
-            String(seconds)
-                .padStart(2, "0");
+            String(seconds).padStart(2, "0");
 
 }
 
 
 updateCountdown();
-
 
 setInterval(
     updateCountdown,
@@ -2532,6 +1360,5 @@ localStorage.setItem(
 
 
 loadToday();
-
 
 updateHomeChallenge();
