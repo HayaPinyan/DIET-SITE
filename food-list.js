@@ -331,9 +331,22 @@ function createRow(
 
             <input
                 type="text"
+                class="food-unit-input"
+                value="${escapeHtml(food.unit || "")}"
+                placeholder="כוס, גרם, מ״ל..."
+                list="unitOptions"
+                autocomplete="off">
+
+        </td>
+
+
+        <td>
+
+            <input
+                type="text"
                 class="food-amount-input"
                 value="${escapeHtml(food.amount)}"
-                placeholder="לדוגמה: 1 יחידה">
+                placeholder="לדוגמה: 100">
 
         </td>
 
@@ -370,6 +383,11 @@ function createRow(
     const nameInput =
         row.querySelector(
             ".food-name-input"
+        );
+
+    const unitInput =
+        row.querySelector(
+            ".food-unit-input"
         );
 
     const amountInput =
@@ -413,6 +431,24 @@ function createRow(
 
             emojiElement.textContent =
                 food.emoji;
+
+
+            saveCatalog();
+
+        }
+    );
+
+
+    // ----------------------------------------------
+    // סוג יחידה
+    // ----------------------------------------------
+
+    unitInput.addEventListener(
+        "input",
+        () => {
+
+            food.unit =
+                unitInput.value;
 
 
             saveCatalog();
@@ -593,6 +629,9 @@ function addFoodRow() {
             "",
 
         emoji:
+            "",
+
+        unit:
             "",
 
         amount:

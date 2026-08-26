@@ -401,7 +401,15 @@ function showSuggestions(
                         ${escapeHtml(food.amount || "")}
 
                         ${
-                            food.amount
+                            food.amount && food.unit
+                                ? " "
+                                : ""
+                        }
+
+                        ${escapeHtml(food.unit || "")}
+
+                        ${
+                            food.amount || food.unit
                                 ? " · "
                                 : ""
                         }
@@ -466,6 +474,17 @@ function addFoodFromCatalog(
     catalogFood
 ) {
 
+    const baseAmount =
+        Number(
+            catalogFood.amount
+        ) || 0;
+
+    const baseCalories =
+        Number(
+            catalogFood.calories
+        ) || 0;
+
+
     allFoodData[dateKey].push({
 
         id:
@@ -480,13 +499,25 @@ function addFoodFromCatalog(
                 catalogFood.name
             ),
 
+        unit:
+            catalogFood.unit || "",
+
         amount:
             catalogFood.amount || "",
 
         calories:
-            Number(
-                catalogFood.calories
-            ) || 0
+            baseCalories,
+
+        // ------------------------------------------
+        // "בסיס" מהמאגר, לחישוב קלוריות יחסי
+        // כשמשנים את הכמות
+        // ------------------------------------------
+
+        baseAmount:
+            baseAmount,
+
+        baseCalories:
+            baseCalories
 
     });
 
@@ -565,10 +596,19 @@ function addFood(
         emoji:
             emoji,
 
+        unit:
+            "",
+
         amount:
             "",
 
         calories:
+            0,
+
+        baseAmount:
+            0,
+
+        baseCalories:
             0
 
     });
@@ -589,12 +629,48 @@ function addFood(
 
 
 // ==================================================
+// שינוי יחידה
+// ==================================================
+
+function updateUnit(
+    id,
+    value
+) {
+
+    const food =
+        allFoodData[dateKey]
+            .find(
+                item =>
+                    item.id === id
+            );
+
+
+    if (!food) {
+        return;
+    }
+
+
+    food.unit =
+        value;
+
+
+    saveFoodData();
+
+}
+
+
+// ==================================================
 // שינוי כמות
+// ==================================================
+//
+// אם למאכל יש "בסיס" מהמאגר (כמות + קלוריות),
+// הקלוריות מתעדכנות אוטומטית באופן יחסי לכמות החדשה.
 // ==================================================
 
 function updateAmount(
     id,
-    value
+    value,
+    calorieInput
 ) {
 
     const food =
@@ -614,7 +690,48 @@ function updateAmount(
         value;
 
 
+    const hasBase =
+        Number(food.baseAmount) > 0;
+
+
+    if (hasBase) {
+
+        const newAmount =
+            Number(value) || 0;
+
+
+        const newCalories =
+            Math.round(
+                (
+                    food.baseCalories *
+                    newAmount
+                ) /
+                food.baseAmount
+            );
+
+
+        food.calories =
+            newCalories;
+
+
+        if (calorieInput) {
+
+            calorieInput.value =
+                newCalories;
+
+        }
+
+    }
+
+
     saveFoodData();
+
+    updateTotal();
+
+
+    window.dispatchEvent(
+        new Event("xpDataChanged")
+    );
 
 }
 
@@ -648,6 +765,30 @@ function updateCalories(
                 0,
                 Number(value) || 0
             );
+
+
+    // ----------------------------------------------
+    // אם עדכנו את הקלוריות ידנית, "מבסיסים" מחדש
+    // את היחס מול הכמות הנוכחית - כך ששינוי כמות
+    // עתידי ימשיך לחשב באופן יחסי נכון
+    // ----------------------------------------------
+
+    const currentAmount =
+        Number(food.amount);
+
+
+    if (
+        currentAmount > 0 &&
+        food.calories !== ""
+    ) {
+
+        food.baseAmount =
+            currentAmount;
+
+        food.baseCalories =
+            food.calories;
+
+    }
 
 
     saveFoodData();
@@ -746,6 +887,19 @@ function renderFoodTable() {
 
                     <input
                         type="text"
+                        value="${escapeHtml(food.unit || "")}"
+                        placeholder="כוס, גרם..."
+                        list="unitOptions"
+                        autocomplete="off"
+                        class="unit-input">
+
+                </td>
+
+
+                <td>
+
+                    <input
+                        type="text"
                         value="${escapeHtml(food.amount || "")}"
                         placeholder="כמות"
                         class="amount-input">
@@ -785,6 +939,31 @@ function renderFoodTable() {
             `;
 
 
+            const unitInput =
+                row.querySelector(
+                    ".unit-input"
+                );
+
+
+            unitInput.addEventListener(
+                "input",
+                () => {
+
+                    updateUnit(
+                        food.id,
+                        unitInput.value
+                    );
+
+                }
+            );
+
+
+            const calorieInput =
+                row.querySelector(
+                    ".calorie-input"
+                );
+
+
             const amountInput =
                 row.querySelector(
                     ".amount-input"
@@ -797,17 +976,12 @@ function renderFoodTable() {
 
                     updateAmount(
                         food.id,
-                        amountInput.value
+                        amountInput.value,
+                        calorieInput
                     );
 
                 }
             );
-
-
-            const calorieInput =
-                row.querySelector(
-                    ".calorie-input"
-                );
 
 
             calorieInput.addEventListener(

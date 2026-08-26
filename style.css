@@ -1466,6 +1466,8 @@ button {
 }
 
 
+.unit-input,
+.amount-input,
 .calorie-input {
     width: 100px;
 
@@ -1477,6 +1479,22 @@ button {
     border-radius: 9px;
 
     font-size: 14px;
+
+    font-family: inherit;
+
+    outline: none;
+
+    background: white;
+
+    transition:
+        border-color 0.2s;
+}
+
+
+.unit-input:focus,
+.amount-input:focus,
+.calorie-input:focus {
+    border-color: #b8c9b0;
 }
 
 
@@ -3515,18 +3533,22 @@ button:active {
 }
 
 .food-list-table th:nth-child(1) {
-    width: 42%;
+    width: 32%;
 }
 
 .food-list-table th:nth-child(2) {
-    width: 27%;
+    width: 20%;
 }
 
 .food-list-table th:nth-child(3) {
-    width: 21%;
+    width: 18%;
 }
 
 .food-list-table th:nth-child(4) {
+    width: 20%;
+}
+
+.food-list-table th:nth-child(5) {
     width: 10%;
 }
 
@@ -3563,6 +3585,7 @@ button:active {
 }
 
 .food-name-input,
+.food-unit-input,
 .food-amount-input,
 .food-calories-input {
 
@@ -3588,6 +3611,7 @@ button:active {
 }
 
 .food-name-input:focus,
+.food-unit-input:focus,
 .food-amount-input:focus,
 .food-calories-input:focus {
 
@@ -3669,7 +3693,7 @@ button:active {
     }
 
     .food-list-table {
-        min-width: 650px;
+        min-width: 750px;
     }
 
 }
