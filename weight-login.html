@@ -2,108 +2,64 @@
 <html lang="he" dir="rtl">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
-    <title>גישה למשקל</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>כניסה ליומן המשקל</title>
     <link rel="stylesheet" href="style.css">
-
 </head>
 
-
 <body>
-
     <header>
-
         <h1>🌸 המסע שלי</h1>
-<nav>
-
-            <a href="index.html">
-                🏠 היום
-            </a>
-
-            <a href="calendar.html">
-                📅 לוח שנה
-            </a>
-            <a href="food-list.html">
-    📋 מאגר מאכלים
-</a>
-            <a href="weight-login.html">
-    📉 משקל
-</a>
-
-            <a href="challenges.html">
-                🎯 אתגרים
-            </a>
-
-            <a href="progress.html">
-                📈 התקדמות
-            </a>
-
-            <a href="achievements.html">
-                🏆 הישגים
-            </a>
-
+        <nav>
+            <a href="index.html">🏠 היום</a>
+            <a href="calendar.html">📅 לוח שנה</a>
+            <a href="food-list.html">📋 מאגר מאכלים</a>
+            <a href="weight-login.html">📉 משקל</a>
+            <a href="challenges.html">🎯 אתגרים</a>
+            <a href="progress.html">📈 התקדמות</a>
+            <a href="achievements.html">🏆 הישגים</a>
         </nav>
-
     </header>
- 
 
     <main>
+        <section class="progress-card" style="max-width: 450px; margin: 40px auto; text-align: center;">
+            
+            <!-- טופס התחברות -->
+            <div id="loginSection">
+                <h2>🔒 כניסה למעקב משקל</h2>
+                <p>יש להזין סיסמה כדי לצפות בנתונים</p>
+                
+                <!-- הודעת מידע על הסיסמה ההתחלתית -->
+                <div style="background-color: #f0f7ff; border: 1px solid #b6d4fe; border-radius: 8px; padding: 10px; margin: 15px 0; color: #084298; font-size: 14px;">
+                    💡 <strong>סיסמה התחלתית:</strong> 1234 (ניתן לשנות אותה למטה)
+                </div>
 
-        <section class="weight-login-page">
-
-            <div class="weight-lock-icon">
-                🔒
+                <div style="margin: 20px 0;">
+                    <input type="password" id="passwordInput" placeholder="הזיני סיסמה" style="padding: 10px; font-size: 16px; width: 80%; border-radius: 8px; border: 1px solid #ccc; text-align: center;">
+                </div>
+                
+                <button id="loginBtn" style="padding: 10px 25px; font-size: 16px; cursor: pointer;">התחברי</button>
+                <p id="loginError" style="color: red; display: none; margin-top: 10px;">סיסמה שגויה, נסי שוב.</p>
             </div>
 
-            <h2>
-                האזור האישי שלי
-            </h2>
+            <!-- אזור שינוי סיסמה -->
+            <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
 
-            <p>
-                הזיני סיסמה כדי להיכנס
-            </p>
-
-
-            <div class="weight-login-box">
-
-                <input
-                    type="password"
-                    id="weightPassword"
-                    placeholder="הקלידי סיסמה"
-                    autocomplete="off">
-
-
-                <button
-                    id="weightLoginButton"
-                    type="button">
-
-                    כניסה
-
-                </button>
-
-
-                <p
-                    id="weightLoginError"
-                    class="weight-login-error">
-                </p>
-
+            <div id="changePasswordSection">
+                <h3>🔑 שינוי סיסמה</h3>
+                <div style="display: flex; flex-direction: column; gap: 10px; align-items: center; margin-top: 15px;">
+                    <input type="password" id="currentPassInput" placeholder="סיסמה נוכחית" style="padding: 8px; font-size: 14px; width: 80%; border-radius: 6px; border: 1px solid #ccc; text-align: center;">
+                    <input type="password" id="newPassInput" placeholder="סיסמה חדשה" style="padding: 8px; font-size: 14px; width: 80%; border-radius: 6px; border: 1px solid #ccc; text-align: center;">
+                    <button id="changePassBtn" style="padding: 8px 18px; font-size: 14px; cursor: pointer;">עדכני סיסמה</button>
+                </div>
+                <p id="changePassMsg" style="display: none; margin-top: 10px; font-weight: bold;"></p>
             </div>
 
         </section>
-
     </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
 
     <script src="weight-login.js"></script>
-<script src="xp.js"></script>
 </body>
 
 </html>
