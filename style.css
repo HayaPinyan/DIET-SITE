@@ -4224,3 +4224,25 @@ button:active {
     }
 
 }
+.chart-grid-line {
+    stroke: #e0e0e0;
+    stroke-dasharray: 4;
+    stroke-width: 1;
+}
+
+.chart-label {
+    fill: #777;
+    font-size: 11px;
+}
+
+.chart-weight-label {
+    fill: #333;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.weight-chart {
+    width: 100%;
+    min-width: 650px;
+    height: 380px;
+}

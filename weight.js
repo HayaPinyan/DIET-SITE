@@ -1,1035 +1,291 @@
 // ==================================================
-// הגדרות
-// ==================================================
-
-const WEIGHT_LOSS_GOAL = 50;
-
-
-// ==================================================
-// היום של האתר
-// ==================================================
-
-function getSiteToday() {
-
-    const parts =
-        new Intl.DateTimeFormat(
-            "en-CA",
-            {
-                timeZone: "Asia/Jerusalem",
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                hour12: false
-            }
-        ).formatToParts(new Date());
-
-
-    let year =
-        Number(
-            parts.find(
-                x => x.type === "year"
-            ).value
-        );
-
-    let month =
-        Number(
-            parts.find(
-                x => x.type === "month"
-            ).value
-        ) - 1;
-
-    let day =
-        Number(
-            parts.find(
-                x => x.type === "day"
-            ).value
-        );
-
-
-    const hour =
-        Number(
-            parts.find(
-                x => x.type === "hour"
-            ).value
-        );
-
-
-    if (hour < 6) {
-
-        const previousDay =
-            new Date(
-                year,
-                month,
-                day
-            );
-
-
-        previousDay.setDate(
-            previousDay.getDate() - 1
-        );
-
-
-        year =
-            previousDay.getFullYear();
-
-        month =
-            previousDay.getMonth();
-
-        day =
-            previousDay.getDate();
-
-    }
-
-
-    return new Date(
-        year,
-        month,
-        day
-    );
-
-}
-
-
-const today =
-    getSiteToday();
-
-
-const currentMonthKey =
-    today.getFullYear() +
-    "-" +
-    String(
-        today.getMonth() + 1
-    ).padStart(
-        2,
-        "0"
-    );
-
-
-// ==================================================
 // אלמנטים
 // ==================================================
-
-const weightInput =
-    document.getElementById(
-        "weightInput"
-    );
-
-const saveWeightButton =
-    document.getElementById(
-        "saveWeightButton"
-    );
-
-const weightLost =
-    document.getElementById(
-        "weightLost"
-    );
-
-const weightRemaining =
-    document.getElementById(
-        "weightRemaining"
-    );
-
-const weighInMessage =
-    document.getElementById(
-        "weighInMessage"
-    );
-
-const weighInCard =
-    document.getElementById(
-        "weighInCard"
-    );
-
-const weightChart =
-    document.getElementById(
-        "weightChart"
-    );
-
-const weightHistory =
-    document.getElementById(
-        "weightHistory"
-    );
-
+const weightInput = document.getElementById("weightInput");
+const saveWeightButton = document.getElementById("saveWeightButton");
+const currentWeightEl = document.getElementById("currentWeight");
+const weightLostEl = document.getElementById("weightLost");
+const startWeightEl = document.getElementById("startWeight");
+const weightChart = document.getElementById("weightChart");
+const weightHistory = document.getElementById("weightHistory");
 
 // ==================================================
-// נתונים
+// טעינת נתונים
 // ==================================================
+let weightData = JSON.parse(localStorage.getItem("weightData_v2")) || [];
 
-const weightData =
-    JSON.parse(
-        localStorage.getItem(
-            "weightData"
-        )
-    ) || {
-
-        startWeight: null,
-
-        weighIns: {}
-
-    };
-
-
-// ==================================================
-// שמירה
-// ==================================================
+// תמיכה בנתונים ישנים אם קיימים
+if (!Array.isArray(weightData)) {
+    weightData = [];
+}
 
 function saveWeightData() {
-
-    localStorage.setItem(
-        "weightData",
-        JSON.stringify(
-            weightData
-        )
-    );
-
+    localStorage.setItem("weightData_v2", JSON.stringify(weightData));
 }
 
-
 // ==================================================
-// ירידה
+// הוספת שקילה
 // ==================================================
-
-function getWeightLost() {
-
-    if (
-        weightData.startWeight === null
-    ) {
-
-        return 0;
-
-    }
-
-
-    const months =
-        Object.keys(
-            weightData.weighIns
-        ).sort();
-
-
-    if (
-        months.length === 0
-    ) {
-
-        return 0;
-
-    }
-
-
-    const latestMonth =
-        months[
-            months.length - 1
-        ];
-
-
-    const latestWeight =
-        Number(
-            weightData.weighIns[
-                latestMonth
-            ]
-        );
-
-
-    return Math.max(
-        0,
-        weightData.startWeight -
-        latestWeight
-    );
-
-}
-
-
-// ==================================================
-// נשאר
-// ==================================================
-
-function getWeightRemaining() {
-
-    return Math.max(
-        0,
-        WEIGHT_LOSS_GOAL -
-        getWeightLost()
-    );
-
-}
-
-
-// ==================================================
-// סיכום
-// ==================================================
-
-function updateSummary() {
-
-    if (weightLost) {
-
-        weightLost.textContent =
-            `${getWeightLost().toFixed(1)} ק״ג`;
-
-    }
-
-
-    if (weightRemaining) {
-
-        weightRemaining.textContent =
-            `${getWeightRemaining().toFixed(1)} ק״ג`;
-
-    }
-
-}
-
-
-// ==================================================
-// השקילה הבאה
-// ==================================================
-
-function getNextWeighInDate() {
-
-    let year =
-        today.getFullYear();
-
-    let month =
-        today.getMonth();
-
-
-    month++;
-
-
-    if (
-        month > 11
-    ) {
-
-        month = 0;
-
-        year++;
-
-    }
-
-
-    return new Date(
-        year,
-        month,
-        1
-    );
-
-}
-
-
-// ==================================================
-// הודעה
-// ==================================================
-
-function hasCurrentMonthWeighIn() {
-
-    return Object.prototype.hasOwnProperty.call(
-        weightData.weighIns,
-        currentMonthKey
-    );
-
-}
-
-
-function updateWeighInMessage() {
-
-    if (
-        !weighInMessage ||
-        !weighInCard
-    ) {
-
-        return;
-
-    }
-
-
-    weighInCard.classList.remove(
-        "weigh-in-today"
-    );
-
-
-    if (
-        hasCurrentMonthWeighIn()
-    ) {
-
-        const nextDate =
-            getNextWeighInDate()
-                .toLocaleDateString(
-                    "he-IL",
-                    {
-                        day:
-                            "2-digit",
-                        month:
-                            "2-digit",
-                        year:
-                            "numeric"
-                    }
-                );
-
-
-        weighInMessage.textContent =
-            `✅ השקילה של החודש כבר בוצעה. השקילה הבאה: ${nextDate}`;
-
-        return;
-
-    }
-
-
-    if (
-        today.getDate() === 1
-    ) {
-
-        weighInMessage.textContent =
-            "⚖️ היום הוא יום השקילה החודשי שלך!";
-
-
-        weighInCard.classList.add(
-            "weigh-in-today"
-        );
-
-
-        return;
-
-    }
-
-
-    const nextDate =
-        new Date(
-            today.getFullYear(),
-            today.getMonth() + 1,
-            1
-        )
-            .toLocaleDateString(
-                "he-IL",
-                {
-                    day:
-                        "2-digit",
-                    month:
-                        "2-digit",
-                    year:
-                        "numeric"
-                }
-            );
-
-
-    weighInMessage.textContent =
-        `השקילה הבאה: ${nextDate}`;
-
-}
-
-
-// ==================================================
-// שמירת שקילה
-// ==================================================
-
 if (saveWeightButton) {
+    saveWeightButton.addEventListener("click", () => {
+        const val = Number(weightInput.value);
 
-    saveWeightButton.addEventListener(
-        "click",
-        () => {
-
-            const value =
-                Number(
-                    weightInput.value
-                );
-
-
-            if (
-                !value ||
-                value <= 0
-            ) {
-
-                alert(
-                    "נא להזין משקל תקין."
-                );
-
-                return;
-
-            }
-
-
-            if (
-                weightData.startWeight ===
-                null
-            ) {
-
-                weightData.startWeight =
-                    value;
-
-            }
-
-
-            weightData.weighIns[
-                currentMonthKey
-            ] = value;
-
-
-            saveWeightData();
-
-
-            weightInput.value =
-                "";
-
-
-            updateAll();
-
+        if (!val || val <= 0) {
+            alert("נא להזין משקל תקין.");
+            return;
         }
-    );
 
+        const now = new Date();
+        const timestamp = now.toISOString();
+        const displayDate = now.toLocaleDateString("he-IL", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+
+        weightData.push({
+            weight: val,
+            timestamp: timestamp,
+            dateStr: displayDate
+        });
+
+        saveWeightData();
+        weightInput.value = "";
+        updateAll();
+    });
 }
 
+// ==================================================
+// עדכון סיכום
+// ==================================================
+function updateSummary() {
+    if (weightData.length === 0) {
+        if (currentWeightEl) currentWeightEl.textContent = "-- ק״ג";
+        if (startWeightEl) startWeightEl.textContent = "-- ק״ג";
+        if (weightLostEl) weightLostEl.textContent = "0 ק״ג";
+        return;
+    }
+
+    const first = weightData[0].weight;
+    const latest = weightData[weightData.length - 1].weight;
+    const diff = latest - first;
+
+    if (currentWeightEl) currentWeightEl.textContent = `${latest.toFixed(1)} ק״ג`;
+    if (startWeightEl) startWeightEl.textContent = `${first.toFixed(1)} ק״ג`;
+
+    if (weightLostEl) {
+        if (diff < 0) {
+            weightLostEl.textContent = `🟢 ירידה של ${Math.abs(diff).toFixed(1)} ק״ג`;
+            weightLostEl.style.color = "#2e7d32";
+        } else if (diff > 0) {
+            weightLostEl.textContent = `🔴 עלייה של ${diff.toFixed(1)} ק״ג`;
+            weightLostEl.style.color = "#c62828";
+        } else {
+            weightLostEl.textContent = "ללא שינוי";
+            weightLostEl.style.color = "#555";
+        }
+    }
+}
 
 // ==================================================
-// גרף
+// ציור הגרף (ירוק בירידה, אדום בעלייה, קו עבה)
 // ==================================================
-
 function drawChart() {
+    if (!weightChart) return;
+    weightChart.innerHTML = "";
 
-    if (!weightChart) {
-        return;
-    }
-
-
-    weightChart.innerHTML =
-        "";
-
-
-    const months =
-        Object.keys(
-            weightData.weighIns
-        ).sort();
-
-
-    if (
-        months.length === 0
-    ) {
-
+    if (weightData.length === 0) {
         weightChart.innerHTML = `
-
-            <text
-                x="400"
-                y="200"
-                text-anchor="middle"
-                class="chart-empty">
-
-                עדיין אין נתונים להצגת הגרף
-
+            <text x="400" y="200" text-anchor="middle" class="chart-empty">
+                עדיין אין נתונים. הזיני שקילה ראשונה כדי להתחיל!
             </text>
-
         `;
-
         return;
-
     }
-
 
     const width = 800;
     const height = 400;
+    const padding = { top: 50, bottom: 60, left: 60, right: 60 };
 
-    const left = 65;
-    const right = 55;
-    const top = 40;
-    const bottom = 60;
+    const chartW = width - padding.left - padding.right;
+    const chartH = height - padding.top - padding.bottom;
 
-    const chartWidth =
-        width -
-        left -
-        right;
+    const weights = weightData.map(d => d.weight);
+    let minW = Math.min(...weights);
+    let maxW = Math.max(...weights);
 
-    const chartHeight =
-        height -
-        top -
-        bottom;
-
-
-    function getY(
-        remaining
-    ) {
-
-        const value =
-            Math.max(
-                0,
-                Math.min(
-                    WEIGHT_LOSS_GOAL,
-                    remaining
-                )
-            );
-
-
-        return (
-            top +
-            (
-                (
-                    WEIGHT_LOSS_GOAL -
-                    value
-                ) /
-                WEIGHT_LOSS_GOAL
-            ) *
-            chartHeight
-        );
-
+    // מרווח לגרף שלא יגע בקצוות
+    if (minW === maxW) {
+        minW -= 2;
+        maxW += 2;
+    } else {
+        const margin = (maxW - minW) * 0.15;
+        minW -= margin;
+        maxW += margin;
     }
 
-
-    for (
-        let value = 0;
-        value <= WEIGHT_LOSS_GOAL;
-        value += 10
-    ) {
-
-        const y =
-            getY(value);
-
-
-        const line =
-            document.createElementNS(
-                "http://www.w3.org/2000/svg",
-                "line"
-            );
-
-
-        line.setAttribute(
-            "x1",
-            left
-        );
-
-        line.setAttribute(
-            "x2",
-            width - right
-        );
-
-        line.setAttribute(
-            "y1",
-            y
-        );
-
-        line.setAttribute(
-            "y2",
-            y
-        );
-
-
-        line.classList.add(
-            "chart-grid-line"
-        );
-
-
-        weightChart.appendChild(
-            line
-        );
-
-
-        const label =
-            document.createElementNS(
-                "http://www.w3.org/2000/svg",
-                "text"
-            );
-
-
-        label.setAttribute(
-            "x",
-            left - 12
-        );
-
-        label.setAttribute(
-            "y",
-            y + 4
-        );
-
-        label.setAttribute(
-            "text-anchor",
-            "end"
-        );
-
-
-        label.classList.add(
-            "chart-label"
-        );
-
-
-        label.textContent =
-            value;
-
-
-        weightChart.appendChild(
-            label
-        );
-
+    function getX(index) {
+        if (weightData.length === 1) return padding.left + chartW / 2;
+        return padding.left + (index / (weightData.length - 1)) * chartW;
     }
 
-
-    const points =
-        months.map(
-            (
-                month,
-                index
-            ) => {
-
-                const weight =
-                    Number(
-                        weightData.weighIns[
-                            month
-                        ]
-                    );
-
-
-                const lost =
-                    Math.max(
-                        0,
-                        weightData.startWeight -
-                        weight
-                    );
-
-
-                const remaining =
-                    Math.max(
-                        0,
-                        WEIGHT_LOSS_GOAL -
-                        lost
-                    );
-
-
-                const x =
-                    months.length === 1
-                        ? left +
-                          chartWidth / 2
-                        : left +
-                          (
-                              index /
-                              (
-                                  months.length -
-                                  1
-                              )
-                          ) *
-                          chartWidth;
-
-
-                const y =
-                    getY(
-                        remaining
-                    );
-
-
-                return {
-
-                    month,
-                    weight,
-                    remaining,
-                    x,
-                    y
-
-                };
-
-            }
-        );
-
-
-    if (
-        points.length > 1
-    ) {
-
-        const polyline =
-            document.createElementNS(
-                "http://www.w3.org/2000/svg",
-                "polyline"
-            );
-
-
-        polyline.setAttribute(
-            "points",
-            points
-                .map(
-                    point =>
-                        `${point.x},${point.y}`
-                )
-                .join(" ")
-        );
-
-
-        polyline.classList.add(
-            "chart-line"
-        );
-
-
-        weightChart.appendChild(
-            polyline
-        );
-
+    function getY(val) {
+        return padding.top + (1 - (val - minW) / (maxW - minW)) * chartH;
     }
 
+    // ציור קווי רשת רוחביים
+    const steps = 4;
+    for (let i = 0; i <= steps; i++) {
+        const val = minW + (i / steps) * (maxW - minW);
+        const y = getY(val);
 
-    points.forEach(
-        point => {
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", padding.left);
+        line.setAttribute("x2", width - padding.right);
+        line.setAttribute("y1", y);
+        line.setAttribute("y2", y);
+        line.classList.add("chart-grid-line");
+        weightChart.appendChild(line);
 
-            const circle =
-                document.createElementNS(
-                    "http://www.w3.org/2000/svg",
-                    "circle"
-                );
+        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        label.setAttribute("x", padding.left - 10);
+        label.setAttribute("y", y + 4);
+        label.setAttribute("text-anchor", "end");
+        label.classList.add("chart-label");
+        label.textContent = val.toFixed(1);
+        weightChart.appendChild(label);
+    }
 
+    // חישוב נקודות
+    const points = weightData.map((d, i) => ({
+        x: getX(i),
+        y: getY(d.weight),
+        weight: d.weight,
+        dateStr: d.dateStr
+    }));
 
-            circle.setAttribute(
-                "cx",
-                point.x
-            );
+    // ציור קווים עבים בין נקודות עם צבע מעודכן (ירוק/אדום)
+    for (let i = 0; i < points.length - 1; i++) {
+        const p1 = points[i];
+        const p2 = points[i + 1];
 
-            circle.setAttribute(
-                "cy",
-                point.y
-            );
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", p1.x);
+        line.setAttribute("y1", p1.y);
+        line.setAttribute("x2", p2.x);
+        line.setAttribute("y2", p2.y);
 
-            circle.setAttribute(
-                "r",
-                "6"
-            );
+        // בעלייה -> אדום, בירידה/שווה -> ירוק
+        const color = p2.weight > p1.weight ? "#e53935" : "#43a047";
 
+        line.setAttribute("stroke", color);
+        line.setAttribute("stroke-width", "6");
+        line.setAttribute("stroke-linecap", "round");
 
-            circle.classList.add(
-                "chart-point"
-            );
+        weightChart.appendChild(line);
+    }
 
+    // ציור הנקודות והתוויות
+    points.forEach((p, i) => {
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", p.x);
+        circle.setAttribute("cy", p.y);
+        circle.setAttribute("r", "7");
 
-            weightChart.appendChild(
-                circle
-            );
-
-
-            const weightLabel =
-                document.createElementNS(
-                    "http://www.w3.org/2000/svg",
-                    "text"
-                );
-
-
-            weightLabel.setAttribute(
-                "x",
-                point.x
-            );
-
-            weightLabel.setAttribute(
-                "y",
-                point.y - 12
-            );
-
-            weightLabel.setAttribute(
-                "text-anchor",
-                "middle"
-            );
-
-
-            weightLabel.classList.add(
-                "chart-weight-label"
-            );
-
-
-            weightLabel.textContent =
-                `${point.weight.toFixed(1)} ק״ג`;
-
-
-            weightChart.appendChild(
-                weightLabel
-            );
-
-
-            const monthLabel =
-                document.createElementNS(
-                    "http://www.w3.org/2000/svg",
-                    "text"
-                );
-
-
-            monthLabel.setAttribute(
-                "x",
-                point.x
-            );
-
-            monthLabel.setAttribute(
-                "y",
-                height - 20
-            );
-
-            monthLabel.setAttribute(
-                "text-anchor",
-                "middle"
-            );
-
-
-            monthLabel.classList.add(
-                "chart-label"
-            );
-
-
-            monthLabel.textContent =
-                point.month;
-
-
-            weightChart.appendChild(
-                monthLabel
-            );
-
+        // צבע הנקודה לפי כיוון השינוי
+        let color = "#43a047";
+        if (i > 0 && points[i].weight > points[i - 1].weight) {
+            color = "#e53935";
         }
-    );
+        circle.setAttribute("fill", color);
+        circle.setAttribute("stroke", "#ffffff");
+        circle.setAttribute("stroke-width", "3");
 
+        weightChart.appendChild(circle);
+
+        // משקל מעל הנקודה
+        const weightLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        weightLabel.setAttribute("x", p.x);
+        weightLabel.setAttribute("y", p.y - 12);
+        weightLabel.setAttribute("text-anchor", "middle");
+        weightLabel.classList.add("chart-weight-label");
+        weightLabel.textContent = `${p.weight.toFixed(1)} ק״ג`;
+        weightChart.appendChild(weightLabel);
+
+        // תאריך מתחת לגרף
+        const dateLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        dateLabel.setAttribute("x", p.x);
+        dateLabel.setAttribute("y", height - 15);
+        dateLabel.setAttribute("text-anchor", "middle");
+        dateLabel.classList.add("chart-label");
+        dateLabel.textContent = p.dateStr.split(",")[0]; // הצגת התאריך בלבד
+        weightChart.appendChild(dateLabel);
+    });
 }
 
-
 // ==================================================
-// היסטוריה
+// היסטוריית שקילות
 // ==================================================
-
 function renderHistory() {
+    if (!weightHistory) return;
+    weightHistory.innerHTML = "";
 
-    if (!weightHistory) {
+    if (weightData.length === 0) {
+        weightHistory.innerHTML = `<p class="weight-empty">עדיין לא נרשמו שקילות.</p>`;
         return;
     }
 
+    // הצגה מהחדש לישן
+    [...weightData].reverse().forEach((item, revIdx) => {
+        const originalIndex = weightData.length - 1 - revIdx;
 
-    weightHistory.innerHTML =
-        "";
+        const row = document.createElement("div");
+        row.className = "weight-history-row";
 
+        // חישוב הפרש מהשקילה הקודמת
+        let diffStr = "";
+        if (originalIndex > 0) {
+            const prev = weightData[originalIndex - 1].weight;
+            const diff = item.weight - prev;
+            if (diff < 0) {
+                diffStr = `<span style="color:#2e7d32">📉 ${Math.abs(diff).toFixed(1)}- ק״ג</span>`;
+            } else if (diff > 0) {
+                diffStr = `<span style="color:#c62828">📈 ${diff.toFixed(1)}+ ק״ג</span>`;
+            } else {
+                diffStr = `<span style="color:#888">ללא שינוי</span>`;
+            }
+        } else {
+            diffStr = `<span style="color:#888">שקילה ראשונה</span>`;
+        }
 
-    const months =
-        Object.keys(
-            weightData.weighIns
-        ).sort()
-        .reverse();
-
-
-    if (
-        months.length === 0
-    ) {
-
-        weightHistory.innerHTML = `
-
-            <p class="weight-empty">
-                עדיין לא נשמרו שקילות.
-            </p>
-
+        row.innerHTML = `
+            <span>${item.dateStr}</span>
+            <strong>${item.weight.toFixed(1)} ק״ג</strong>
+            ${diffStr}
+            <button type="button" class="delete-weight-button" data-index="${originalIndex}">🗑️</button>
         `;
 
-        return;
+        row.querySelector(".delete-weight-button").addEventListener("click", () => {
+            if (confirm("למחוק שקילה זו?")) {
+                weightData.splice(originalIndex, 1);
+                saveWeightData();
+                updateAll();
+            }
+        });
 
-    }
-
-
-    months.forEach(
-        month => {
-
-            const weight =
-                Number(
-                    weightData.weighIns[
-                        month
-                    ]
-                );
-
-
-            const lost =
-                Math.max(
-                    0,
-                    weightData.startWeight -
-                    weight
-                );
-
-
-            const row =
-                document.createElement(
-                    "div"
-                );
-
-
-            row.className =
-                "weight-history-row";
-
-
-            row.innerHTML = `
-
-                <span>
-                    ${month}
-                </span>
-
-                <strong>
-                    ${weight.toFixed(1)} ק״ג
-                </strong>
-
-                <span>
-                    ירדו ${lost.toFixed(1)} ק״ג
-                </span>
-
-                <button
-                    type="button"
-                    class="delete-weight-button"
-                    data-month="${month}">
-
-                    🗑️
-
-                </button>
-
-            `;
-
-
-            row.querySelector(
-                ".delete-weight-button"
-            ).addEventListener(
-                "click",
-                () => {
-
-                    if (
-                        !confirm(
-                            `למחוק את השקילה של ${month}?`
-                        )
-                    ) {
-
-                        return;
-
-                    }
-
-
-                    delete weightData.weighIns[
-                        month
-                    ];
-
-
-                    if (
-                        Object.keys(
-                            weightData.weighIns
-                        ).length === 0
-                    ) {
-
-                        weightData.startWeight =
-                            null;
-
-                    }
-
-
-                    saveWeightData();
-
-                    updateAll();
-
-                }
-            );
-
-
-            weightHistory.appendChild(
-                row
-            );
-
-        }
-    );
-
+        weightHistory.appendChild(row);
+    });
 }
 
-
 // ==================================================
-// הכול
+// רענון הכול
 // ==================================================
-
 function updateAll() {
-
     updateSummary();
-
-    updateWeighInMessage();
-
     drawChart();
-
     renderHistory();
-
 }
-
 
 updateAll();
