@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>הרצף שלי</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
+</head>
+
+
+<body>
+
+    <!-- =========================
+         כותרת וניווט
+    ========================== -->
+
+    <header>
+
+        <h1>
+            🌸 המסע שלי
+        </h1>
+
+
+        <nav>
+
+            <a href="index.html">
+                🏠 היום
+            </a>
+
+            <a href="calendar.html">
+                📅 לוח שנה
+            </a>
+
+            <a href="food-list.html">
+                📋 מאגר מאכלים
+            </a>
+
+            <a href="weight-login.html">
+                📉 משקל
+            </a>
+
+            <a href="challenges.html">
+                🎯 אתגרים
+            </a>
+
+            <a href="progress.html">
+                📈 התקדמות
+            </a>
+
+            <a href="achievements.html">
+                🏆 הישגים
+            </a>
+
+            <a href="streak.html"
+               class="active-nav">
+                🔥 הרצף שלי
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <main>
+
+        <section class="streak-page">
+
+
+            <!-- =========================
+                 כותרת
+            ========================== -->
+
+            <div class="streak-title-area">
+
+                <h2>
+                    🔥 הרצף שלי
+                </h2>
+
+                <p>
+                    כל יום מושלם מקרב אותך למתנה הבאה
+                </p>
+
+            </div>
+
+
+            <!-- =========================
+                 נתוני רצף
+            ========================== -->
+
+            <div class="streak-stats">
+
+                <div class="streak-stat">
+
+                    <span class="streak-stat-icon">
+                        🔥
+                    </span>
+
+                    <strong id="currentStreak">
+                        0
+                    </strong>
+
+                    <span>
+                        ימים ברצף
+                    </span>
+
+                </div>
+
+
+                <div class="streak-stat">
+
+                    <span class="streak-stat-icon">
+                        🏆
+                    </span>
+
+                    <strong id="bestStreak">
+                        0
+                    </strong>
+
+                    <span>
+                        שיא אישי
+                    </span>
+
+                </div>
+
+
+                <div class="streak-stat">
+
+                    <span class="streak-stat-icon">
+                        🎁
+                    </span>
+
+                    <strong id="giftCount">
+                        0 / 10
+                    </strong>
+
+                    <span>
+                        מתנות
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 מסלול הרצף
+            ========================== -->
+
+            <div class="streak-wheel-area">
+
+
+                <div class="streak-wheel">
+
+
+                    <!-- ---------------------------------
+                         SVG
+                    ---------------------------------- -->
+
+                    <svg
+                        class="streak-circle-svg"
+                        viewBox="0 0 600 600"
+                        aria-hidden="true">
+
+
+                        <!-- מסלול אפור קבוע -->
+
+                        <circle
+                            class="streak-track"
+                            cx="300"
+                            cy="300"
+                            r="220">
+                        </circle>
+
+
+                        <!-- שיא קודם -->
+
+                        <circle
+                            id="streakGhost"
+                            class="streak-ghost"
+                            cx="300"
+                            cy="300"
+                            r="220">
+                        </circle>
+
+
+                        <!-- הרצף הנוכחי -->
+
+                        <circle
+                            id="streakProgress"
+                            class="streak-progress"
+                            cx="300"
+                            cy="300"
+                            r="220">
+                        </circle>
+
+
+                        <!-- נקודת התחלה -->
+
+                        <circle
+                            class="streak-start-dot"
+                            cx="300"
+                            cy="80"
+                            r="6">
+                        </circle>
+
+                    </svg>
+
+<div
+    id="streakProgressContainer"
+    class="streak-progress-container">
+</div>
+                    <!-- ---------------------------------
+                         מרכז
+                    ---------------------------------- -->
+
+                    <div class="streak-center">
+
+
+                        <div
+                            class="streak-fire"
+                            id="streakFire">
+
+                            🔥
+
+                        </div>
+
+
+                        <div
+                            class="streak-number"
+                            id="streakCenterNumber">
+
+                            0
+
+                        </div>
+
+
+                        <div
+                            class="streak-center-label">
+
+                            ימים מושלמים ברצף
+
+                        </div>
+
+
+                        <div
+                            class="streak-next-message"
+                            id="nextGiftMessage">
+
+                            המתנה הראשונה מחכה לך 🎁
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ---------------------------------
+                         מתנות
+                    ---------------------------------- -->
+
+                    <div
+                        id="giftContainer"
+                        class="gift-container">
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 השיא
+            ========================== -->
+
+            <div class="streak-best-message"
+                 id="bestStreakMessage">
+
+            </div>
+
+
+            <!-- =========================
+                 הסבר
+            ========================== -->
+
+            <div class="streak-info-card">
+
+                <div class="streak-info-icon">
+                    💫
+                </div>
+
+                <div>
+
+                    <strong>
+                        איך זה עובד?
+                    </strong>
+
+                    <p>
+
+                        יום מושלם הוא יום שבו
+                        כל שלוש המשימות הושלמו.
+                        בכל 10 ימים רצופים מחכה
+                        לך מתנה חדשה.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================
+         חלונית קבלת מתנה
+    ========================== -->
+
+    <div
+        id="giftPopup"
+        class="gift-popup">
+
+        <div class="gift-popup-content">
+
+
+            <div
+                class="gift-sparkles"
+                aria-hidden="true">
+
+                ✨ ✨ ✨
+
+            </div>
+
+
+            <div
+                class="gift-popup-title">
+
+                🎉 מתנה חדשה! 🎉
+
+            </div>
+
+
+            <img
+                id="giftPopupImage"
+                class="gift-popup-image"
+                src=""
+                alt="המתנה שלך">
+
+
+            <div
+                id="giftPopupText"
+                class="gift-popup-text">
+
+            </div>
+
+
+            <div
+                id="giftPopupXP"
+                class="gift-popup-subtitle">
+
+            </div>
+
+
+            <button
+                id="giftPopupButton"
+                class="gift-popup-button"
+                type="button">
+
+                איזה כיף! 🎁
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script src="streak.js"></script>
+
+</body>
+
+</html>
