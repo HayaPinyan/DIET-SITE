@@ -10,6 +10,26 @@ const STREAK_STORAGE_KEY =
 
 
 // ==================================================
+// שמות המתנות
+// ==================================================
+
+const STREAK_GIFT_NAMES = [
+
+    { emoji: "🥤", name: "קולה זירו" },
+    { emoji: "🌿", name: "משקה אלוורה" },
+    { emoji: "🫓", name: "טורטית" },
+    { emoji: "🍬", name: "סוכריות ללא סוכר" },
+    { emoji: "🧊", name: "אייס קפה" },
+    { emoji: "🍫", name: "קוקילידה" },
+    { emoji: "🍓", name: "מארז לה פרוטה" },
+    { emoji: "🍕", name: "פיצה אישית" },
+    { emoji: "🍦", name: "טילון אקסטרים" },
+    { emoji: "🥗", name: "סלט מגרג" }
+
+];
+
+
+// ==================================================
 // אלמנטים
 // ==================================================
 
@@ -667,6 +687,14 @@ if (
 
             </div>
 
+
+            <div class="streak-gift-name">
+
+                ${STREAK_GIFT_NAMES[giftNumber - 1].emoji}
+                ${STREAK_GIFT_NAMES[giftNumber - 1].name}
+
+            </div>
+
         `;
 
 
@@ -727,6 +755,31 @@ function updateCircle(
     streakProgress.style.strokeDashoffset =
         CIRCLE_CIRCUMFERENCE -
         currentLength;
+
+
+    // ----------------------------------------------
+    // מסכת הברק - מוצג רק על החלק המואר של הקו
+    // ----------------------------------------------
+
+    const progressMaskCircle =
+        document.getElementById(
+            "progressMaskCircle"
+        );
+
+
+    if (
+        progressMaskCircle
+    ) {
+
+        progressMaskCircle.style.strokeDasharray =
+            CIRCLE_CIRCUMFERENCE;
+
+
+        progressMaskCircle.style.strokeDashoffset =
+            CIRCLE_CIRCUMFERENCE -
+            currentLength;
+
+    }
 
 
     // ----------------------------------------------
