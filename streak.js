@@ -121,6 +121,15 @@ const dietData =
     ) || {};
 
 
+// נתוני סיום יום
+const finishDayData =
+    JSON.parse(
+        localStorage.getItem(
+            "finishDayData"
+        )
+    ) || {};
+
+
 // ==================================================
 // היום של האתר
 // 06:00 = התחלת יום חדש
@@ -274,6 +283,7 @@ function getDateKey(
 // ==================================================
 //
 // שלוש המשימות:
+//
 // food
 // activity
 // challenge
@@ -303,7 +313,35 @@ function isPerfectDay(
 
 
 // ==================================================
+// האם היום הסתיים
+// ==================================================
+
+function isDayFinished(
+    dateKey
+) {
+
+    return (
+
+        finishDayData[dateKey] &&
+        finishDayData[dateKey].finished === true
+
+    );
+
+}
+
+
+// ==================================================
 // חישוב רצף נוכחי
+// ==================================================
+//
+// אם היום עדיין לא הסתיים:
+//
+// לא סופרים את היום הנוכחי
+// ומתחילים לבדוק מאתמול.
+//
+// אם היום הסתיים:
+//
+// היום הנוכחי כן נכלל ברצף.
 // ==================================================
 
 function calculateCurrentStreak() {
@@ -311,6 +349,40 @@ function calculateCurrentStreak() {
     let date =
         getSiteToday();
 
+
+    const todayKey =
+        getDateKey(date);
+
+
+    // ----------------------------------------------
+    // האם היום כבר הסתיים?
+    // ----------------------------------------------
+
+    const todayFinished =
+        isDayFinished(
+            todayKey
+        );
+
+
+    // ----------------------------------------------
+    // אם היום עדיין לא הסתיים
+    // לא כוללים אותו ברצף
+    // ----------------------------------------------
+
+    if (
+        !todayFinished
+    ) {
+
+        date.setDate(
+            date.getDate() - 1
+        );
+
+    }
+
+
+    // ----------------------------------------------
+    // חישוב הרצף
+    // ----------------------------------------------
 
     let streak = 0;
 
@@ -642,25 +714,33 @@ function renderGifts(
             );
 
 
-        if (earned) {
+        if (
+            earned
+        ) {
 
             gift.classList.add(
                 "earned"
             );
-            const nextGiftNumber =
-    earnedGifts.length + 1;
+
+        }
 
 
-if (
-    giftNumber ===
-    nextGiftNumber
-) {
+        // ------------------------------------------
+        // המתנה הבאה
+        // ------------------------------------------
 
-    gift.classList.add(
-        "next-gift"
-    );
+        const nextGiftNumber =
+            earnedGifts.length + 1;
 
-}
+
+        if (
+            giftNumber ===
+            nextGiftNumber
+        ) {
+
+            gift.classList.add(
+                "next-gift"
+            );
 
         }
 
@@ -758,7 +838,7 @@ function updateCircle(
 
 
     // ----------------------------------------------
-    // מסכת הברק - מוצג רק על החלק המואר של הקו
+    // מסכת הברק
     // ----------------------------------------------
 
     const progressMaskCircle =
@@ -812,6 +892,11 @@ function updateCircle(
 
 }
 
+
+// ==================================================
+// ניצוץ בקצה ההתקדמות
+// ==================================================
+
 function updateProgressSpark(
     currentStreak
 ) {
@@ -822,8 +907,12 @@ function updateProgressSpark(
         );
 
 
-    if (!container) {
+    if (
+        !container
+    ) {
+
         return;
+
     }
 
 
@@ -855,7 +944,8 @@ function updateProgressSpark(
 
     const angle =
         (
-            progress * 360
+            progress *
+            360
         ) - 90;
 
 
@@ -912,7 +1002,9 @@ function updateProgressSpark(
     );
 
 
+    // ----------------------------------------------
     // אבק כוכבים קטן סביב הקצה
+    // ----------------------------------------------
 
     for (
         let i = 0;
@@ -979,6 +1071,8 @@ function updateProgressSpark(
     }
 
 }
+
+
 // ==================================================
 // טקסט מרכזי
 // ==================================================
@@ -1022,7 +1116,7 @@ function updateCenter(
 
 
     // ----------------------------------------------
-    // המתנה הבאה שעדיין לא התקבלה
+    // המתנה הבאה
     // ----------------------------------------------
 
     let nextGift =
@@ -1233,156 +1327,6 @@ function closeGiftPopup() {
 }
 
 
-if (
-    giftPopupButton
-) {
-
-    giftPopupButton.addEventListener(
-        "click",
-        closeGiftPopup
-    );
-
-}
-
-
-if (
-    giftPopup
-) {
-
-    giftPopup.addEventListener(
-        "click",
-        event => {
-
-            if (
-                event.target ===
-                giftPopup
-            ) {
-
-                closeGiftPopup();
-
-            }
-
-        }
-    );
-
-}
-
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if (
-            event.key ===
-            "Escape"
-        ) {
-
-            closeGiftPopup();
-
-        }
-
-    }
-);
-
-
-// ==================================================
-// הפעלה
-// ==================================================
-
-function initializeStreak() {
-
-    const currentStreak =
-        calculateCurrentStreak();
-
-
-    const calculatedBest =
-        calculateBestStreak();
-
-
-    const giftData =
-        loadGiftData();
-
-
-    // השיא לא יורד לעולם
-
-    const bestStreak =
-        Math.max(
-            calculatedBest,
-            giftData.bestStreak || 0
-        );
-
-
-    giftData.bestStreak =
-        bestStreak;
-
-
-    saveGiftData(
-        giftData
-    );
-
-
-    // בדיקת מתנות חדשות
-
-    const newlyEarned =
-        checkForNewGifts(
-            currentStreak
-        );
-
-
-    const updatedGiftData =
-        loadGiftData();
-
-
-    // ציור
-
-    renderGifts(
-        updatedGiftData.earnedGifts
-    );
-
-
-    updateCircle(
-        currentStreak,
-        bestStreak
-    );
-
-updateProgressSpark(
-    currentStreak
-);
-    updateCenter(
-        currentStreak,
-        updatedGiftData.earnedGifts
-    );
-
-
-    updateBestMessage(
-        currentStreak,
-        bestStreak
-    );
-
-
-    updateFireAnimation(
-        currentStreak
-    );
-
-
-    // ----------------------------------------------
-    // אם נפתחו כמה מתנות
-    // מציגים אותן אחת אחרי השנייה
-    // ----------------------------------------------
-
-    if (
-        newlyEarned.length > 0
-    ) {
-
-        showGiftQueue(
-            newlyEarned
-        );
-
-    }
-
-}
-
-
 // ==================================================
 // תור מתנות
 // ==================================================
@@ -1437,16 +1381,13 @@ function showNextGift() {
 }
 
 
-// כאשר החלונית נסגרת
-// ממשיכים למתנה הבאה
-
-const originalClose =
-    closeGiftPopup;
-
+// ==================================================
+// סגירה והמשך למתנה הבאה
+// ==================================================
 
 function closeAndContinue() {
 
-    originalClose();
+    closeGiftPopup();
 
 
     setTimeout(
@@ -1494,6 +1435,146 @@ if (
 }
 
 
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key ===
+            "Escape"
+        ) {
+
+            closeAndContinue();
+
+        }
+
+    }
+);
+
+
+// ==================================================
+// הפעלה
+// ==================================================
+
+function initializeStreak() {
+
+    const currentStreak =
+        calculateCurrentStreak();
+
+
+    const calculatedBest =
+        calculateBestStreak();
+
+
+    const giftData =
+        loadGiftData();
+
+
+    // ----------------------------------------------
+    // השיא לא יורד לעולם
+    // ----------------------------------------------
+
+    const bestStreak =
+        Math.max(
+            calculatedBest,
+            giftData.bestStreak || 0
+        );
+
+
+    giftData.bestStreak =
+        bestStreak;
+
+
+    saveGiftData(
+        giftData
+    );
+
+
+    // ----------------------------------------------
+    // בדיקת מתנות חדשות
+    // ----------------------------------------------
+
+    const newlyEarned =
+        checkForNewGifts(
+            currentStreak
+        );
+
+
+    const updatedGiftData =
+        loadGiftData();
+
+
+    // ----------------------------------------------
+    // ציור המתנות
+    // ----------------------------------------------
+
+    renderGifts(
+        updatedGiftData.earnedGifts
+    );
+
+
+    // ----------------------------------------------
+    // ציור המעגל
+    // ----------------------------------------------
+
+    updateCircle(
+        currentStreak,
+        bestStreak
+    );
+
+
+    // ----------------------------------------------
+    // ניצוץ בקצה הקו
+    // ----------------------------------------------
+
+    updateProgressSpark(
+        currentStreak
+    );
+
+
+    // ----------------------------------------------
+    // טקסטים
+    // ----------------------------------------------
+
+    updateCenter(
+        currentStreak,
+        updatedGiftData.earnedGifts
+    );
+
+
+    updateBestMessage(
+        currentStreak,
+        bestStreak
+    );
+
+
+    // ----------------------------------------------
+    // אש
+    // ----------------------------------------------
+
+    updateFireAnimation(
+        currentStreak
+    );
+
+
+    // ----------------------------------------------
+    // אם נפתחו כמה מתנות
+    // מציגים אותן אחת אחרי השנייה
+    // ----------------------------------------------
+
+    if (
+        newlyEarned.length > 0
+    ) {
+
+        showGiftQueue(
+            newlyEarned
+        );
+
+    }
+
+}
+
+
 // ==================================================
 // רענון במקרה שהנתונים השתנו
 // ==================================================
@@ -1515,8 +1596,10 @@ window.addEventListener(
 initializeStreak();
 
 
-// בדיקה מחזורית קצרה
+// ==================================================
+// בדיקה מחזורית
 // כדי שהעמוד יתעדכן אם היום התחלף
+// ==================================================
 
 setInterval(
     initializeStreak,
