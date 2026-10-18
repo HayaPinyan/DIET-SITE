@@ -133,7 +133,9 @@
             <a href="achievements.html">
                 🏆 הישגים
             </a>
-  <a href="streak.html"> 🔥 הרצף שלי</a>
+
+            <a href="streak.html"> 🔥 הרצף שלי</a>
+
         </nav>
 
     </header>
@@ -676,9 +678,37 @@
             </button>
 
 
+            <!-- כפתור קטן לסיום יום שעבר -->
+
+            <button
+                id="finishPastDayButton"
+                type="button"
+                style="padding: 9px 22px; font-size: 14px; margin-top: 10px;">
+
+                📅 סיום יום שעבר
+
+            </button>
+
+
+            <!-- בחירת תאריך עבור הכפתור הנוסף -->
+
+            <input
+                id="finishPastDayDate"
+                type="date"
+                aria-label="בחירת תאריך לסיום יום שעבר"
+                style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none;">
+
+
             <div
                 id="finishDayMessage"
                 class="finish-day-message">
+            </div>
+
+
+            <div
+                id="finishPastDayMessage"
+                class="finish-day-message"
+                aria-live="polite">
             </div>
 
         </section>

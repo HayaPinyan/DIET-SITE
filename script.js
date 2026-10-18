@@ -40,10 +40,10 @@ function escapeEmailHtml(value) {
 // בניית HTML של המאכלים למייל
 // ==================================================
 
-function buildFoodEmailHtml() {
+function buildFoodEmailHtml(targetDateKey = dateKey) {
 
     const foods =
-        foodData[dateKey] || [];
+        foodData[targetDateKey] || [];
 
 
     if (!foods.length) {
@@ -158,10 +158,10 @@ function buildFoodEmailHtml() {
 // בניית HTML של הפעילויות למייל
 // ==================================================
 
-function buildActivityEmailHtml() {
+function buildActivityEmailHtml(targetDateKey = dateKey) {
 
     const activities =
-        activityData[dateKey] || [];
+        activityData[targetDateKey] || [];
 
 
     if (!activities.length) {
@@ -377,7 +377,7 @@ function getDailyMessage(score) {
 // שליחת סיכום יומי במייל
 // ==================================================
 
-async function sendDailySummaryEmail() {
+async function sendDailySummaryEmail(targetDateKey = dateKey) {
 
     try {
 
@@ -387,7 +387,7 @@ async function sendDailySummaryEmail() {
 
 
         const score =
-            getTodayScore();
+            getTodayScore(targetDateKey);
 
 
         // ==========================================
@@ -403,11 +403,12 @@ async function sendDailySummaryEmail() {
         const challengeCompleted =
             !!(
                 (
-                    savedData[dateKey] &&
-                    savedData[dateKey].challenge === true
+                    savedData[targetDateKey] &&
+                    savedData[targetDateKey].challenge === true
                 )
                 ||
                 (
+                    targetDateKey === dateKey &&
                     challengeButton &&
                     challengeButton.classList.contains(
                         "completed"
@@ -423,13 +424,12 @@ async function sendDailySummaryEmail() {
 
 
         const challengeName =
+            targetDateKey === dateKey &&
             typeof currentChallenge !== "undefined" &&
             currentChallenge &&
             currentChallenge.name
-
                 ? currentChallenge.name
-
-                : "האתגר השבועי";
+                : getChallengeNameForDate(targetDateKey);
 
 
         // ==========================================
@@ -453,11 +453,21 @@ async function sendDailySummaryEmail() {
         // תאריך
         // ==========================================
 
+        const dateParts =
+            targetDateKey.split("-").map(Number);
+
+        const targetDate =
+            new Date(
+                dateParts[0],
+                dateParts[1] - 1,
+                dateParts[2]
+            );
+
         const dateText =
-            `${daysOfWeek[today.getDay()]}, ` +
-            `${today.getDate()} ` +
-            `ב${months[today.getMonth()]} ` +
-            `${today.getFullYear()}`;
+            `${daysOfWeek[targetDate.getDay()]}, ` +
+            `${targetDate.getDate()} ` +
+            `ב${months[targetDate.getMonth()]} ` +
+            `${targetDate.getFullYear()}`;
 
 
         // ==========================================
@@ -473,19 +483,19 @@ async function sendDailySummaryEmail() {
                 score,
 
             food_html:
-                buildFoodEmailHtml(),
+                buildFoodEmailHtml(targetDateKey),
 
             total_calories:
-                getTodayCalories(),
+                getTodayCalories(targetDateKey),
 
             calorie_target:
                 DAILY_CALORIE_TARGET,
 
             activity_html:
-                buildActivityEmailHtml(),
+                buildActivityEmailHtml(targetDateKey),
 
             total_activity:
-                getTodayActivityMinutes(),
+                getTodayActivityMinutes(targetDateKey),
 
             activity_target:
                 DAILY_ACTIVITY_TARGET,
@@ -640,6 +650,15 @@ const finishDayButton =
 
 const finishDayMessage =
     document.getElementById("finishDayMessage");
+
+const finishPastDayButton =
+    document.getElementById("finishPastDayButton");
+
+const finishPastDayDate =
+    document.getElementById("finishPastDayDate");
+
+const finishPastDayMessage =
+    document.getElementById("finishPastDayMessage");
 
 
 // ==================================================
@@ -858,10 +877,10 @@ if (todayDate) {
 // קלוריות
 // ==================================================
 
-function getTodayCalories() {
+function getTodayCalories(targetDateKey = dateKey) {
 
     const foods =
-        foodData[dateKey] || [];
+        foodData[targetDateKey] || [];
 
 
     return foods.reduce(
@@ -887,10 +906,10 @@ function getTodayCalories() {
 // פעילות
 // ==================================================
 
-function getTodayActivityMinutes() {
+function getTodayActivityMinutes(targetDateKey = dateKey) {
 
     const activities =
-        activityData[dateKey] || [];
+        activityData[targetDateKey] || [];
 
 
     return activities.reduce(
@@ -916,14 +935,14 @@ function getTodayActivityMinutes() {
 // ציון
 // ==================================================
 
-function getTodayScore() {
+function getTodayScore(targetDateKey = dateKey) {
 
     let score = 0;
 
 
     if (
-        savedData[dateKey] &&
-        savedData[dateKey].food
+        savedData[targetDateKey] &&
+        savedData[targetDateKey].food
     ) {
 
         score++;
@@ -932,8 +951,8 @@ function getTodayScore() {
 
 
     if (
-        savedData[dateKey] &&
-        savedData[dateKey].activity
+        savedData[targetDateKey] &&
+        savedData[targetDateKey].activity
     ) {
 
         score++;
@@ -942,8 +961,8 @@ function getTodayScore() {
 
 
     if (
-        savedData[dateKey] &&
-        savedData[dateKey].challenge
+        savedData[targetDateKey] &&
+        savedData[targetDateKey].challenge
     ) {
 
         score++;
@@ -960,12 +979,12 @@ function getTodayScore() {
 // האם היום הסתיים
 // ==================================================
 
-function isDayFinished() {
+function isDayFinished(targetDateKey = dateKey) {
 
     return !!(
 
-        finishDayData[dateKey] &&
-        finishDayData[dateKey].finished === true
+        finishDayData[targetDateKey] &&
+        finishDayData[targetDateKey].finished === true
 
     );
 
@@ -1965,6 +1984,271 @@ function updateHomeChallenge() {
 
     homeChallengeProgress.style.width =
         `${(completed / 7) * 100}%`;
+
+}
+
+
+// ==================================================
+// סיום יום שעבר - פעולות ממוקדות לתאריך שנבחר
+// ==================================================
+
+function getChallengeNameForDate(targetDateKey) {
+
+    if (
+        typeof challengeSchedule === "undefined" ||
+        !Array.isArray(challengeSchedule) ||
+        !challengeSchedule.length ||
+        typeof startDate === "undefined"
+    ) {
+        return "האתגר השבועי";
+    }
+
+    const parts = targetDateKey.split("-").map(Number);
+
+    const targetUtc = Date.UTC(
+        parts[0],
+        parts[1] - 1,
+        parts[2]
+    );
+
+    const startUtc = Date.UTC(
+        startDate.getFullYear(),
+        startDate.getMonth(),
+        startDate.getDate()
+    );
+
+    const weekNumber = Math.max(
+        1,
+        Math.floor((targetUtc - startUtc) / (7 * 24 * 60 * 60 * 1000)) + 1
+    );
+
+    const scheduleIndex = (weekNumber - 1) % challengeSchedule.length;
+
+    return (
+        challengeSchedule[scheduleIndex] &&
+        challengeSchedule[scheduleIndex].name
+    ) || "האתגר השבועי";
+
+}
+
+
+function updatePastFinishButtonColor(targetDateKey) {
+
+    if (!finishPastDayButton) {
+        return;
+    }
+
+    finishPastDayButton.classList.remove(
+        "finish-score-0",
+        "finish-score-1",
+        "finish-score-2",
+        "finish-score-3"
+    );
+
+    if (!isDayFinished(targetDateKey)) {
+        return;
+    }
+
+    finishPastDayButton.classList.add(
+        `finish-score-${getTodayScore(targetDateKey)}`
+    );
+
+}
+
+
+async function finishPastDay(targetDateKey) {
+
+    if (!targetDateKey || targetDateKey >= dateKey) {
+        if (finishPastDayMessage) {
+            finishPastDayMessage.textContent =
+                "אפשר לסיים רק יום שעבר, ולא את היום הנוכחי או יום עתידי.";
+        }
+        return;
+    }
+
+    if (!savedData[targetDateKey]) {
+        savedData[targetDateKey] = {
+            food: false,
+            activity: false,
+            challenge: false
+        };
+    }
+
+    // לחיצה חוזרת מתנהגת כמו ביטול סיום היום בכפתור הרגיל.
+    if (isDayFinished(targetDateKey)) {
+
+        savedData[targetDateKey].food =
+            finishDayData[targetDateKey].previousFood;
+
+        finishDayData[targetDateKey].finished = false;
+
+        localStorage.setItem(
+            "dietData",
+            JSON.stringify(savedData)
+        );
+
+        localStorage.setItem(
+            "finishDayData",
+            JSON.stringify(finishDayData)
+        );
+
+        window.dispatchEvent(
+            new Event("xpDataChanged")
+        );
+
+        updatePastFinishButtonColor(targetDateKey);
+
+        if (finishPastDayMessage) {
+            finishPastDayMessage.textContent =
+                `בוטל סיום היום של ${targetDateKey}. אפשר לבחור שוב את התאריך כדי לסיים אותו.`;
+        }
+
+        return;
+    }
+
+    const previousFood =
+        savedData[targetDateKey].food;
+
+    const calories =
+        getTodayCalories(targetDateKey);
+
+    // בדומה ל-loadToday() של היום הרגיל: עדכון דגל הפעילות לפי הפעילות שנרשמה.
+    savedData[targetDateKey].activity =
+        getTodayActivityMinutes(targetDateKey) >= DAILY_ACTIVITY_TARGET;
+
+    finishDayData[targetDateKey] = {
+        finished: true,
+        previousFood: previousFood,
+        emailSent: false
+    };
+
+    savedData[targetDateKey].food =
+        calories <= DAILY_CALORIE_TARGET;
+
+    localStorage.setItem(
+        "dietData",
+        JSON.stringify(savedData)
+    );
+
+    localStorage.setItem(
+        "finishDayData",
+        JSON.stringify(finishDayData)
+    );
+
+    window.dispatchEvent(
+        new Event("xpDataChanged")
+    );
+
+    updatePastFinishButtonColor(targetDateKey);
+
+    if (finishPastDayMessage) {
+        finishPastDayMessage.textContent =
+            `הנתונים של ${targetDateKey} נשמרו. שולחת את הסיכום למייל... 📧`;
+    }
+
+    const sent =
+        await sendDailySummaryEmail(targetDateKey);
+
+    if (sent) {
+
+        finishDayData[targetDateKey].emailSent = true;
+
+        localStorage.setItem(
+            "finishDayData",
+            JSON.stringify(finishDayData)
+        );
+
+        const score = getTodayScore(targetDateKey);
+        let message;
+
+        if (score === 3) {
+            message = "🎉 כל הכבוד! היום הושלם בהצלחה! המייל נשלח 📧";
+        } else if (score === 2) {
+            message = "🌟 כמעט מושלם! המייל נשלח 📧";
+        } else if (score === 1) {
+            message = "💪 ממשיכים קדימה! המייל נשלח 📧";
+        } else {
+            message = "חבל... המייל נשלח 📧";
+        }
+
+        if (finishPastDayMessage) {
+            finishPastDayMessage.textContent =
+                `${targetDateKey}: ${message}`;
+        }
+
+    } else if (finishPastDayMessage) {
+
+        finishPastDayMessage.textContent =
+            `היום ${targetDateKey} נשמר, אבל המייל לא נשלח. בדקי את ה־Console.`;
+
+    }
+
+}
+
+
+// הגדרת התאריך האחרון שמותר לבחור: היום הקודם לפי שעון האתר (06:00).
+function getPreviousSiteDayKey() {
+
+    const previousDate = new Date(today);
+
+    previousDate.setDate(previousDate.getDate() - 1);
+
+    return getDateKeyFromDate(previousDate);
+
+}
+
+
+if (finishPastDayDate) {
+    finishPastDayDate.max = getPreviousSiteDayKey();
+}
+
+
+if (finishPastDayButton && finishPastDayDate) {
+
+    finishPastDayButton.addEventListener("click", () => {
+
+        finishPastDayDate.max = getPreviousSiteDayKey();
+        finishPastDayDate.value = "";
+
+        if (finishPastDayMessage) {
+            finishPastDayMessage.textContent = "";
+        }
+
+        try {
+            if (typeof finishPastDayDate.showPicker === "function") {
+                finishPastDayDate.showPicker();
+            } else {
+                finishPastDayDate.click();
+            }
+        } catch (error) {
+            finishPastDayDate.click();
+        }
+
+    });
+
+    finishPastDayDate.addEventListener("change", async () => {
+
+        const selectedDateKey = finishPastDayDate.value;
+
+        if (!selectedDateKey) {
+            return;
+        }
+
+        if (selectedDateKey >= dateKey) {
+
+            if (finishPastDayMessage) {
+                finishPastDayMessage.textContent =
+                    "אפשר לבחור רק תאריך שעבר.";
+            }
+
+            finishPastDayDate.value = "";
+            return;
+        }
+
+        await finishPastDay(selectedDateKey);
+        finishPastDayDate.value = "";
+
+    });
 
 }
 
