@@ -1,19 +1,20 @@
+
 // ==================================================
 // אלמנטים
 // ==================================================
 
 const achievementsGrid =
-    document.getElementById(
-        "achievementsGrid"
-    );
+    document.getElementById("achievementsGrid");
 
 
 // ==================================================
 // הגדרות
 // ==================================================
 
-const CALORIE_TARGET = 1500;
-const ACTIVITY_TARGET = 20;
+const CALORIE_TARGET =
+    typeof DAILY_CALORIE_TARGET !== "undefined"
+        ? DAILY_CALORIE_TARGET
+        : 1400;
 
 
 // ==================================================
@@ -32,11 +33,6 @@ function loadAchievementData() {
         foodData:
             JSON.parse(
                 localStorage.getItem("foodData")
-            ) || {},
-
-        activityData:
-            JSON.parse(
-                localStorage.getItem("activityData")
             ) || {},
 
         finishDayData:
@@ -61,44 +57,10 @@ function getCalories(
     const foods =
         foodData[dateKey] || [];
 
-
     return foods.reduce(
-        (
-            total,
-            food
-        ) =>
+        (total, food) =>
             total +
-            Number(
-                food.calories || 0
-            ),
-        0
-    );
-
-}
-
-
-// ==================================================
-// פעילות
-// ==================================================
-
-function getActivityMinutes(
-    activityData,
-    dateKey
-) {
-
-    const activities =
-        activityData[dateKey] || [];
-
-
-    return activities.reduce(
-        (
-            total,
-            activity
-        ) =>
-            total +
-            Number(
-                activity.minutes || 0
-            ),
+            Number(food.calories || 0),
         0
     );
 
@@ -122,9 +84,7 @@ function getSiteToday() {
                 hour: "2-digit",
                 hour12: false
             }
-        ).formatToParts(
-            new Date()
-        );
+        ).formatToParts(new Date());
 
 
     let year =
@@ -134,7 +94,6 @@ function getSiteToday() {
             ).value
         );
 
-
     let month =
         Number(
             parts.find(
@@ -142,14 +101,12 @@ function getSiteToday() {
             ).value
         ) - 1;
 
-
     let day =
         Number(
             parts.find(
                 x => x.type === "day"
             ).value
         );
-
 
     const hour =
         Number(
@@ -159,33 +116,20 @@ function getSiteToday() {
         );
 
 
-    if (
-        hour < 6
-    ) {
+    // יום האתר מתחלף בשעה 06:00
+
+    if (hour < 6) {
 
         const previousDay =
-            new Date(
-                year,
-                month,
-                day
-            );
-
+            new Date(year, month, day);
 
         previousDay.setDate(
             previousDay.getDate() - 1
         );
 
-
-        year =
-            previousDay.getFullYear();
-
-
-        month =
-            previousDay.getMonth();
-
-
-        day =
-            previousDay.getDate();
+        year = previousDay.getFullYear();
+        month = previousDay.getMonth();
+        day = previousDay.getDate();
 
     }
 
@@ -203,9 +147,7 @@ function getSiteToday() {
 // מפתח תאריך
 // ==================================================
 
-function getDateKey(
-    date
-) {
+function getDateKey(date) {
 
     return (
         date.getFullYear() +
@@ -223,20 +165,14 @@ function getDateKey(
 
 
 // ==================================================
-// יום מושלם
+// בדיקת יום מושלם
 // ==================================================
 
 function isPerfectDay(
     dateKey,
-    dietData,
     foodData,
-    activityData,
     finishDayData
 ) {
-
-    const day =
-        dietData[dateKey] || {};
-
 
     const calories =
         getCalories(
@@ -244,35 +180,14 @@ function isPerfectDay(
             dateKey
         );
 
-
-    const activityMinutes =
-        getActivityMinutes(
-            activityData,
-            dateKey
-        );
-
-
-    const foodSuccess =
-        !!(
-            finishDayData[dateKey] &&
-            finishDayData[dateKey].finished === true &&
-            calories <= CALORIE_TARGET
-        );
-
-
-    const activitySuccess =
-        activityMinutes >=
-        ACTIVITY_TARGET;
-
-
-    const challengeSuccess =
-        day.challenge === true;
+    const dayFinished =
+        finishDayData[dateKey] &&
+        finishDayData[dateKey].finished === true;
 
 
     return (
-        foodSuccess &&
-        activitySuccess &&
-        challengeSuccess
+        dayFinished &&
+        calories <= CALORIE_TARGET
     );
 
 }
@@ -287,18 +202,11 @@ function calculateStats() {
     const data =
         loadAchievementData();
 
-
     const dietData =
         data.dietData;
 
-
     const foodData =
         data.foodData;
-
-
-    const activityData =
-        data.activityData;
-
 
     const finishDayData =
         data.finishDayData;
@@ -309,131 +217,74 @@ function calculateStats() {
 
             ...Object.keys(dietData),
             ...Object.keys(foodData),
-            ...Object.keys(activityData),
             ...Object.keys(finishDayData)
 
         ]);
 
 
     let activeDays = 0;
-
     let perfectDays = 0;
-
     let calorieSuccessDays = 0;
-
-    let activitySuccessDays = 0;
-
-    let challengeDays = 0;
-
     let finishedDays = 0;
 
-    let totalActivityMinutes = 0;
+
+    allDateKeys.forEach(dateKey => {
+
+        const calories =
+            getCalories(
+                foodData,
+                dateKey
+            );
 
 
-    allDateKeys.forEach(
-        dateKey => {
-
-            const day =
-                dietData[dateKey] || {};
+        const dayFinished =
+            finishDayData[dateKey] &&
+            finishDayData[dateKey].finished === true;
 
 
-            const calories =
-                getCalories(
-                    foodData,
-                    dateKey
-                );
+        const foodSuccess =
+            isPerfectDay(
+                dateKey,
+                foodData,
+                finishDayData
+            );
 
 
-            const activityMinutes =
-                getActivityMinutes(
-                    activityData,
-                    dateKey
-                );
+        // יום שבו הוזנו נתוני תזונה
 
+        if (calories > 0) {
 
-            const foodSuccess =
-                !!(
-                    finishDayData[dateKey] &&
-                    finishDayData[dateKey].finished === true &&
-                    calories <= CALORIE_TARGET
-                );
-
-
-            const activitySuccess =
-                activityMinutes >=
-                ACTIVITY_TARGET;
-
-
-            const challengeSuccess =
-                day.challenge === true;
-
-
-            if (
-                calories > 0 ||
-                activityMinutes > 0 ||
-                challengeSuccess
-            ) {
-
-                activeDays++;
-
-            }
-
-
-            if (foodSuccess) {
-
-                calorieSuccessDays++;
-
-            }
-
-
-            if (activitySuccess) {
-
-                activitySuccessDays++;
-
-            }
-
-
-            if (challengeSuccess) {
-
-                challengeDays++;
-
-            }
-
-
-            if (
-                finishDayData[dateKey] &&
-                finishDayData[dateKey].finished === true
-            ) {
-
-                finishedDays++;
-
-            }
-
-
-            if (
-                foodSuccess &&
-                activitySuccess &&
-                challengeSuccess
-            ) {
-
-                perfectDays++;
-
-            }
-
-
-            totalActivityMinutes +=
-                activityMinutes;
+            activeDays++;
 
         }
-    );
+
+
+        // יום שהושלם
+
+        if (dayFinished) {
+
+            finishedDays++;
+
+        }
+
+
+        // עמידה ביעד הקלורי
+
+        if (foodSuccess) {
+
+            calorieSuccessDays++;
+            perfectDays++;
+
+        }
+
+    });
 
 
     // ==================================================
-    // רצף
+    // חישוב רצף ימים מושלמים
     // ==================================================
 
     let currentStreak = 0;
-
 
     let checkDate =
         getSiteToday();
@@ -442,15 +293,12 @@ function calculateStats() {
     while (
         isPerfectDay(
             getDateKey(checkDate),
-            dietData,
             foodData,
-            activityData,
             finishDayData
         )
     ) {
 
         currentStreak++;
-
 
         checkDate.setDate(
             checkDate.getDate() - 1
@@ -464,10 +312,7 @@ function calculateStats() {
         activeDays,
         perfectDays,
         calorieSuccessDays,
-        activitySuccessDays,
-        challengeDays,
         finishedDays,
-        totalActivityMinutes,
         currentStreak
 
     };
@@ -481,9 +326,7 @@ function calculateStats() {
 
 function renderAchievements() {
 
-    if (
-        !achievementsGrid
-    ) {
+    if (!achievementsGrid) {
 
         console.error(
             "לא נמצא achievementsGrid"
@@ -494,23 +337,20 @@ function renderAchievements() {
     }
 
 
-    // מחכים לטעינת achievement-data.js
+    // ממתינים לטעינת achievement-data.js
 
     if (
-        typeof achievementCatalog ===
-        "undefined"
+        typeof achievementCatalog === "undefined"
     ) {
 
         console.warn(
             "achievement-data.js עדיין לא נטען. מנסה שוב..."
         );
 
-
         setTimeout(
             renderAchievements,
             100
         );
-
 
         return;
 
@@ -521,88 +361,79 @@ function renderAchievements() {
         calculateStats();
 
 
-    achievementsGrid.innerHTML =
-        "";
+    achievementsGrid.innerHTML = "";
 
 
-    achievementCatalog.forEach(
-        achievement => {
+    achievementCatalog.forEach(achievement => {
 
-            const unlocked =
-                achievement.unlocked(
-                    stats
-                );
+        const unlocked =
+            achievement.unlocked(stats);
 
 
-            const card =
-                document.createElement(
-                    "div"
-                );
+        const card =
+            document.createElement("div");
 
 
-            card.className =
-                unlocked
-                    ? "achievement-card unlocked"
-                    : "achievement-card locked";
+        card.className =
+            unlocked
+                ? "achievement-card unlocked"
+                : "achievement-card locked";
 
 
-            card.innerHTML = `
+        card.innerHTML = `
 
-                <div class="achievement-icon">
+            <div class="achievement-icon">
+
+                ${
+                    unlocked
+                        ? achievement.icon
+                        : "🔒"
+                }
+
+            </div>
+
+
+            <div class="achievement-info">
+
+                <h3>
+                    ${escapeHtml(
+                        achievement.name
+                    )}
+                </h3>
+
+
+                <p>
+                    ${escapeHtml(
+                        achievement.description
+                    )}
+                </p>
+
+
+                <div class="achievement-xp">
+
+                    +${achievement.xp} XP
+
+                </div>
+
+
+                <div class="achievement-status">
 
                     ${
                         unlocked
-                            ? achievement.icon
-                            : "🔒"
+                            ? "✓ הושג"
+                            : "עוד לא הושג"
                     }
 
                 </div>
 
+            </div>
 
-                <div class="achievement-info">
-
-                    <h3>
-                        ${escapeHtml(
-                            achievement.name
-                        )}
-                    </h3>
+        `;
 
 
-                    <p>
-                        ${escapeHtml(
-                            achievement.description
-                        )}
-                    </p>
+        achievementsGrid.appendChild(card);
 
-
-                    <div class="achievement-xp">
-
-                        +${achievement.xp} XP
-
-                    </div>
-
-
-                    <div class="achievement-status">
-
-                        ${
-                            unlocked
-                                ? "✓ הושג"
-                                : "עוד לא הושג"
-                        }
-
-                    </div>
-
-                </div>
-
-            `;
-
-
-            achievementsGrid.appendChild(
-                card
-            );
-
-        }
-    );
+    });
 
 }
 
@@ -611,33 +442,14 @@ function renderAchievements() {
 // אבטחה
 // ==================================================
 
-function escapeHtml(
-    value
-) {
+function escapeHtml(value) {
 
-    return String(
-        value ?? ""
-    )
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 
 }
 

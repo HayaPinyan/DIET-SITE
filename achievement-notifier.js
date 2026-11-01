@@ -2,8 +2,13 @@
 // הגדרות
 // ==================================================
 
-const NOTIFIER_CALORIE_TARGET = 1800;
-const NOTIFIER_ACTIVITY_TARGET = 20;
+function getNotifierCalorieTarget() {
+
+    return typeof DAILY_CALORIE_TARGET !== "undefined"
+        ? DAILY_CALORIE_TARGET
+        : 1400;
+
+}
 
 
 // ==================================================
@@ -23,30 +28,17 @@ function loadNotifierData() {
 
         dietData:
             JSON.parse(
-                localStorage.getItem(
-                    "dietData"
-                )
+                localStorage.getItem("dietData")
             ) || {},
 
         foodData:
             JSON.parse(
-                localStorage.getItem(
-                    "foodData"
-                )
-            ) || {},
-
-        activityData:
-            JSON.parse(
-                localStorage.getItem(
-                    "activityData"
-                )
+                localStorage.getItem("foodData")
             ) || {},
 
         finishDayData:
             JSON.parse(
-                localStorage.getItem(
-                    "finishDayData"
-                )
+                localStorage.getItem("finishDayData")
             ) || {}
 
     };
@@ -58,48 +50,15 @@ function loadNotifierData() {
 // קלוריות
 // ==================================================
 
-function notifierGetCalories(
-    foodData,
-    dateKey
-) {
+function notifierGetCalories(foodData, dateKey) {
 
     const foods =
         foodData[dateKey] || [];
 
 
     return foods.reduce(
-        (
-            total,
-            food
-        ) =>
-            total +
-            Number(food.calories || 0),
-        0
-    );
-
-}
-
-
-// ==================================================
-// פעילות
-// ==================================================
-
-function notifierGetActivity(
-    activityData,
-    dateKey
-) {
-
-    const activities =
-        activityData[dateKey] || [];
-
-
-    return activities.reduce(
-        (
-            total,
-            activity
-        ) =>
-            total +
-            Number(activity.minutes || 0),
+        (total, food) =>
+            total + Number(food.calories || 0),
         0
     );
 
@@ -128,42 +87,30 @@ function getSiteToday() {
 
     let year =
         Number(
-            parts.find(
-                x => x.type === "year"
-            ).value
+            parts.find(x => x.type === "year").value
         );
 
     let month =
         Number(
-            parts.find(
-                x => x.type === "month"
-            ).value
+            parts.find(x => x.type === "month").value
         ) - 1;
 
     let day =
         Number(
-            parts.find(
-                x => x.type === "day"
-            ).value
+            parts.find(x => x.type === "day").value
         );
 
 
     const hour =
         Number(
-            parts.find(
-                x => x.type === "hour"
-            ).value
+            parts.find(x => x.type === "hour").value
         );
 
 
     if (hour < 6) {
 
         const previousDay =
-            new Date(
-                year,
-                month,
-                day
-            );
+            new Date(year, month, day);
 
 
         previousDay.setDate(
@@ -171,41 +118,26 @@ function getSiteToday() {
         );
 
 
-        year =
-            previousDay.getFullYear();
-
-        month =
-            previousDay.getMonth();
-
-        day =
-            previousDay.getDate();
+        year = previousDay.getFullYear();
+        month = previousDay.getMonth();
+        day = previousDay.getDate();
 
     }
 
 
-    return new Date(
-        year,
-        month,
-        day
-    );
+    return new Date(year, month, day);
 
 }
 
 
-function notifierDateKey(
-    date
-) {
+function notifierDateKey(date) {
 
     return (
         date.getFullYear() +
         "-" +
-        String(
-            date.getMonth() + 1
-        ).padStart(2, "0") +
+        String(date.getMonth() + 1).padStart(2, "0") +
         "-" +
-        String(
-            date.getDate()
-        ).padStart(2, "0")
+        String(date.getDate()).padStart(2, "0")
     );
 
 }
@@ -219,13 +151,8 @@ function notifierIsPerfectDay(
     dateKey,
     dietData,
     foodData,
-    activityData,
     finishDayData
 ) {
-
-    const day =
-        dietData[dateKey] || {};
-
 
     const calories =
         notifierGetCalories(
@@ -234,34 +161,14 @@ function notifierIsPerfectDay(
         );
 
 
-    const activityMinutes =
-        notifierGetActivity(
-            activityData,
-            dateKey
-        );
-
-
-    const foodSuccess =
-        !!(
-            finishDayData[dateKey] &&
-            finishDayData[dateKey].finished === true &&
-            calories <= NOTIFIER_CALORIE_TARGET
-        );
-
-
-    const activitySuccess =
-        activityMinutes >=
-        NOTIFIER_ACTIVITY_TARGET;
-
-
-    const challengeSuccess =
-        day.challenge === true;
+    const finished =
+        finishDayData[dateKey] &&
+        finishDayData[dateKey].finished === true;
 
 
     return (
-        foodSuccess &&
-        activitySuccess &&
-        challengeSuccess
+        finished &&
+        calories <= getNotifierCalorieTarget()
     );
 
 }
@@ -283,9 +190,6 @@ function calculateNotifierStats() {
     const foodData =
         data.foodData;
 
-    const activityData =
-        data.activityData;
-
     const finishDayData =
         data.finishDayData;
 
@@ -295,7 +199,6 @@ function calculateNotifierStats() {
 
             ...Object.keys(dietData),
             ...Object.keys(foodData),
-            ...Object.keys(activityData),
             ...Object.keys(finishDayData)
 
         ]);
@@ -304,100 +207,56 @@ function calculateNotifierStats() {
     let activeDays = 0;
     let perfectDays = 0;
     let calorieSuccessDays = 0;
-    let activitySuccessDays = 0;
-    let challengeDays = 0;
     let finishedDays = 0;
-    let totalActivityMinutes = 0;
 
 
-    allDateKeys.forEach(
-        dateKey => {
+    allDateKeys.forEach(dateKey => {
 
-            const day =
-                dietData[dateKey] || {};
-
-
-            const calories =
-                notifierGetCalories(
-                    foodData,
-                    dateKey
-                );
+        const calories =
+            notifierGetCalories(
+                foodData,
+                dateKey
+            );
 
 
-            const activityMinutes =
-                notifierGetActivity(
-                    activityData,
-                    dateKey
-                );
+        const finished =
+            finishDayData[dateKey] &&
+            finishDayData[dateKey].finished === true;
 
 
-            const foodSuccess =
-                !!(
-                    finishDayData[dateKey] &&
-                    finishDayData[dateKey].finished === true &&
-                    calories <= NOTIFIER_CALORIE_TARGET
-                );
+        const foodSuccess =
+            !!(
+                finished &&
+                calories <= getNotifierCalorieTarget()
+            );
 
 
-            const activitySuccess =
-                activityMinutes >=
-                NOTIFIER_ACTIVITY_TARGET;
+        if (calories > 0) {
 
-
-            const challengeSuccess =
-                day.challenge === true;
-
-
-            if (
-                calories > 0 ||
-                activityMinutes > 0 ||
-                challengeSuccess
-            ) {
-
-                activeDays++;
-
-            }
-
-
-            if (foodSuccess)
-                calorieSuccessDays++;
-
-            if (activitySuccess)
-                activitySuccessDays++;
-
-            if (challengeSuccess)
-                challengeDays++;
-
-            if (
-                finishDayData[dateKey] &&
-                finishDayData[dateKey].finished === true
-            ) {
-
-                finishedDays++;
-
-            }
-
-
-            if (
-                foodSuccess &&
-                activitySuccess &&
-                challengeSuccess
-            ) {
-
-                perfectDays++;
-
-            }
-
-
-            totalActivityMinutes +=
-                activityMinutes;
+            activeDays++;
 
         }
-    );
+
+
+        if (foodSuccess) {
+
+            calorieSuccessDays++;
+            perfectDays++;
+
+        }
+
+
+        if (finished) {
+
+            finishedDays++;
+
+        }
+
+    });
 
 
     // ----------------------------------------------
-    // רצף
+    // רצף ימים מושלמים
     // ----------------------------------------------
 
     let checkDate =
@@ -412,7 +271,6 @@ function calculateNotifierStats() {
             notifierDateKey(checkDate),
             dietData,
             foodData,
-            activityData,
             finishDayData
         )
     ) {
@@ -432,10 +290,7 @@ function calculateNotifierStats() {
         activeDays,
         perfectDays,
         calorieSuccessDays,
-        activitySuccessDays,
-        challengeDays,
         finishedDays,
-        totalActivityMinutes,
         currentStreak
 
     };
@@ -461,9 +316,7 @@ function createAchievementPopup() {
 
 
     popup =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
 
     popup.id =
@@ -526,9 +379,7 @@ function createAchievementPopup() {
     `;
 
 
-    document.body.appendChild(
-        popup
-    );
+    document.body.appendChild(popup);
 
 
     document.getElementById(
@@ -551,9 +402,7 @@ function createAchievementPopup() {
         "click",
         event => {
 
-            if (
-                event.target === popup
-            ) {
+            if (event.target === popup) {
 
                 handleAchievementClose();
 
@@ -582,30 +431,24 @@ function isAchievementPopupOpen() {
 
     return !!(
         popup &&
-        popup.classList.contains(
-            "show"
-        )
+        popup.classList.contains("show")
     );
 
 }
 
 
 // ==================================================
-// הבא
+// הצגת ההישג הבא
 // ==================================================
 
 function showNextAchievement() {
 
-    if (
-        achievementQueue.length === 0
-    ) {
+    if (achievementQueue.length === 0) {
         return;
     }
 
 
-    if (
-        isAchievementPopupOpen()
-    ) {
+    if (isAchievementPopupOpen()) {
         return;
     }
 
@@ -614,9 +457,7 @@ function showNextAchievement() {
         achievementQueue.shift();
 
 
-    showGlobalAchievement(
-        achievement
-    );
+    showGlobalAchievement(achievement);
 
 }
 
@@ -625,9 +466,7 @@ function showNextAchievement() {
 // הצגת הישג
 // ==================================================
 
-function showGlobalAchievement(
-    achievement
-) {
+function showGlobalAchievement(achievement) {
 
     const popup =
         createAchievementPopup();
@@ -682,9 +521,7 @@ function showGlobalAchievement(
     }
 
 
-    popup.classList.add(
-        "show"
-    );
+    popup.classList.add("show");
 
 }
 
@@ -706,9 +543,7 @@ function handleAchievementClose() {
     }
 
 
-    popup.classList.remove(
-        "show"
-    );
+    popup.classList.remove("show");
 
 
     setTimeout(
@@ -724,7 +559,7 @@ function handleAchievementClose() {
 
 
 // ==================================================
-// בדיקה
+// בדיקת הישגים
 // ==================================================
 
 const ACHIEVEMENT_SNAPSHOT_KEY =
@@ -744,15 +579,11 @@ function getAchievementSnapshot() {
 }
 
 
-function saveAchievementSnapshot(
-    snapshot
-) {
+function saveAchievementSnapshot(snapshot) {
 
     localStorage.setItem(
         ACHIEVEMENT_SNAPSHOT_KEY,
-        JSON.stringify(
-            snapshot
-        )
+        JSON.stringify(snapshot)
     );
 
 }
@@ -762,9 +593,7 @@ function saveAchievementSnapshot(
 // כרטיסי הישגים
 // ==================================================
 
-function updateAchievementCards(
-    unlockedAchievements
-) {
+function updateAchievementCards(unlockedAchievements) {
 
     const cards =
         document.querySelectorAll(
@@ -772,103 +601,96 @@ function updateAchievementCards(
         );
 
 
-    cards.forEach(
-        card => {
+    cards.forEach(card => {
 
-            const title =
-                card.querySelector(
-                    ".achievement-info h3"
-                );
-
-
-            if (!title) {
-                return;
-            }
+        const title =
+            card.querySelector(
+                ".achievement-info h3"
+            );
 
 
-            const achievement =
-                (
-                    typeof achievementCatalog !==
-                    "undefined"
-                )
-                    ? achievementCatalog.find(
-                        item =>
-                            item.name ===
-                            title.textContent.trim()
-                    )
-                    : null;
+        if (!title) {
+            return;
+        }
 
 
-            if (!achievement) {
-                return;
-            }
-
-
-            const unlocked =
-                unlockedAchievements.some(
+        const achievement =
+            (
+                typeof achievementCatalog !== "undefined"
+            )
+                ? achievementCatalog.find(
                     item =>
-                        item.id ===
-                        achievement.id
-                );
+                        item.name === title.textContent.trim()
+                )
+                : null;
 
 
-            card.classList.toggle(
-                "locked",
-                !unlocked
+        if (!achievement) {
+            return;
+        }
+
+
+        const unlocked =
+            unlockedAchievements.some(
+                item => item.id === achievement.id
             );
 
-            card.classList.toggle(
-                "unlocked",
+
+        card.classList.toggle(
+            "locked",
+            !unlocked
+        );
+
+        card.classList.toggle(
+            "unlocked",
+            unlocked
+        );
+
+
+        const icon =
+            card.querySelector(
+                ".achievement-icon"
+            );
+
+
+        if (icon) {
+
+            icon.textContent =
                 unlocked
-            );
-
-
-            const icon =
-                card.querySelector(
-                    ".achievement-icon"
-                );
-
-
-            if (icon) {
-
-                icon.textContent =
-                    unlocked
-                        ? achievement.icon
-                        : "🔒";
-
-            }
-
-
-            const status =
-                card.querySelector(
-                    ".achievement-status"
-                );
-
-
-            if (status) {
-
-                status.textContent =
-                    unlocked
-                        ? "✓ הושג"
-                        : "עוד לא הושג";
-
-            }
+                    ? achievement.icon
+                    : "🔒";
 
         }
-    );
+
+
+        const status =
+            card.querySelector(
+                ".achievement-status"
+            );
+
+
+        if (status) {
+
+            status.textContent =
+                unlocked
+                    ? "✓ הושג"
+                    : "עוד לא הושג";
+
+        }
+
+    });
 
 }
 
 
 // ==================================================
-// בדיקת הישגים
+// בדיקת הישגים חדשים
 // ==================================================
 
 function checkForNewAchievements() {
 
     if (
-        typeof achievementCatalog ===
-        "undefined"
+        typeof achievementCatalog === "undefined"
     ) {
 
         return;
@@ -884,61 +706,41 @@ function checkForNewAchievements() {
         getAchievementSnapshot();
 
 
-    const currentSnapshot =
-        {};
+    const currentSnapshot = {};
+
+    const currentlyUnlocked = [];
+
+    const newlyUnlocked = [];
 
 
-    const currentlyUnlocked =
-        [];
+    achievementCatalog.forEach(achievement => {
+
+        const unlocked =
+            achievement.unlocked(stats);
 
 
-    const newlyUnlocked =
-        [];
+        currentSnapshot[achievement.id] =
+            unlocked;
 
 
-    achievementCatalog.forEach(
-        achievement => {
+        if (unlocked) {
 
-            const unlocked =
-                achievement.unlocked(
-                    stats
-                );
-
-
-            currentSnapshot[
-                achievement.id
-            ] =
-                unlocked;
-
-
-            if (unlocked) {
-
-                currentlyUnlocked.push(
-                    achievement
-                );
-
-            }
-
-
-            const wasUnlocked =
-                previousSnapshot[
-                    achievement.id
-                ] === true;
-
-
-            if (
-                unlocked &&
-                !wasUnlocked
-            ) {
-
-                newlyUnlocked.push(
-                    achievement
-                );
-
-            }
+            currentlyUnlocked.push(achievement);
 
         }
-    );
+
+
+        const wasUnlocked =
+            previousSnapshot[achievement.id] === true;
+
+
+        if (unlocked && !wasUnlocked) {
+
+            newlyUnlocked.push(achievement);
+
+        }
+
+    });
 
 
     updateAchievementCards(
@@ -951,33 +753,23 @@ function checkForNewAchievements() {
     );
 
 
-    if (
-        newlyUnlocked.length > 0
-    ) {
+    if (newlyUnlocked.length > 0) {
 
-        newlyUnlocked.forEach(
-            achievement => {
+        newlyUnlocked.forEach(achievement => {
 
-                const alreadyQueued =
-                    achievementQueue.some(
-                        item =>
-                            item.id ===
-                            achievement.id
-                    );
+            const alreadyQueued =
+                achievementQueue.some(
+                    item => item.id === achievement.id
+                );
 
 
-                if (
-                    !alreadyQueued
-                ) {
+            if (!alreadyQueued) {
 
-                    achievementQueue.push(
-                        achievement
-                    );
-
-                }
+                achievementQueue.push(achievement);
 
             }
-        );
+
+        });
 
 
         showNextAchievement();
@@ -992,8 +784,7 @@ function checkForNewAchievements() {
 // ==================================================
 
 if (
-    typeof achievementCatalog !==
-    "undefined"
+    typeof achievementCatalog !== "undefined"
 ) {
 
     const existingSnapshot =
@@ -1008,22 +799,15 @@ if (
             calculateNotifierStats();
 
 
-        const initialSnapshot =
-            {};
+        const initialSnapshot = {};
 
 
-        achievementCatalog.forEach(
-            achievement => {
+        achievementCatalog.forEach(achievement => {
 
-                initialSnapshot[
-                    achievement.id
-                ] =
-                    achievement.unlocked(
-                        stats
-                    );
+            initialSnapshot[achievement.id] =
+                achievement.unlocked(stats);
 
-            }
-        );
+        });
 
 
         saveAchievementSnapshot(

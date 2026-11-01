@@ -1,3 +1,4 @@
+
 // ==================================================
 // אלמנטים
 // ==================================================
@@ -31,8 +32,7 @@ const emptyFoodMessage =
 // מאגר אישי
 // ==================================================
 
-const FOOD_CATALOG_KEY =
-    "foodCatalog";
+const FOOD_CATALOG_KEY = "foodCatalog";
 
 
 const builtInFoodEmoji = {
@@ -103,17 +103,14 @@ function loadFoodCatalog() {
 
     return (
         JSON.parse(
-            localStorage.getItem(
-                FOOD_CATALOG_KEY
-            )
+            localStorage.getItem(FOOD_CATALOG_KEY)
         ) || []
     );
 
 }
 
 
-let foodCatalog =
-    loadFoodCatalog();
+let foodCatalog = loadFoodCatalog();
 
 
 // ==================================================
@@ -138,84 +135,57 @@ function getSiteToday() {
 
     let year =
         Number(
-            parts.find(
-                x => x.type === "year"
-            ).value
+            parts.find(x => x.type === "year").value
         );
 
     let month =
         Number(
-            parts.find(
-                x => x.type === "month"
-            ).value
+            parts.find(x => x.type === "month").value
         ) - 1;
 
     let day =
         Number(
-            parts.find(
-                x => x.type === "day"
-            ).value
+            parts.find(x => x.type === "day").value
         );
-
 
     const hour =
         Number(
-            parts.find(
-                x => x.type === "hour"
-            ).value
+            parts.find(x => x.type === "hour").value
         );
 
+
+    // לפני 06:00 היום נחשב ליום הקודם
 
     if (hour < 6) {
 
         const previousDay =
-            new Date(
-                year,
-                month,
-                day
-            );
-
+            new Date(year, month, day);
 
         previousDay.setDate(
             previousDay.getDate() - 1
         );
 
-
-        year =
-            previousDay.getFullYear();
-
-        month =
-            previousDay.getMonth();
-
-        day =
-            previousDay.getDate();
+        year = previousDay.getFullYear();
+        month = previousDay.getMonth();
+        day = previousDay.getDate();
 
     }
 
 
-    return new Date(
-        year,
-        month,
-        day
-    );
+    return new Date(year, month, day);
 
 }
 
 
-const today =
-    getSiteToday();
+const today = getSiteToday();
 
 
 const dateKey =
     today.getFullYear() +
     "-" +
-    String(
-        today.getMonth() + 1
-    ).padStart(2, "0") +
+    String(today.getMonth() + 1).padStart(2, "0") +
     "-" +
-    String(
-        today.getDate()
-    ).padStart(2, "0");
+    String(today.getDate()).padStart(2, "0");
 
 
 // ==================================================
@@ -224,13 +194,11 @@ const dateKey =
 
 const allFoodData =
     JSON.parse(
-        localStorage.getItem(
-            "foodData"
-        )
+        localStorage.getItem("foodData")
     ) || {};
 
 
-if (!allFoodData[dateKey]) {
+if (!Array.isArray(allFoodData[dateKey])) {
 
     allFoodData[dateKey] = [];
 
@@ -245,9 +213,7 @@ function saveFoodData() {
 
     localStorage.setItem(
         "foodData",
-        JSON.stringify(
-            allFoodData
-        )
+        JSON.stringify(allFoodData)
     );
 
 }
@@ -257,23 +223,13 @@ function saveFoodData() {
 // אימוג'י
 // ==================================================
 
-function getFoodEmoji(
-    name
-) {
+function getFoodEmoji(name) {
 
-    const cleanName =
-        name.trim();
+    const cleanName = name.trim();
 
+    if (builtInFoodEmoji[cleanName]) {
 
-    if (
-        builtInFoodEmoji[
-            cleanName
-        ]
-    ) {
-
-        return builtInFoodEmoji[
-            cleanName
-        ];
+        return builtInFoodEmoji[cleanName];
 
     }
 
@@ -282,22 +238,17 @@ function getFoodEmoji(
         foodCatalog.find(
             food =>
                 food.name &&
-                food.name.trim()
-                    .localeCompare(
-                        cleanName,
-                        "he",
-                        {
-                            sensitivity:
-                                "base"
-                        }
-                    ) === 0
+                food.name.trim().localeCompare(
+                    cleanName,
+                    "he",
+                    {
+                        sensitivity: "base"
+                    }
+                ) === 0
         );
 
 
-    if (
-        catalogFood &&
-        catalogFood.emoji
-    ) {
+    if (catalogFood && catalogFood.emoji) {
 
         return catalogFood.emoji;
 
@@ -313,13 +264,9 @@ function getFoodEmoji(
 // התאמות למאגר
 // ==================================================
 
-function findCatalogMatches(
-    searchText
-) {
+function findCatalogMatches(searchText) {
 
-    const cleanSearch =
-        searchText.trim();
-
+    const cleanSearch = searchText.trim();
 
     if (!cleanSearch) {
         return [];
@@ -329,9 +276,7 @@ function findCatalogMatches(
     return foodCatalog.filter(
         food =>
             food.name &&
-            food.name.includes(
-                cleanSearch
-            )
+            food.name.includes(cleanSearch)
     );
 
 }
@@ -341,20 +286,14 @@ function findCatalogMatches(
 // הצעות
 // ==================================================
 
-function showSuggestions(
-    value
-) {
+function showSuggestions(value) {
 
-    foodSuggestions.innerHTML =
-        "";
+    foodSuggestions.innerHTML = "";
 
-    customFoodBox.style.display =
-        "none";
+    customFoodBox.style.display = "none";
 
 
-    const searchText =
-        value.trim();
-
+    const searchText = value.trim();
 
     if (!searchText) {
         return;
@@ -362,104 +301,83 @@ function showSuggestions(
 
 
     const matches =
-        findCatalogMatches(
-            searchText
-        );
+        findCatalogMatches(searchText);
 
 
-    matches.forEach(
-        food => {
+    matches.forEach(food => {
 
-            const suggestion =
-                document.createElement(
-                    "div"
-                );
+        const suggestion =
+            document.createElement("div");
 
-
-            suggestion.className =
-                "food-suggestion";
+        suggestion.className = "food-suggestion";
 
 
-            suggestion.innerHTML = `
-
-                <span
-                    class="food-suggestion-emoji">
-
-                    ${food.emoji || getFoodEmoji(food.name)}
-
-                </span>
-
-                <span
-                    class="food-suggestion-content">
-
-                    <strong>
-                        ${escapeHtml(food.name)}
-                    </strong>
-
-                    <small>
-
-                        ${escapeHtml(food.amount || "")}
-
-                        ${
-                            food.amount && food.unit
-                                ? " "
-                                : ""
-                        }
-
-                        ${escapeHtml(food.unit || "")}
-
-                        ${
-                            food.amount || food.unit
-                                ? " · "
-                                : ""
-                        }
-
-                        ${Number(food.calories || 0)}
-                        קלוריות
-
-                    </small>
-
-                </span>
-
-            `;
+        const emoji =
+            food.emoji || getFoodEmoji(food.name);
 
 
-            suggestion.addEventListener(
-                "click",
-                () => {
+        suggestion.innerHTML = `
 
-                    addFoodFromCatalog(
-                        food
-                    );
+            <span class="food-suggestion-emoji">
+                ${escapeHtml(emoji)}
+            </span>
+
+            <span class="food-suggestion-content">
+
+                <strong>
+                    ${escapeHtml(food.name)}
+                </strong>
+
+                <small>
+
+                    ${escapeHtml(food.amount || "")}
+
+                    ${
+                        food.amount && food.unit
+                            ? " "
+                            : ""
+                    }
+
+                    ${escapeHtml(food.unit || "")}
+
+                    ${
+                        food.amount || food.unit
+                            ? " · "
+                            : ""
+                    }
+
+                    ${Number(food.calories || 0)}
+                    קלוריות
+
+                </small>
+
+            </span>
+
+        `;
 
 
-                    foodSearch.value =
-                        "";
+        suggestion.addEventListener("click", () => {
 
-                    foodSuggestions.innerHTML =
-                        "";
+            addFoodFromCatalog(food);
 
-                }
-            );
+            foodSearch.value = "";
 
+            foodSuggestions.innerHTML = "";
 
-            foodSuggestions.appendChild(
-                suggestion
-            );
-
-        }
-    );
+        });
 
 
-    if (
-        matches.length === 0
-    ) {
+        foodSuggestions.appendChild(suggestion);
+
+    });
+
+
+    if (matches.length === 0) {
 
         customFoodText.textContent =
             `המאכל "${searchText}" לא נמצא במאגר. אפשר להוסיף אותו ידנית.`;
 
-        customFoodBox.style.display =
-            "block";
+        customFoodBox.style.display = "block";
 
     }
 
@@ -470,54 +388,36 @@ function showSuggestions(
 // הוספה מהמאגר
 // ==================================================
 
-function addFoodFromCatalog(
-    catalogFood
-) {
+function addFoodFromCatalog(catalogFood) {
 
     const baseAmount =
-        Number(
-            catalogFood.amount
-        ) || 0;
+        Number(catalogFood.amount) || 0;
 
     const baseCalories =
-        Number(
-            catalogFood.calories
-        ) || 0;
+        Number(catalogFood.calories) || 0;
 
 
     allFoodData[dateKey].push({
 
-        id:
-            Date.now(),
+        id: Date.now(),
 
-        name:
-            catalogFood.name,
+        name: catalogFood.name,
 
         emoji:
             catalogFood.emoji ||
-            getFoodEmoji(
-                catalogFood.name
-            ),
+            getFoodEmoji(catalogFood.name),
 
-        unit:
-            catalogFood.unit || "",
+        unit: catalogFood.unit || "",
 
-        amount:
-            catalogFood.amount || "",
+        amount: catalogFood.amount || "",
 
-        calories:
-            baseCalories,
+        calories: baseCalories,
 
-        // ------------------------------------------
-        // "בסיס" מהמאגר, לחישוב קלוריות יחסי
-        // כשמשנים את הכמות
-        // ------------------------------------------
+        // נתוני בסיס לחישוב קלוריות יחסי
 
-        baseAmount:
-            baseAmount,
+        baseAmount: baseAmount,
 
-        baseCalories:
-            baseCalories
+        baseCalories: baseCalories
 
     });
 
@@ -542,36 +442,28 @@ function addFoodFromCatalog(
 
 if (addCustomFood) {
 
-    addCustomFood.addEventListener(
-        "click",
-        () => {
+    addCustomFood.addEventListener("click", () => {
 
-            const name =
-                foodSearch.value.trim();
+        const name = foodSearch.value.trim();
 
-
-            if (!name) {
-                return;
-            }
-
-
-            addFood(
-                name,
-                getFoodEmoji(name)
-            );
-
-
-            foodSearch.value =
-                "";
-
-            foodSuggestions.innerHTML =
-                "";
-
-            customFoodBox.style.display =
-                "none";
-
+        if (!name) {
+            return;
         }
-    );
+
+
+        addFood(
+            name,
+            getFoodEmoji(name)
+        );
+
+
+        foodSearch.value = "";
+
+        foodSuggestions.innerHTML = "";
+
+        customFoodBox.style.display = "none";
+
+    });
 
 }
 
@@ -580,36 +472,25 @@ if (addCustomFood) {
 // הוספת מאכל
 // ==================================================
 
-function addFood(
-    name,
-    emoji = ""
-) {
+function addFood(name, emoji = "") {
 
     allFoodData[dateKey].push({
 
-        id:
-            Date.now(),
+        id: Date.now(),
 
-        name:
-            name,
+        name: name,
 
-        emoji:
-            emoji,
+        emoji: emoji,
 
-        unit:
-            "",
+        unit: "",
 
-        amount:
-            "",
+        amount: "",
 
-        calories:
-            0,
+        calories: 0,
 
-        baseAmount:
-            0,
+        baseAmount: 0,
 
-        baseCalories:
-            0
+        baseCalories: 0
 
     });
 
@@ -632,17 +513,12 @@ function addFood(
 // שינוי יחידה
 // ==================================================
 
-function updateUnit(
-    id,
-    value
-) {
+function updateUnit(id, value) {
 
     const food =
-        allFoodData[dateKey]
-            .find(
-                item =>
-                    item.id === id
-            );
+        allFoodData[dateKey].find(
+            item => item.id === id
+        );
 
 
     if (!food) {
@@ -650,9 +526,7 @@ function updateUnit(
     }
 
 
-    food.unit =
-        value;
-
+    food.unit = value;
 
     saveFoodData();
 
@@ -662,23 +536,13 @@ function updateUnit(
 // ==================================================
 // שינוי כמות
 // ==================================================
-//
-// אם למאכל יש "בסיס" מהמאגר (כמות + קלוריות),
-// הקלוריות מתעדכנות אוטומטית באופן יחסי לכמות החדשה.
-// ==================================================
 
-function updateAmount(
-    id,
-    value,
-    calorieInput
-) {
+function updateAmount(id, value, calorieInput) {
 
     const food =
-        allFoodData[dateKey]
-            .find(
-                item =>
-                    item.id === id
-            );
+        allFoodData[dateKey].find(
+            item => item.id === id
+        );
 
 
     if (!food) {
@@ -686,8 +550,7 @@ function updateAmount(
     }
 
 
-    food.amount =
-        value;
+    food.amount = value;
 
 
     const hasBase =
@@ -699,7 +562,6 @@ function updateAmount(
         const newAmount =
             Number(value) || 0;
 
-
         const newCalories =
             Math.round(
                 (
@@ -710,15 +572,10 @@ function updateAmount(
             );
 
 
-        food.calories =
-            newCalories;
-
+        food.calories = newCalories;
 
         if (calorieInput) {
-
-            calorieInput.value =
-                newCalories;
-
+            calorieInput.value = newCalories;
         }
 
     }
@@ -740,17 +597,12 @@ function updateAmount(
 // שינוי קלוריות
 // ==================================================
 
-function updateCalories(
-    id,
-    value
-) {
+function updateCalories(id, value) {
 
     const food =
-        allFoodData[dateKey]
-            .find(
-                item =>
-                    item.id === id
-            );
+        allFoodData[dateKey].find(
+            item => item.id === id
+        );
 
 
     if (!food) {
@@ -761,17 +613,10 @@ function updateCalories(
     food.calories =
         value === ""
             ? ""
-            : Math.max(
-                0,
-                Number(value) || 0
-            );
+            : Math.max(0, Number(value) || 0);
 
 
-    // ----------------------------------------------
-    // אם עדכנו את הקלוריות ידנית, "מבסיסים" מחדש
-    // את היחס מול הכמות הנוכחית - כך ששינוי כמות
-    // עתידי ימשיך לחשב באופן יחסי נכון
-    // ----------------------------------------------
+    // עדכון בסיס החישוב לאחר שינוי ידני
 
     const currentAmount =
         Number(food.amount);
@@ -782,11 +627,9 @@ function updateCalories(
         food.calories !== ""
     ) {
 
-        food.baseAmount =
-            currentAmount;
+        food.baseAmount = currentAmount;
 
-        food.baseCalories =
-            food.calories;
+        food.baseCalories = food.calories;
 
     }
 
@@ -807,16 +650,12 @@ function updateCalories(
 // מחיקה
 // ==================================================
 
-function deleteFood(
-    id
-) {
+function deleteFood(id) {
 
     allFoodData[dateKey] =
-        allFoodData[dateKey]
-            .filter(
-                item =>
-                    item.id !== id
-            );
+        allFoodData[dateKey].filter(
+            item => item.id !== id
+        );
 
 
     saveFoodData();
@@ -839,12 +678,10 @@ function deleteFood(
 
 function renderFoodTable() {
 
-    foodTableBody.innerHTML =
-        "";
+    foodTableBody.innerHTML = "";
 
 
-    const todayFoods =
-        allFoodData[dateKey];
+    const todayFoods = allFoodData[dateKey];
 
 
     emptyFoodMessage.style.display =
@@ -853,174 +690,142 @@ function renderFoodTable() {
             : "none";
 
 
-    todayFoods.forEach(
-        food => {
+    todayFoods.forEach(food => {
 
-            const row =
-                document.createElement(
-                    "tr"
-                );
+        const row =
+            document.createElement("tr");
 
 
-            row.innerHTML = `
+        row.innerHTML = `
 
-                <td>
+            <td>
 
-                    <span
-                        class="table-food-name">
+                <span class="table-food-name">
 
-                        <span
-                            class="table-food-emoji">
-
-                            ${food.emoji || ""}
-
-                        </span>
-
-                        ${escapeHtml(food.name)}
-
+                    <span class="table-food-emoji">
+                        ${escapeHtml(food.emoji || "")}
                     </span>
 
-                </td>
+                    ${escapeHtml(food.name)}
+
+                </span>
+
+            </td>
 
 
-                <td>
+            <td>
 
-                    <input
-                        type="text"
-                        value="${escapeHtml(food.unit || "")}"
-                        placeholder="כוס, גרם..."
-                        list="unitOptions"
-                        autocomplete="off"
-                        class="unit-input">
+                <input
+                    type="text"
+                    value="${escapeHtml(food.unit || "")}"
+                    placeholder="כוס, גרם..."
+                    list="unitOptions"
+                    autocomplete="off"
+                    class="unit-input">
 
-                </td>
-
-
-                <td>
-
-                    <input
-                        type="text"
-                        value="${escapeHtml(food.amount || "")}"
-                        placeholder="כמות"
-                        class="amount-input">
-
-                </td>
+            </td>
 
 
-                <td>
+            <td>
 
-                    <input
-                        type="number"
-                        min="0"
-                        step="1"
-                        value="${
-                            food.calories === ""
-                                ? ""
-                                : food.calories
-                        }"
-                        placeholder="קלוריות"
-                        class="calorie-input">
+                <input
+                    type="text"
+                    value="${escapeHtml(food.amount || "")}"
+                    placeholder="כמות"
+                    class="amount-input">
 
-                </td>
+            </td>
 
 
-                <td>
+            <td>
 
-                    <button
-                        class="delete-food"
-                        type="button">
+                <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value="${
+                        food.calories === ""
+                            ? ""
+                            : food.calories
+                    }"
+                    placeholder="קלוריות"
+                    class="calorie-input">
 
-                        🗑️
-
-                    </button>
-
-                </td>
-
-            `;
-
-
-            const unitInput =
-                row.querySelector(
-                    ".unit-input"
-                );
+            </td>
 
 
-            unitInput.addEventListener(
-                "input",
-                () => {
+            <td>
 
-                    updateUnit(
-                        food.id,
-                        unitInput.value
-                    );
+                <button
+                    class="delete-food"
+                    type="button">
 
-                }
+                    🗑️
+
+                </button>
+
+            </td>
+
+        `;
+
+
+        const unitInput =
+            row.querySelector(".unit-input");
+
+
+        unitInput.addEventListener("input", () => {
+
+            updateUnit(
+                food.id,
+                unitInput.value
             );
 
-
-            const calorieInput =
-                row.querySelector(
-                    ".calorie-input"
-                );
+        });
 
 
-            const amountInput =
-                row.querySelector(
-                    ".amount-input"
-                );
+        const calorieInput =
+            row.querySelector(".calorie-input");
 
 
-            amountInput.addEventListener(
-                "input",
-                () => {
+        const amountInput =
+            row.querySelector(".amount-input");
 
-                    updateAmount(
-                        food.id,
-                        amountInput.value,
-                        calorieInput
-                    );
 
-                }
+        amountInput.addEventListener("input", () => {
+
+            updateAmount(
+                food.id,
+                amountInput.value,
+                calorieInput
             );
 
+        });
 
-            calorieInput.addEventListener(
-                "input",
-                () => {
 
-                    updateCalories(
-                        food.id,
-                        calorieInput.value
-                    );
+        calorieInput.addEventListener("input", () => {
 
-                }
+            updateCalories(
+                food.id,
+                calorieInput.value
             );
 
-
-            const deleteButton =
-                row.querySelector(
-                    ".delete-food"
-                );
+        });
 
 
-            deleteButton.addEventListener(
-                "click",
-                () => {
-
-                    deleteFood(
-                        food.id
-                    );
-
-                }
-            );
+        const deleteButton =
+            row.querySelector(".delete-food");
 
 
-            foodTableBody.appendChild(
-                row
-            );
+        deleteButton.addEventListener("click", () => {
 
-        }
-    );
+            deleteFood(food.id);
+
+        });
+
+
+        foodTableBody.appendChild(row);
+
+    });
 
 
     updateTotal();
@@ -1029,28 +834,20 @@ function renderFoodTable() {
 
 
 // ==================================================
-// סה"כ
+// סה"כ קלוריות
 // ==================================================
 
 function updateTotal() {
 
     const total =
-        allFoodData[dateKey]
-            .reduce(
-                (
-                    sum,
-                    food
-                ) =>
-                    sum +
-                    Number(
-                        food.calories || 0
-                    ),
-                0
-            );
+        allFoodData[dateKey].reduce(
+            (sum, food) =>
+                sum + Number(food.calories || 0),
+            0
+        );
 
 
-    foodTotal.textContent =
-        total;
+    foodTotal.textContent = total;
 
 }
 
@@ -1061,16 +858,11 @@ function updateTotal() {
 
 if (foodSearch) {
 
-    foodSearch.addEventListener(
-        "input",
-        () => {
+    foodSearch.addEventListener("input", () => {
 
-            showSuggestions(
-                foodSearch.value
-            );
+        showSuggestions(foodSearch.value);
 
-        }
-    );
+    });
 
 }
 
@@ -1079,61 +871,34 @@ if (foodSearch) {
 // סגירת הצעות
 // ==================================================
 
-document.addEventListener(
-    "click",
-    event => {
+document.addEventListener("click", event => {
 
-        if (
-            foodSearch &&
-            foodSuggestions &&
-            !foodSearch.contains(
-                event.target
-            ) &&
-            !foodSuggestions.contains(
-                event.target
-            )
-        ) {
+    if (
+        foodSearch &&
+        foodSuggestions &&
+        !foodSearch.contains(event.target) &&
+        !foodSuggestions.contains(event.target)
+    ) {
 
-            foodSuggestions.innerHTML =
-                "";
-
-        }
+        foodSuggestions.innerHTML = "";
 
     }
-);
+
+});
 
 
 // ==================================================
 // עזר
 // ==================================================
 
-function escapeHtml(
-    value
-) {
+function escapeHtml(value) {
 
-    return String(
-        value ?? ""
-    )
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 
 }
 

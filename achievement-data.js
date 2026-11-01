@@ -125,8 +125,8 @@ const achievementCatalog = [
         id: "fifty_finished_days",
         icon: "💎",
         name: "50 ימים שהושלמו",
-        description: "סיימת 50 ימים",
         xp: 350,
+        description: "סיימת 50 ימים",
         unlocked: data => data.finishedDays >= 50
     },
 
@@ -323,124 +323,6 @@ const achievementCatalog = [
         description: "עמדת ביעד הקלורי ב־50 ימים",
         xp: 400,
         unlocked: data => data.calorieSuccessDays >= 50
-    },
-
-
-    // ==================================================
-    // פעילות
-    // ==================================================
-
-    {
-        id: "first_activity_day",
-        icon: "🏃",
-        name: "מתחילים לזוז",
-        description: "השלמת את יעד 20 הדקות הראשון",
-        xp: 50,
-        unlocked: data => data.activitySuccessDays >= 1
-    },
-
-    {
-        id: "five_activity_days",
-        icon: "👟",
-        name: "5 ימי תנועה",
-        description: "הגעת ליעד הפעילות ב־5 ימים",
-        xp: 75,
-        unlocked: data => data.activitySuccessDays >= 5
-    },
-
-    {
-        id: "ten_activity_days",
-        icon: "⚡",
-        name: "10 אימונים מוצלחים",
-        description: "הגעת ליעד הפעילות ב־10 ימים",
-        xp: 100,
-        unlocked: data => data.activitySuccessDays >= 10
-    },
-
-    {
-        id: "twenty_activity_days",
-        icon: "🏃‍♀️",
-        name: "20 ימי תנועה",
-        description: "הגעת ליעד הפעילות ב־20 ימים",
-        xp: 200,
-        unlocked: data => data.activitySuccessDays >= 20
-    },
-
-    {
-        id: "thirty_activity_days",
-        icon: "🔥",
-        name: "30 ימי תנועה",
-        description: "הגעת ליעד הפעילות ב־30 ימים",
-        xp: 250,
-        unlocked: data => data.activitySuccessDays >= 30
-    },
-
-    {
-        id: "fifty_activity_days",
-        icon: "🏅",
-        name: "50 ימי תנועה",
-        description: "הגעת ליעד הפעילות ב־50 ימים",
-        xp: 400,
-        unlocked: data => data.activitySuccessDays >= 50
-    },
-
-
-    // ==================================================
-    // דקות פעילות
-    // ==================================================
-
-    {
-        id: "one_hundred_activity_minutes",
-        icon: "⏱️",
-        name: "100 דקות",
-        description: "צברת 100 דקות פעילות",
-        xp: 50,
-        unlocked: data => data.totalActivityMinutes >= 100
-    },
-
-    {
-        id: "two_hundred_fifty_activity_minutes",
-        icon: "⌚",
-        name: "250 דקות",
-        description: "צברת 250 דקות פעילות",
-        xp: 75,
-        unlocked: data => data.totalActivityMinutes >= 250
-    },
-
-    {
-        id: "five_hundred_activity_minutes",
-        icon: "🚀",
-        name: "500 דקות",
-        description: "צברת 500 דקות פעילות",
-        xp: 100,
-        unlocked: data => data.totalActivityMinutes >= 500
-    },
-
-    {
-        id: "one_thousand_activity_minutes",
-        icon: "🌈",
-        name: "1000 דקות",
-        description: "צברת 1000 דקות פעילות",
-        xp: 200,
-        unlocked: data => data.totalActivityMinutes >= 1000
-    },
-
-    {
-        id: "two_thousand_activity_minutes",
-        icon: "💫",
-        name: "2000 דקות",
-        description: "צברת 2000 דקות פעילות",
-        xp: 300,
-        unlocked: data => data.totalActivityMinutes >= 2000
-    },
-
-    {
-        id: "five_thousand_activity_minutes",
-        icon: "👑",
-        name: "5000 דקות",
-        description: "צברת 5000 דקות פעילות",
-        xp: 750,
-        unlocked: data => data.totalActivityMinutes >= 5000
     },
 
 

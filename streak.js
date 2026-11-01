@@ -1,6 +1,9 @@
+
 // ==================================================
 // הגדרות
 // ==================================================
+
+const DAILY_CALORIE_TARGET = 1400;
 
 const STREAK_GIFT_INTERVAL = 10;
 const STREAK_TOTAL_GIFTS = 10;
@@ -34,100 +37,77 @@ const STREAK_GIFT_NAMES = [
 // ==================================================
 
 const currentStreakElement =
-    document.getElementById(
-        "currentStreak"
-    );
+    document.getElementById("currentStreak");
 
 const bestStreakElement =
-    document.getElementById(
-        "bestStreak"
-    );
+    document.getElementById("bestStreak");
 
 const giftCountElement =
-    document.getElementById(
-        "giftCount"
-    );
+    document.getElementById("giftCount");
 
 const streakProgress =
-    document.getElementById(
-        "streakProgress"
-    );
+    document.getElementById("streakProgress");
 
 const streakGhost =
-    document.getElementById(
-        "streakGhost"
-    );
+    document.getElementById("streakGhost");
 
 const streakCenterNumber =
-    document.getElementById(
-        "streakCenterNumber"
-    );
+    document.getElementById("streakCenterNumber");
 
 const nextGiftMessage =
-    document.getElementById(
-        "nextGiftMessage"
-    );
+    document.getElementById("nextGiftMessage");
 
 const bestStreakMessage =
-    document.getElementById(
-        "bestStreakMessage"
-    );
+    document.getElementById("bestStreakMessage");
 
 const streakFire =
-    document.getElementById(
-        "streakFire"
-    );
+    document.getElementById("streakFire");
 
 const giftContainer =
-    document.getElementById(
-        "giftContainer"
-    );
+    document.getElementById("giftContainer");
 
 const giftPopup =
-    document.getElementById(
-        "giftPopup"
-    );
+    document.getElementById("giftPopup");
 
 const giftPopupImage =
-    document.getElementById(
-        "giftPopupImage"
-    );
+    document.getElementById("giftPopupImage");
 
 const giftPopupText =
-    document.getElementById(
-        "giftPopupText"
-    );
+    document.getElementById("giftPopupText");
 
 const giftPopupXP =
-    document.getElementById(
-        "giftPopupXP"
-    );
+    document.getElementById("giftPopupXP");
 
 const giftPopupButton =
-    document.getElementById(
-        "giftPopupButton"
-    );
+    document.getElementById("giftPopupButton");
 
 
 // ==================================================
 // נתונים
 // ==================================================
 
-const dietData =
-    JSON.parse(
-        localStorage.getItem(
-            "dietData"
-        )
-    ) || {};
+let foodData = {};
+
+let finishDayData = {};
 
 
-// נתוני סיום יום
-const finishDayData =
-    JSON.parse(
-        localStorage.getItem(
-            "finishDayData"
-        )
-    ) || {};
+// ==================================================
+// טעינת נתונים
+// ==================================================
+
+function loadStreakData() {
+
+    foodData =
+        JSON.parse(
+            localStorage.getItem("foodData")
+        ) || {};
+
+    finishDayData =
+        JSON.parse(
+            localStorage.getItem("finishDayData")
+        ) || {};
+
+}
 
 
 // ==================================================
@@ -141,35 +121,20 @@ function getSiteToday() {
         new Intl.DateTimeFormat(
             "en-CA",
             {
-                timeZone:
-                    "Asia/Jerusalem",
-
-                year:
-                    "numeric",
-
-                month:
-                    "2-digit",
-
-                day:
-                    "2-digit",
-
-                hour:
-                    "2-digit",
-
-                hour12:
-                    false
+                timeZone: "Asia/Jerusalem",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                hour12: false
             }
-        ).formatToParts(
-            new Date()
-        );
+        ).formatToParts(new Date());
 
 
     let year =
         Number(
             parts.find(
-                x =>
-                    x.type ===
-                    "year"
+                x => x.type === "year"
             ).value
         );
 
@@ -177,9 +142,7 @@ function getSiteToday() {
     let month =
         Number(
             parts.find(
-                x =>
-                    x.type ===
-                    "month"
+                x => x.type === "month"
             ).value
         ) - 1;
 
@@ -187,9 +150,7 @@ function getSiteToday() {
     let day =
         Number(
             parts.find(
-                x =>
-                    x.type ===
-                    "day"
+                x => x.type === "day"
             ).value
         );
 
@@ -197,49 +158,28 @@ function getSiteToday() {
     const hour =
         Number(
             parts.find(
-                x =>
-                    x.type ===
-                    "hour"
+                x => x.type === "hour"
             ).value
         );
 
 
-    if (
-        hour < 6
-    ) {
+    if (hour < 6) {
 
         const previousDay =
-            new Date(
-                year,
-                month,
-                day
-            );
-
+            new Date(year, month, day);
 
         previousDay.setDate(
             previousDay.getDate() - 1
         );
 
-
-        year =
-            previousDay.getFullYear();
-
-
-        month =
-            previousDay.getMonth();
-
-
-        day =
-            previousDay.getDate();
+        year = previousDay.getFullYear();
+        month = previousDay.getMonth();
+        day = previousDay.getDate();
 
     }
 
 
-    return new Date(
-        year,
-        month,
-        day
-    );
+    return new Date(year, month, day);
 
 }
 
@@ -248,9 +188,7 @@ function getSiteToday() {
 // מפתח תאריך
 // ==================================================
 
-function getDateKey(
-    date
-) {
+function getDateKey(date) {
 
     return (
 
@@ -259,19 +197,13 @@ function getDateKey(
 
         String(
             date.getMonth() + 1
-        ).padStart(
-            2,
-            "0"
-        ) +
+        ).padStart(2, "0") +
 
         "-" +
 
         String(
             date.getDate()
-        ).padStart(
-            2,
-            "0"
-        )
+        ).padStart(2, "0")
 
     );
 
@@ -279,34 +211,20 @@ function getDateKey(
 
 
 // ==================================================
-// האם יום מושלם
-// ==================================================
-//
-// שלוש המשימות:
-//
-// food
-// activity
-// challenge
-//
-// חייבות להיות true
+// חישוב קלוריות יומיות
 // ==================================================
 
-function isPerfectDay(
-    dateKey
-) {
+function getCalories(dateKey) {
 
-    const day =
-        dietData[
-            dateKey
-        ] || {};
+    const foods =
+        foodData[dateKey] || [];
 
 
-    return (
-
-        day.food === true &&
-        day.activity === true &&
-        day.challenge === true
-
+    return foods.reduce(
+        (total, food) =>
+            total +
+            Number(food.calories || 0),
+        0
     );
 
 }
@@ -316,15 +234,41 @@ function isPerfectDay(
 // האם היום הסתיים
 // ==================================================
 
-function isDayFinished(
-    dateKey
-) {
+function isDayFinished(dateKey) {
 
     return (
 
         finishDayData[dateKey] &&
         finishDayData[dateKey].finished === true
 
+    );
+
+}
+
+
+// ==================================================
+// האם היום מושלם
+// ==================================================
+//
+// יום מושלם:
+//
+// 1. היום הסתיים.
+// 2. סך הקלוריות אינו עולה על 1400.
+//
+// ==================================================
+
+function isPerfectDay(dateKey) {
+
+    if (!isDayFinished(dateKey)) {
+
+        return false;
+
+    }
+
+
+    return (
+        getCalories(dateKey) <=
+        DAILY_CALORIE_TARGET
     );
 
 }
@@ -341,7 +285,8 @@ function isDayFinished(
 //
 // אם היום הסתיים:
 //
-// היום הנוכחי כן נכלל ברצף.
+// היום הנוכחי נכלל ברצף,
+// בתנאי שהושג יעד הקלוריות.
 // ==================================================
 
 function calculateCurrentStreak() {
@@ -354,24 +299,16 @@ function calculateCurrentStreak() {
         getDateKey(date);
 
 
-    // ----------------------------------------------
-    // האם היום כבר הסתיים?
-    // ----------------------------------------------
-
     const todayFinished =
-        isDayFinished(
-            todayKey
-        );
+        isDayFinished(todayKey);
 
 
     // ----------------------------------------------
     // אם היום עדיין לא הסתיים
-    // לא כוללים אותו ברצף
+    // מתחילים לבדוק מאתמול
     // ----------------------------------------------
 
-    if (
-        !todayFinished
-    ) {
+    if (!todayFinished) {
 
         date.setDate(
             date.getDate() - 1
@@ -415,92 +352,59 @@ function calculateCurrentStreak() {
 function calculateBestStreak() {
 
     const dates =
-        Object.keys(
-            dietData
-        ).sort();
+        Object.keys(finishDayData)
+            .filter(dateKey =>
+                isPerfectDay(dateKey)
+            )
+            .sort();
 
 
     let best = 0;
 
     let current = 0;
 
-    let previousDate =
-        null;
+    let previousDate = null;
 
 
-    dates.forEach(
-        dateKey => {
+    dates.forEach(dateKey => {
 
-            if (
-                !isPerfectDay(
-                    dateKey
-                )
-            ) {
+        const currentDate =
+            new Date(dateKey + "T12:00:00");
+
+
+        if (previousDate) {
+
+            const difference =
+                currentDate - previousDate;
+
+
+            const differenceDays =
+                Math.round(
+                    difference /
+                    (1000 * 60 * 60 * 24)
+                );
+
+
+            if (differenceDays !== 1) {
 
                 current = 0;
 
-                previousDate =
-                    null;
-
-                return;
-
             }
-
-
-            const currentDate =
-                new Date(
-                    dateKey +
-                    "T12:00:00"
-                );
-
-
-            if (
-                previousDate
-            ) {
-
-                const difference =
-                    currentDate -
-                    previousDate;
-
-
-                const differenceDays =
-                    Math.round(
-                        difference /
-                        (
-                            1000 *
-                            60 *
-                            60 *
-                            24
-                        )
-                    );
-
-
-                if (
-                    differenceDays !== 1
-                ) {
-
-                    current = 0;
-
-                }
-
-            }
-
-
-            current++;
-
-
-            best =
-                Math.max(
-                    best,
-                    current
-                );
-
-
-            previousDate =
-                currentDate;
 
         }
-    );
+
+
+        current++;
+
+
+        best =
+            Math.max(best, current);
+
+
+        previousDate =
+            currentDate;
+
+    });
 
 
     return best;
@@ -524,9 +428,7 @@ function loadGiftData() {
 
     if (
         saved &&
-        Array.isArray(
-            saved.earnedGifts
-        )
+        Array.isArray(saved.earnedGifts)
     ) {
 
         return saved;
@@ -545,15 +447,11 @@ function loadGiftData() {
 }
 
 
-function saveGiftData(
-    data
-) {
+function saveGiftData(data) {
 
     localStorage.setItem(
         STREAK_STORAGE_KEY,
-        JSON.stringify(
-            data
-        )
+        JSON.stringify(data)
     );
 
 }
@@ -563,9 +461,7 @@ function saveGiftData(
 // עדכון מתנות שהגיעו להן
 // ==================================================
 
-function checkForNewGifts(
-    currentStreak
-) {
+function checkForNewGifts(currentStreak) {
 
     const giftData =
         loadGiftData();
@@ -581,13 +477,11 @@ function checkForNewGifts(
     ) {
 
         const requiredDays =
-            giftNumber *
-            STREAK_GIFT_INTERVAL;
+            giftNumber * STREAK_GIFT_INTERVAL;
 
 
         if (
-            currentStreak >=
-            requiredDays
+            currentStreak >= requiredDays
         ) {
 
             if (
@@ -613,17 +507,11 @@ function checkForNewGifts(
 
 
     giftData.earnedGifts.sort(
-        (
-            a,
-            b
-        ) =>
-            a - b
+        (a, b) => a - b
     );
 
 
-    saveGiftData(
-        giftData
-    );
+    saveGiftData(giftData);
 
 
     return newlyEarned;
@@ -635,20 +523,14 @@ function checkForNewGifts(
 // יצירת המתנות סביב המעגל
 // ==================================================
 
-function renderGifts(
-    earnedGifts
-) {
+function renderGifts(earnedGifts) {
 
-    giftContainer.innerHTML =
-        "";
+    giftContainer.innerHTML = "";
 
 
-    const center =
-        300;
+    const center = 300;
 
-
-    const radius =
-        220;
+    const radius = 220;
 
 
     for (
@@ -658,38 +540,25 @@ function renderGifts(
     ) {
 
         const angle =
-            (
-                giftNumber *
-                36
-            ) - 90;
+            (giftNumber * 36) - 90;
 
 
         const radians =
-            angle *
-            Math.PI /
-            180;
+            angle * Math.PI / 180;
 
 
         const x =
             center +
-            radius *
-            Math.cos(
-                radians
-            );
+            radius * Math.cos(radians);
 
 
         const y =
             center +
-            radius *
-            Math.sin(
-                radians
-            );
+            radius * Math.sin(radians);
 
 
         const gift =
-            document.createElement(
-                "div"
-            );
+            document.createElement("div");
 
 
         gift.className =
@@ -697,30 +566,20 @@ function renderGifts(
 
 
         gift.style.left =
-            `${(
-                x / 600
-            ) * 100}%`;
+            `${(x / 600) * 100}%`;
 
 
         gift.style.top =
-            `${(
-                y / 600
-            ) * 100}%`;
+            `${(y / 600) * 100}%`;
 
 
         const earned =
-            earnedGifts.includes(
-                giftNumber
-            );
+            earnedGifts.includes(giftNumber);
 
 
-        if (
-            earned
-        ) {
+        if (earned) {
 
-            gift.classList.add(
-                "earned"
-            );
+            gift.classList.add("earned");
 
         }
 
@@ -734,25 +593,23 @@ function renderGifts(
 
 
         if (
-            giftNumber ===
-            nextGiftNumber
+            giftNumber === nextGiftNumber
         ) {
 
-            gift.classList.add(
-                "next-gift"
-            );
+            gift.classList.add("next-gift");
 
         }
+
+
+        const giftInfo =
+            STREAK_GIFT_NAMES[giftNumber - 1];
 
 
         gift.innerHTML = `
 
             <div class="streak-gift-number">
-
                 ${giftNumber}
-
             </div>
-
 
             <img
                 src="images/${giftNumber}.PNG"
@@ -760,27 +617,19 @@ function renderGifts(
                 class="streak-gift-image"
                 draggable="false">
 
-
             <div class="streak-gift-days">
-
-                ${giftNumber * 10}
-
+                ${giftNumber * STREAK_GIFT_INTERVAL}
             </div>
 
-
             <div class="streak-gift-name">
-
-                ${STREAK_GIFT_NAMES[giftNumber - 1].emoji}
-                ${STREAK_GIFT_NAMES[giftNumber - 1].name}
-
+                ${giftInfo.emoji}
+                ${giftInfo.name}
             </div>
 
         `;
 
 
-        giftContainer.appendChild(
-            gift
-        );
+        giftContainer.appendChild(gift);
 
     }
 
@@ -794,19 +643,14 @@ function renderGifts(
 const CIRCLE_RADIUS = 220;
 
 const CIRCLE_CIRCUMFERENCE =
-    2 *
-    Math.PI *
-    CIRCLE_RADIUS;
+    2 * Math.PI * CIRCLE_RADIUS;
 
 
 // ==================================================
 // עדכון הקו
 // ==================================================
 
-function updateCircle(
-    currentStreak,
-    bestStreak
-) {
+function updateCircle(currentStreak, bestStreak) {
 
     // ----------------------------------------------
     // הרצף הנוכחי
@@ -824,8 +668,7 @@ function updateCircle(
 
 
     const currentLength =
-        currentRatio *
-        CIRCLE_CIRCUMFERENCE;
+        currentRatio * CIRCLE_CIRCUMFERENCE;
 
 
     streakProgress.style.strokeDasharray =
@@ -833,8 +676,7 @@ function updateCircle(
 
 
     streakProgress.style.strokeDashoffset =
-        CIRCLE_CIRCUMFERENCE -
-        currentLength;
+        CIRCLE_CIRCUMFERENCE - currentLength;
 
 
     // ----------------------------------------------
@@ -847,17 +689,14 @@ function updateCircle(
         );
 
 
-    if (
-        progressMaskCircle
-    ) {
+    if (progressMaskCircle) {
 
         progressMaskCircle.style.strokeDasharray =
             CIRCLE_CIRCUMFERENCE;
 
 
         progressMaskCircle.style.strokeDashoffset =
-            CIRCLE_CIRCUMFERENCE -
-            currentLength;
+            CIRCLE_CIRCUMFERENCE - currentLength;
 
     }
 
@@ -878,8 +717,7 @@ function updateCircle(
 
 
     const bestLength =
-        bestRatio *
-        CIRCLE_CIRCUMFERENCE;
+        bestRatio * CIRCLE_CIRCUMFERENCE;
 
 
     streakGhost.style.strokeDasharray =
@@ -887,8 +725,7 @@ function updateCircle(
 
 
     streakGhost.style.strokeDashoffset =
-        CIRCLE_CIRCUMFERENCE -
-        bestLength;
+        CIRCLE_CIRCUMFERENCE - bestLength;
 
 }
 
@@ -897,9 +734,7 @@ function updateCircle(
 // ניצוץ בקצה ההתקדמות
 // ==================================================
 
-function updateProgressSpark(
-    currentStreak
-) {
+function updateProgressSpark(currentStreak) {
 
     const container =
         document.getElementById(
@@ -907,17 +742,14 @@ function updateProgressSpark(
         );
 
 
-    if (
-        !container
-    ) {
+    if (!container) {
 
         return;
 
     }
 
 
-    container.innerHTML =
-        "";
+    container.innerHTML = "";
 
 
     const totalDays =
@@ -925,9 +757,7 @@ function updateProgressSpark(
         STREAK_TOTAL_GIFTS;
 
 
-    if (
-        currentStreak <= 0
-    ) {
+    if (currentStreak <= 0) {
 
         return;
 
@@ -937,48 +767,31 @@ function updateProgressSpark(
     const progress =
         Math.min(
             1,
-            currentStreak /
-            totalDays
+            currentStreak / totalDays
         );
 
 
     const angle =
-        (
-            progress *
-            360
-        ) - 90;
+        (progress * 360) - 90;
 
 
     const radians =
-        angle *
-        Math.PI /
-        180;
+        angle * Math.PI / 180;
 
 
-    const radius =
-        220;
+    const radius = 220;
 
 
     const x =
-        300 +
-        radius *
-        Math.cos(
-            radians
-        );
+        300 + radius * Math.cos(radians);
 
 
     const y =
-        300 +
-        radius *
-        Math.sin(
-            radians
-        );
+        300 + radius * Math.sin(radians);
 
 
     const spark =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
 
     spark.className =
@@ -986,20 +799,14 @@ function updateProgressSpark(
 
 
     spark.style.left =
-        `${(
-            x / 600
-        ) * 100}%`;
+        `${(x / 600) * 100}%`;
 
 
     spark.style.top =
-        `${(
-            y / 600
-        ) * 100}%`;
+        `${(y / 600) * 100}%`;
 
 
-    container.appendChild(
-        spark
-    );
+    container.appendChild(spark);
 
 
     // ----------------------------------------------
@@ -1013,9 +820,7 @@ function updateProgressSpark(
     ) {
 
         const particle =
-            document.createElement(
-                "div"
-            );
+            document.createElement("div");
 
 
         particle.className =
@@ -1023,29 +828,19 @@ function updateProgressSpark(
 
 
         particle.style.left =
-            `${(
-                x / 600
-            ) * 100}%`;
+            `${(x / 600) * 100}%`;
 
 
         particle.style.top =
-            `${(
-                y / 600
-            ) * 100}%`;
+            `${(y / 600) * 100}%`;
 
 
         const randomX =
-            (
-                Math.random() *
-                35
-            ) - 17;
+            (Math.random() * 35) - 17;
 
 
         const randomY =
-            (
-                Math.random() *
-                35
-            ) - 17;
+            (Math.random() * 35) - 17;
 
 
         particle.style.setProperty(
@@ -1064,9 +859,7 @@ function updateProgressSpark(
             `${i * 0.11}s`;
 
 
-        container.appendChild(
-            particle
-        );
+        container.appendChild(particle);
 
     }
 
@@ -1077,10 +870,7 @@ function updateProgressSpark(
 // טקסט מרכזי
 // ==================================================
 
-function updateCenter(
-    currentStreak,
-    earnedGifts
-) {
+function updateCenter(currentStreak, earnedGifts) {
 
     streakCenterNumber.textContent =
         currentStreak;
@@ -1103,8 +893,7 @@ function updateCenter(
     // ----------------------------------------------
 
     if (
-        earnedGifts.length ===
-        STREAK_TOTAL_GIFTS
+        earnedGifts.length === STREAK_TOTAL_GIFTS
     ) {
 
         nextGiftMessage.textContent =
@@ -1119,16 +908,12 @@ function updateCenter(
     // המתנה הבאה
     // ----------------------------------------------
 
-    let nextGift =
-        1;
+    let nextGift = 1;
 
 
     while (
-        earnedGifts.includes(
-            nextGift
-        ) &&
-        nextGift <=
-        STREAK_TOTAL_GIFTS
+        earnedGifts.includes(nextGift) &&
+        nextGift <= STREAK_TOTAL_GIFTS
     ) {
 
         nextGift++;
@@ -1137,29 +922,23 @@ function updateCenter(
 
 
     const nextGiftDay =
-        nextGift *
-        STREAK_GIFT_INTERVAL;
+        nextGift * STREAK_GIFT_INTERVAL;
 
 
     const remaining =
         Math.max(
             0,
-            nextGiftDay -
-            currentStreak
+            nextGiftDay - currentStreak
         );
 
 
-    if (
-        currentStreak === 0
-    ) {
+    if (currentStreak === 0) {
 
         nextGiftMessage.textContent =
             `המתנה ${nextGift} מחכה לך 🎁`;
 
     }
-    else if (
-        remaining === 0
-    ) {
+    else if (remaining === 0) {
 
         nextGiftMessage.textContent =
             `🎁 מתנה ${nextGift} נפתחה!`;
@@ -1179,14 +958,9 @@ function updateCenter(
 // הודעת שיא
 // ==================================================
 
-function updateBestMessage(
-    currentStreak,
-    bestStreak
-) {
+function updateBestMessage(currentStreak, bestStreak) {
 
-    if (
-        bestStreak === 0
-    ) {
+    if (bestStreak === 0) {
 
         bestStreakMessage.textContent =
             "🌱 היום מתחילים לבנות את הרצף הראשון שלך.";
@@ -1232,24 +1006,16 @@ function updateBestMessage(
 // אנימציית אש
 // ==================================================
 
-function updateFireAnimation(
-    currentStreak
-) {
+function updateFireAnimation(currentStreak) {
 
-    if (
-        currentStreak >= 10
-    ) {
+    if (currentStreak >= 10) {
 
-        streakFire.classList.add(
-            "big-fire"
-        );
+        streakFire.classList.add("big-fire");
 
     }
     else {
 
-        streakFire.classList.remove(
-            "big-fire"
-        );
+        streakFire.classList.remove("big-fire");
 
     }
 
@@ -1260,9 +1026,7 @@ function updateFireAnimation(
 // חלונית מתנה
 // ==================================================
 
-function showGiftPopup(
-    giftNumber
-) {
+function showGiftPopup(giftNumber) {
 
     giftPopupImage.src =
         `images/${giftNumber}.PNG`;
@@ -1276,9 +1040,9 @@ function showGiftPopup(
 
         הגעת ל־
         <strong>
-            ${giftNumber * 10}
+            ${giftNumber * STREAK_GIFT_INTERVAL}
         </strong>
-        ימים מושלמים ברצף!
+        ימים מוצלחים ברצף!
 
         <br>
 
@@ -1294,22 +1058,16 @@ function showGiftPopup(
         "איזו התמדה! זה לגמרי מגיע לך ✨";
 
 
-    giftPopup.classList.add(
-        "show"
-    );
+    giftPopup.classList.add("show");
 
 
-    giftPopup.classList.remove(
-        "gift-celebration"
-    );
+    giftPopup.classList.remove("gift-celebration");
 
 
     void giftPopup.offsetWidth;
 
 
-    giftPopup.classList.add(
-        "gift-celebration"
-    );
+    giftPopup.classList.add("gift-celebration");
 
 }
 
@@ -1320,9 +1078,7 @@ function showGiftPopup(
 
 function closeGiftPopup() {
 
-    giftPopup.classList.remove(
-        "show"
-    );
+    giftPopup.classList.remove("show");
 
 }
 
@@ -1334,14 +1090,9 @@ function closeGiftPopup() {
 let giftQueue = [];
 
 
-function showGiftQueue(
-    gifts
-) {
+function showGiftQueue(gifts) {
 
-    giftQueue.push(
-        ...gifts
-    );
-
+    giftQueue.push(...gifts);
 
     showNextGift();
 
@@ -1351,9 +1102,7 @@ function showGiftQueue(
 function showNextGift() {
 
     if (
-        giftPopup.classList.contains(
-            "show"
-        )
+        giftPopup.classList.contains("show")
     ) {
 
         return;
@@ -1361,9 +1110,7 @@ function showNextGift() {
     }
 
 
-    if (
-        giftQueue.length === 0
-    ) {
+    if (giftQueue.length === 0) {
 
         return;
 
@@ -1374,9 +1121,7 @@ function showNextGift() {
         giftQueue.shift();
 
 
-    showGiftPopup(
-        giftNumber
-    );
+    showGiftPopup(giftNumber);
 
 }
 
@@ -1402,9 +1147,7 @@ function closeAndContinue() {
 }
 
 
-if (
-    giftPopupButton
-) {
+if (giftPopupButton) {
 
     giftPopupButton.onclick =
         closeAndContinue;
@@ -1412,18 +1155,13 @@ if (
 }
 
 
-if (
-    giftPopup
-) {
+if (giftPopup) {
 
     giftPopup.addEventListener(
         "click",
         event => {
 
-            if (
-                event.target ===
-                giftPopup
-            ) {
+            if (event.target === giftPopup) {
 
                 closeAndContinue();
 
@@ -1439,10 +1177,7 @@ document.addEventListener(
     "keydown",
     event => {
 
-        if (
-            event.key ===
-            "Escape"
-        ) {
+        if (event.key === "Escape") {
 
             closeAndContinue();
 
@@ -1457,6 +1192,9 @@ document.addEventListener(
 // ==================================================
 
 function initializeStreak() {
+
+    loadStreakData();
+
 
     const currentStreak =
         calculateCurrentStreak();
@@ -1485,9 +1223,7 @@ function initializeStreak() {
         bestStreak;
 
 
-    saveGiftData(
-        giftData
-    );
+    saveGiftData(giftData);
 
 
     // ----------------------------------------------
@@ -1495,9 +1231,7 @@ function initializeStreak() {
     // ----------------------------------------------
 
     const newlyEarned =
-        checkForNewGifts(
-            currentStreak
-        );
+        checkForNewGifts(currentStreak);
 
 
     const updatedGiftData =
@@ -1562,13 +1296,9 @@ function initializeStreak() {
     // מציגים אותן אחת אחרי השנייה
     // ----------------------------------------------
 
-    if (
-        newlyEarned.length > 0
-    ) {
+    if (newlyEarned.length > 0) {
 
-        showGiftQueue(
-            newlyEarned
-        );
+        showGiftQueue(newlyEarned);
 
     }
 

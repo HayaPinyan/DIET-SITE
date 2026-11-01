@@ -1,11 +1,22 @@
+
 // ==================================================
 // הגדרות XP
 // ==================================================
 
 const XP_CALORIE_SUCCESS = 20;
-const XP_ACTIVITY_SUCCESS = 20;
-const XP_CHALLENGE_SUCCESS = 30;
 const XP_PERFECT_DAY_BONUS = 50;
+
+
+// יעד הקלוריות נלקח מההגדרה המרכזית ב-script.js.
+// אם script.js לא נטען בעמוד מסוים, ברירת המחדל היא 1400.
+
+function getXPCalorieTarget() {
+
+    return typeof DAILY_CALORIE_TARGET !== "undefined"
+        ? DAILY_CALORIE_TARGET
+        : 1400;
+
+}
 
 
 // ==================================================
@@ -44,11 +55,6 @@ function loadXPData() {
         foodData:
             JSON.parse(
                 localStorage.getItem("foodData")
-            ) || {},
-
-        activityData:
-            JSON.parse(
-                localStorage.getItem("activityData")
             ) || {},
 
         finishDayData:
@@ -90,28 +96,27 @@ function getXPCalories(
 
 
 // ==================================================
-// פעילות
+// בדיקת הצלחה יומית
 // ==================================================
 
-function getXPActivity(
-    activityData,
-    dateKey
+function isXPSuccessfulFoodDay(
+    dateKey,
+    dietData,
+    foodData,
+    finishDayData
 ) {
 
-    const activities =
-        activityData[dateKey] || [];
+    const calories =
+        getXPCalories(
+            foodData,
+            dateKey
+        );
 
 
-    return activities.reduce(
-        (
-            total,
-            activity
-        ) =>
-            total +
-            Number(
-                activity.minutes || 0
-            ),
-        0
+    return !!(
+        finishDayData[dateKey] &&
+        finishDayData[dateKey].finished === true &&
+        calories <= getXPCalorieTarget()
     );
 
 }
@@ -133,9 +138,6 @@ function calculateXPStats() {
     const foodData =
         data.foodData;
 
-    const activityData =
-        data.activityData;
-
     const finishDayData =
         data.finishDayData;
 
@@ -145,7 +147,6 @@ function calculateXPStats() {
 
             ...Object.keys(dietData),
             ...Object.keys(foodData),
-            ...Object.keys(activityData),
             ...Object.keys(finishDayData)
 
         ]);
@@ -154,18 +155,11 @@ function calculateXPStats() {
     let activeDays = 0;
     let perfectDays = 0;
     let calorieSuccessDays = 0;
-    let activitySuccessDays = 0;
-    let challengeDays = 0;
     let finishedDays = 0;
-    let totalActivityMinutes = 0;
 
 
     allDateKeys.forEach(
         dateKey => {
-
-            const day =
-                dietData[dateKey] || {};
-
 
             const calories =
                 getXPCalories(
@@ -174,48 +168,30 @@ function calculateXPStats() {
                 );
 
 
-            const activityMinutes =
-                getXPActivity(
-                    activityData,
-                    dateKey
-                );
-
-
             const foodSuccess =
-                !!(
-                    finishDayData[dateKey] &&
-                    finishDayData[dateKey].finished === true &&
-                    calories <= 1800
+                isXPSuccessfulFoodDay(
+                    dateKey,
+                    dietData,
+                    foodData,
+                    finishDayData
                 );
 
 
-            const activitySuccess =
-                activityMinutes >= 20;
-
-
-            const challengeSuccess =
-                day.challenge === true;
-
-
-            if (
-                calories > 0 ||
-                activityMinutes > 0 ||
-                challengeSuccess
-            ) {
+            if (calories > 0) {
 
                 activeDays++;
 
             }
 
 
-            if (foodSuccess)
+            if (foodSuccess) {
+
                 calorieSuccessDays++;
 
-            if (activitySuccess)
-                activitySuccessDays++;
+                perfectDays++;
 
-            if (challengeSuccess)
-                challengeDays++;
+            }
+
 
             if (
                 finishDayData[dateKey] &&
@@ -225,21 +201,6 @@ function calculateXPStats() {
                 finishedDays++;
 
             }
-
-
-            if (
-                foodSuccess &&
-                activitySuccess &&
-                challengeSuccess
-            ) {
-
-                perfectDays++;
-
-            }
-
-
-            totalActivityMinutes +=
-                activityMinutes;
 
         }
     );
@@ -270,12 +231,14 @@ function calculateXPStats() {
             ).value
         );
 
+
     let month =
         Number(
             parts.find(
                 x => x.type === "month"
             ).value
         ) - 1;
+
 
     let day =
         Number(
@@ -328,9 +291,7 @@ function calculateXPStats() {
         );
 
 
-    function getDateKey(
-        date
-    ) {
+    function getDateKey(date) {
 
         return (
             date.getFullYear() +
@@ -347,34 +308,13 @@ function calculateXPStats() {
     }
 
 
-    function isPerfectDay(
-        key
-    ) {
+    function isPerfectDay(key) {
 
-        const dayData =
-            dietData[key] || {};
-
-
-        const calories =
-            getXPCalories(
-                foodData,
-                key
-            );
-
-
-        const activityMinutes =
-            getXPActivity(
-                activityData,
-                key
-            );
-
-
-        return !!(
-            finishDayData[key] &&
-            finishDayData[key].finished === true &&
-            calories <= 1800 &&
-            activityMinutes >= 20 &&
-            dayData.challenge === true
+        return isXPSuccessfulFoodDay(
+            key,
+            dietData,
+            foodData,
+            finishDayData
         );
 
     }
@@ -404,10 +344,7 @@ function calculateXPStats() {
         activeDays,
         perfectDays,
         calorieSuccessDays,
-        activitySuccessDays,
-        challengeDays,
         finishedDays,
-        totalActivityMinutes,
         currentStreak
 
     };
@@ -431,9 +368,6 @@ function calculateTaskXP() {
     const foodData =
         data.foodData;
 
-    const activityData =
-        data.activityData;
-
     const finishDayData =
         data.finishDayData;
 
@@ -443,7 +377,6 @@ function calculateTaskXP() {
 
             ...Object.keys(dietData),
             ...Object.keys(foodData),
-            ...Object.keys(activityData),
             ...Object.keys(finishDayData)
 
         ]);
@@ -455,41 +388,13 @@ function calculateTaskXP() {
     allDateKeys.forEach(
         dateKey => {
 
-            const day =
-                dietData[dateKey] || {};
-
-
-            const calories =
-                getXPCalories(
-                    foodData,
-                    dateKey
-                );
-
-
-            const activityMinutes =
-                getXPActivity(
-                    activityData,
-                    dateKey
-                );
-
-
             const foodSuccess =
-                !!(
-                    finishDayData[dateKey] &&
-                    finishDayData[dateKey].finished === true &&
-                    calories <= 1800
+                isXPSuccessfulFoodDay(
+                    dateKey,
+                    dietData,
+                    foodData,
+                    finishDayData
                 );
-
-
-            const activitySuccess =
-                activityMinutes >= 20;
-
-
-            const challengeSuccess =
-                day.challenge === true;
-
-
-            let tasks = 0;
 
 
             if (foodSuccess) {
@@ -497,32 +402,9 @@ function calculateTaskXP() {
                 totalXP +=
                     XP_CALORIE_SUCCESS;
 
-                tasks++;
 
-            }
-
-
-            if (activitySuccess) {
-
-                totalXP +=
-                    XP_ACTIVITY_SUCCESS;
-
-                tasks++;
-
-            }
-
-
-            if (challengeSuccess) {
-
-                totalXP +=
-                    XP_CHALLENGE_SUCCESS;
-
-                tasks++;
-
-            }
-
-
-            if (tasks === 3) {
+                // בונוס יום מושלם:
+                // המשימה היחידה באתר הושלמה.
 
                 totalXP +=
                     XP_PERFECT_DAY_BONUS;
@@ -726,6 +608,7 @@ function getLevelInfo(
                 i;
 
         }
+
         else {
 
             break;

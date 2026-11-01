@@ -1,9 +1,9 @@
+
 // ==================================================
 // הגדרות
 // ==================================================
 
-const DAILY_CALORIE_TARGET = 1500;
-const DAILY_ACTIVITY_TARGET = 20;
+const DAILY_CALORIE_TARGET = 1400;
 
 
 // ==================================================
@@ -26,14 +26,8 @@ const modalScore = document.getElementById("modalScore");
 // נתונים
 // ==================================================
 
-const dietData =
-    JSON.parse(localStorage.getItem("dietData")) || {};
-
 const foodData =
     JSON.parse(localStorage.getItem("foodData")) || {};
-
-const activityData =
-    JSON.parse(localStorage.getItem("activityData")) || {};
 
 const finishDayData =
     JSON.parse(localStorage.getItem("finishDayData")) || {};
@@ -137,6 +131,7 @@ function getSiteToday() {
         year = previousDay.getFullYear();
         month = previousDay.getMonth();
         day = previousDay.getDate();
+
     }
 
 
@@ -166,26 +161,6 @@ function getCalories(dateKey) {
 
 
 // ==================================================
-// דקות פעילות
-// ==================================================
-
-function getActivityMinutes(dateKey) {
-
-    const activities =
-        activityData[dateKey] || [];
-
-
-    return activities.reduce(
-        (total, activity) =>
-            total +
-            Number(activity.minutes || 0),
-        0
-    );
-
-}
-
-
-// ==================================================
 // הצלחת תזונה
 // ==================================================
 
@@ -208,64 +183,18 @@ function isFoodSuccess(dateKey) {
 
 
 // ==================================================
-// הצלחת פעילות
-// ==================================================
-
-function isActivitySuccess(dateKey) {
-
-    return (
-        getActivityMinutes(dateKey) >=
-        DAILY_ACTIVITY_TARGET
-    );
-
-}
-
-
-// ==================================================
-// הצלחת אתגר
-// ==================================================
-
-function isChallengeSuccess(dateKey) {
-
-    return !!(
-        dietData[dateKey] &&
-        dietData[dateKey].challenge
-    );
-
-}
-
-
-// ==================================================
-// ציון
+// ציון יומי
 // ==================================================
 
 function getScore(dateKey) {
 
-    let score = 0;
-
-
-    if (isFoodSuccess(dateKey)) {
-        score++;
-    }
-
-
-    if (isActivitySuccess(dateKey)) {
-        score++;
-    }
-
-
-    if (isChallengeSuccess(dateKey)) {
-        score++;
-    }
-
-
-    return score;
+    return isFoodSuccess(dateKey) ? 1 : 0;
 
 }
 
 
 // ==================================================
-// יצירת שורת כותרת לתזונה
+// יצירת פירוט תזונה
 // ==================================================
 
 function createFoodDetails(dateKey) {
@@ -352,7 +281,7 @@ function createFoodDetails(dateKey) {
 
             <div class="modal-empty-detail">
 
-                לא נאכלו מאכלים ביום הזה 🌸
+                לא נרשמו מאכלים ביום הזה 🌸
 
             </div>
 
@@ -380,7 +309,7 @@ function createFoodDetails(dateKey) {
                 <div class="modal-food-name">
 
                     <span>
-                        ${food.emoji || "🍽️"}
+                        ${escapeHtml(food.emoji || "🍽️")}
                     </span>
 
                     <span>
@@ -434,258 +363,7 @@ function createFoodDetails(dateKey) {
 
 
     // --------------------------------------------------
-    // חץ
-    // --------------------------------------------------
-
-    const arrow =
-        header.querySelector(
-            ".modal-expand-arrow"
-        );
-
-
-    function toggleDetails() {
-
-        const isOpen =
-            details.style.display !== "none";
-
-
-        if (isOpen) {
-
-            details.style.display =
-                "none";
-
-            arrow.textContent =
-                "▾";
-
-            arrow.setAttribute(
-                "aria-expanded",
-                "false"
-            );
-
-        }
-
-        else {
-
-            details.style.display =
-                "block";
-
-            arrow.textContent =
-                "▴";
-
-            arrow.setAttribute(
-                "aria-expanded",
-                "true"
-            );
-
-        }
-
-    }
-
-
-    arrow.addEventListener(
-        "click",
-        function(event) {
-
-            event.stopPropagation();
-
-            toggleDetails();
-
-        }
-    );
-
-
-    arrow.addEventListener(
-        "keydown",
-        function(event) {
-
-            if (
-                event.key === "Enter" ||
-                event.key === " "
-            ) {
-
-                event.preventDefault();
-
-                toggleDetails();
-
-            }
-
-        }
-    );
-
-
-    container.appendChild(header);
-    container.appendChild(details);
-
-
-    return container;
-
-}
-
-
-// ==================================================
-// יצירת שורת פעילות
-// ==================================================
-
-function createActivityDetails(dateKey) {
-
-    const activities =
-        activityData[dateKey] || [];
-
-    const totalMinutes =
-        getActivityMinutes(dateKey);
-
-
-    // --------------------------------------------------
-    // עטיפה
-    // --------------------------------------------------
-
-    const container =
-        document.createElement("div");
-
-    container.className =
-        "modal-expand-container";
-
-
-    // --------------------------------------------------
-    // שורת הכותרת
-    // --------------------------------------------------
-
-    const header =
-        document.createElement("div");
-
-    header.className =
-        "modal-task";
-
-
-    header.innerHTML = `
-
-        <span class="modal-expand-title">
-            🏃 פעילות
-        </span>
-
-        <span class="modal-task-status">
-            ${
-                isActivitySuccess(dateKey)
-                    ? "✓"
-                    : "○"
-            }
-        </span>
-
-        <span
-            class="modal-expand-arrow"
-            role="button"
-            tabindex="0"
-            aria-label="פתח פירוט פעילות"
-            aria-expanded="false">
-
-            ▾
-
-        </span>
-
-    `;
-
-
-    // --------------------------------------------------
-    // פירוט
-    // --------------------------------------------------
-
-    const details =
-        document.createElement("div");
-
-    details.className =
-        "modal-expandable-details";
-
-
-    details.style.display =
-        "none";
-
-
-    // --------------------------------------------------
-    // אין פעילות
-    // --------------------------------------------------
-
-    if (activities.length === 0) {
-
-        details.innerHTML = `
-
-            <div class="modal-empty-detail">
-
-                לא נרשמה פעילות ביום הזה 🌸
-
-            </div>
-
-        `;
-
-    }
-
-    // --------------------------------------------------
-    // יש פעילות
-    // --------------------------------------------------
-
-    else {
-
-        activities.forEach(activity => {
-
-            const row =
-                document.createElement("div");
-
-            row.className =
-                "modal-activity-row";
-
-
-            row.innerHTML = `
-
-                <div class="modal-activity-name">
-
-                    <span>
-                        ${activity.emoji || "🏃"}
-                    </span>
-
-                    <span>
-                        ${escapeHtml(activity.name)}
-                    </span>
-
-                </div>
-
-
-                <div class="modal-activity-minutes">
-
-                    ${Number(activity.minutes || 0)}
-                    דקות
-
-                </div>
-
-            `;
-
-
-            details.appendChild(row);
-
-        });
-
-
-        const total =
-            document.createElement("div");
-
-        total.className =
-            "modal-activity-total";
-
-
-        total.innerHTML = `
-
-            <strong>
-                סה״כ: ${totalMinutes} דקות
-            </strong>
-
-        `;
-
-
-        details.appendChild(total);
-
-    }
-
-
-    // --------------------------------------------------
-    // חץ
+    // פתיחה וסגירה של הפירוט
     // --------------------------------------------------
 
     const arrow =
@@ -886,7 +564,7 @@ function renderCalendar() {
             </span>
 
             <span class="score">
-                ${score}/3
+                ${score}/1
             </span>
 
         `;
@@ -931,14 +609,6 @@ function openDayModal(dateKey, day) {
 
     const calories =
         getCalories(dateKey);
-
-
-    const activityMinutes =
-        getActivityMinutes(dateKey);
-
-
-    const challengeSuccess =
-        isChallengeSuccess(dateKey);
 
 
     const score =
@@ -1016,86 +686,11 @@ function openDayModal(dateKey, day) {
 
 
     // ==================================================
-    // פעילות
-    // ==================================================
-
-    const activityWrapper =
-        document.createElement("div");
-
-    activityWrapper.className =
-        "modal-task-wrapper";
-
-
-    const activityExpand =
-        createActivityDetails(dateKey);
-
-
-    const activityInfo =
-        document.createElement("div");
-
-    activityInfo.className =
-        "modal-detail";
-
-
-    activityInfo.textContent =
-        `${activityMinutes} / ${DAILY_ACTIVITY_TARGET} דקות`;
-
-
-    activityWrapper.appendChild(
-        activityExpand
-    );
-
-    activityWrapper.appendChild(
-        activityInfo
-    );
-
-
-    modalTasks.appendChild(
-        activityWrapper
-    );
-
-
-    // ==================================================
-    // אתגר
-    // ==================================================
-
-    const challengeElement =
-        document.createElement("div");
-
-    challengeElement.className =
-        "modal-task";
-
-
-    challengeElement.innerHTML = `
-
-        <span>
-            🎯 אתגר
-        </span>
-
-        <span class="modal-task-status">
-
-            ${
-                challengeSuccess
-                    ? "✓"
-                    : "○"
-            }
-
-        </span>
-
-    `;
-
-
-    modalTasks.appendChild(
-        challengeElement
-    );
-
-
-    // ==================================================
     // ציון
     // ==================================================
 
     modalScore.textContent =
-        `${score} / 3`;
+        `${score} / 1`;
 
 
     // ==================================================

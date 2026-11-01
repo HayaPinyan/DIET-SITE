@@ -15,9 +15,7 @@
 
 </head>
 
-
 <body>
-
 
     <header>
 
@@ -32,14 +30,13 @@
             <a href="calendar.html">
                 📅 לוח שנה
             </a>
+
             <a href="food-list.html">
-    📋 מאגר מאכלים
-</a>
-<a href="weight-login.html">
-    📉 משקל
-</a>
-            <a href="challenges.html">
-                🎯 אתגרים
+                📋 מאגר מאכלים
+            </a>
+
+            <a href="weight-login.html">
+                📉 משקל
             </a>
 
             <a href="progress.html">
@@ -49,34 +46,32 @@
             <a href="achievements.html">
                 🏆 הישגים
             </a>
-  <a href="streak.html"> 🔥 הרצף שלי</a>
+
+            <a href="streak.html">
+                🔥 הרצף שלי
+            </a>
+
         </nav>
 
     </header>
-
-
 
     <main>
 
         <section class="progress-page">
 
-
             <h2>
                 📈 ההתקדמות שלי
             </h2>
 
-
             <p class="progress-subtitle">
                 כל יום קטן הוא צעד קדימה 🌸
             </p>
-
 
             <!-- =========================
                  סטטיסטיקות
             ========================== -->
 
             <div class="stats-grid">
-
 
                 <div class="stat-card">
 
@@ -94,7 +89,6 @@
 
                 </div>
 
-
                 <div class="stat-card">
 
                     <span class="stat-icon">
@@ -111,7 +105,6 @@
 
                 </div>
 
-
                 <div class="stat-card">
 
                     <span class="stat-icon">
@@ -123,15 +116,12 @@
                     </strong>
 
                     <span>
-                        ימים פעילים
+                        ימים עם נתוני תזונה
                     </span>
 
                 </div>
 
-
             </div>
-
-
 
             <!-- =========================
                  סיכום ימים
@@ -142,7 +132,6 @@
                 <h3>
                     הסיכום שלי
                 </h3>
-
 
                 <div class="summary-row">
 
@@ -156,7 +145,6 @@
 
                 </div>
 
-
                 <div class="summary-row">
 
                     <span>
@@ -169,11 +157,10 @@
 
                 </div>
 
-
                 <div class="summary-row">
 
                     <span>
-                        ימים ללא פעילות
+                        ימים ללא נתוני תזונה
                     </span>
 
                     <strong id="emptyDays">
@@ -184,8 +171,6 @@
 
             </div>
 
-
-
             <!-- =========================
                  נתונים יומיים ממוצעים
             ========================== -->
@@ -193,9 +178,8 @@
             <div class="progress-card">
 
                 <h3>
-                    הנתונים שלי
+                    נתוני התזונה שלי
                 </h3>
-
 
                 <div class="summary-row">
 
@@ -203,44 +187,13 @@
                         🍽️ ממוצע קלוריות ליום
                     </span>
 
-                    <strong
-                        id="averageCalories">
-                        0
-                    </strong>
-
-                </div>
-
-
-                <div class="summary-row">
-
-                    <span>
-                        🏃 ממוצע דקות פעילות
-                    </span>
-
-                    <strong
-                        id="averageActivity">
-                        0
-                    </strong>
-
-                </div>
-
-
-                <div class="summary-row">
-
-                    <span>
-                        🎯 ימי אתגר שהושלמו
-                    </span>
-
-                    <strong
-                        id="challengeDays">
+                    <strong id="averageCalories">
                         0
                     </strong>
 
                 </div>
 
             </div>
-
-
 
             <!-- =========================
                  התקדמות כללית
@@ -252,14 +205,12 @@
                     ההתקדמות הכללית
                 </h3>
 
-
                 <div class="overall-progress">
-
 
                     <div class="overall-progress-info">
 
                         <span>
-                            השלמת המשימות
+                            אחוז הימים המושלמים
                         </span>
 
                         <strong id="overallPercentage">
@@ -267,7 +218,6 @@
                         </strong>
 
                     </div>
-
 
                     <div class="overall-progress-bar">
 
@@ -278,12 +228,9 @@
 
                     </div>
 
-
                 </div>
 
             </div>
-
-
 
             <!-- =========================
                  הודעה
@@ -294,17 +241,22 @@
                 class="progress-message">
             </div>
 
-
         </section>
 
     </main>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="supabase.js"></script>
+
     <script src="progress.js"></script>
+
     <script src="achievement-data.js"></script>
-<script src="achievement-notifier.js"></script>
-<script src="xp.js"></script>
+
+    <script src="achievement-notifier.js"></script>
+
+    <script src="xp.js"></script>
+
 </body>
 
 </html>

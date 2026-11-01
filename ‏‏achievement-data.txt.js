@@ -12,7 +12,7 @@ const achievementCatalog = [
         id: "first_active_day",
         icon: "🌱",
         name: "הצעד הראשון",
-        description: "היית פעילה ביום הראשון",
+        description: "הזנת נתוני תזונה ביום הראשון",
         xp: 50,
         unlocked: data => data.activeDays >= 1
     },
@@ -30,7 +30,7 @@ const achievementCatalog = [
         id: "three_active_days",
         icon: "🥳",
         name: "התחלה טובה",
-        description: "השלמת 3 ימים פעילים",
+        description: "הזנת נתוני תזונה ב־3 ימים",
         xp: 50,
         unlocked: data => data.activeDays >= 3
     },
@@ -39,7 +39,7 @@ const achievementCatalog = [
         id: "five_active_days",
         icon: "🌼",
         name: "נכנסת לקצב",
-        description: "השלמת 5 ימים פעילים",
+        description: "הזנת נתוני תזונה ב־5 ימים",
         xp: 75,
         unlocked: data => data.activeDays >= 5
     },
@@ -48,7 +48,7 @@ const achievementCatalog = [
         id: "ten_active_days",
         icon: "📅",
         name: "10 ימים",
-        description: "השלמת 10 ימים פעילים",
+        description: "הזנת נתוני תזונה ב־10 ימים",
         xp: 100,
         unlocked: data => data.activeDays >= 10
     },
@@ -57,7 +57,7 @@ const achievementCatalog = [
         id: "thirty_active_days",
         icon: "🌸",
         name: "30 ימים",
-        description: "השלמת 30 ימים פעילים",
+        description: "הזנת נתוני תזונה ב־30 ימים",
         xp: 200,
         unlocked: data => data.activeDays >= 30
     },
@@ -66,7 +66,7 @@ const achievementCatalog = [
         id: "sixty_active_days",
         icon: "💮",
         name: "60 ימים",
-        description: "השלמת 60 ימים פעילים",
+        description: "הזנת נתוני תזונה ב־60 ימים",
         xp: 300,
         unlocked: data => data.activeDays >= 60
     },
@@ -74,8 +74,8 @@ const achievementCatalog = [
     {
         id: "one_hundred_active_days",
         icon: "👑",
-        name: "100 ימים פעילים",
-        description: "השלמת 100 ימים פעילים",
+        name: "100 ימים",
+        description: "הזנת נתוני תזונה ב־100 ימים",
         xp: 500,
         unlocked: data => data.activeDays >= 100
     },
@@ -148,7 +148,7 @@ const achievementCatalog = [
         id: "first_perfect_day",
         icon: "⭐",
         name: "היום המושלם הראשון",
-        description: "השלמת יום מושלם",
+        description: "עמדת ביעד הקלורי וסיימת את היום",
         xp: 100,
         unlocked: data => data.perfectDays >= 1
     },
@@ -268,7 +268,7 @@ const achievementCatalog = [
 
 
     // ==================================================
-    // תזונה
+    // תזונה ועמידה ביעד הקלורי
     // ==================================================
 
     {
@@ -323,183 +323,6 @@ const achievementCatalog = [
         description: "עמדת ביעד הקלורי ב־50 ימים",
         xp: 400,
         unlocked: data => data.calorieSuccessDays >= 50
-    },
-
-
-    // ==================================================
-    // פעילות
-    // ==================================================
-
-    {
-        id: "first_activity_day",
-        icon: "🏃",
-        name: "מתחילים לזוז",
-        description: "השלמת את יעד 20 הדקות הראשון",
-        xp: 50,
-        unlocked: data => data.activitySuccessDays >= 1
-    },
-
-    {
-        id: "five_activity_days",
-        icon: "👟",
-        name: "5 ימי תנועה",
-        description: "הגעת ליעד הפעילות ב־5 ימים",
-        xp: 75,
-        unlocked: data => data.activitySuccessDays >= 5
-    },
-
-    {
-        id: "ten_activity_days",
-        icon: "⚡",
-        name: "10 אימונים מוצלחים",
-        description: "הגעת ליעד הפעילות ב־10 ימים",
-        xp: 100,
-        unlocked: data => data.activitySuccessDays >= 10
-    },
-
-    {
-        id: "twenty_activity_days",
-        icon: "🏃‍♀️",
-        name: "20 ימי תנועה",
-        description: "הגעת ליעד הפעילות ב־20 ימים",
-        xp: 200,
-        unlocked: data => data.activitySuccessDays >= 20
-    },
-
-    {
-        id: "thirty_activity_days",
-        icon: "🔥",
-        name: "30 ימי תנועה",
-        description: "הגעת ליעד הפעילות ב־30 ימים",
-        xp: 250,
-        unlocked: data => data.activitySuccessDays >= 30
-    },
-
-    {
-        id: "fifty_activity_days",
-        icon: "🏅",
-        name: "50 ימי תנועה",
-        description: "הגעת ליעד הפעילות ב־50 ימים",
-        xp: 400,
-        unlocked: data => data.activitySuccessDays >= 50
-    },
-
-
-    // ==================================================
-    // דקות פעילות
-    // ==================================================
-
-    {
-        id: "one_hundred_activity_minutes",
-        icon: "⏱️",
-        name: "100 דקות",
-        description: "צברת 100 דקות פעילות",
-        xp: 50,
-        unlocked: data => data.totalActivityMinutes >= 100
-    },
-
-    {
-        id: "two_hundred_fifty_activity_minutes",
-        icon: "⌚",
-        name: "250 דקות",
-        description: "צברת 250 דקות פעילות",
-        xp: 75,
-        unlocked: data => data.totalActivityMinutes >= 250
-    },
-
-    {
-        id: "five_hundred_activity_minutes",
-        icon: "🚀",
-        name: "500 דקות",
-        description: "צברת 500 דקות פעילות",
-        xp: 100,
-        unlocked: data => data.totalActivityMinutes >= 500
-    },
-
-    {
-        id: "one_thousand_activity_minutes",
-        icon: "🌈",
-        name: "1000 דקות",
-        description: "צברת 1000 דקות פעילות",
-        xp: 200,
-        unlocked: data => data.totalActivityMinutes >= 1000
-    },
-
-    {
-        id: "two_thousand_activity_minutes",
-        icon: "💫",
-        name: "2000 דקות",
-        description: "צברת 2000 דקות פעילות",
-        xp: 300,
-        unlocked: data => data.totalActivityMinutes >= 2000
-    },
-
-    {
-        id: "five_thousand_activity_minutes",
-        icon: "👑",
-        name: "5000 דקות",
-        description: "צברת 5000 דקות פעילות",
-        xp: 750,
-        unlocked: data => data.totalActivityMinutes >= 5000
-    },
-
-
-    // ==================================================
-    // אתגרים
-    // ==================================================
-
-    {
-        id: "first_challenge_day",
-        icon: "🎯",
-        name: "אתגר ראשון",
-        description: "השלמת אתגר ביום אחד",
-        xp: 50,
-        unlocked: data => data.challengeDays >= 1
-    },
-
-    {
-        id: "three_challenge_days",
-        icon: "🎯",
-        name: "3 ימי אתגר",
-        description: "השלמת אתגר ב־3 ימים",
-        xp: 75,
-        unlocked: data => data.challengeDays >= 3
-    },
-
-    {
-        id: "seven_challenge_days",
-        icon: "🏆",
-        name: "שבוע של אתגרים",
-        description: "השלמת אתגר ב־7 ימים",
-        xp: 100,
-        unlocked: data => data.challengeDays >= 7
-    },
-
-    {
-        id: "fourteen_challenge_days",
-        icon: "🔥",
-        name: "14 ימי אתגר",
-        description: "השלמת אתגר ב־14 ימים",
-        xp: 150,
-        unlocked: data => data.challengeDays >= 14
-    },
-
-    {
-        id: "thirty_challenge_days",
-        icon: "💎",
-        name: "30 ימי אתגר",
-        description: "השלמת אתגר ב־30 ימים",
-        xp: 250,
-        unlocked: data => data.challengeDays >= 30
-    },
-
-    {
-        id: "fifty_challenge_days",
-        icon: "👑",
-        name: "50 ימי אתגר",
-        description: "השלמת אתגר ב־50 ימים",
-        xp: 400,
-        unlocked: data => data.challengeDays >= 50
     }
 
 ];
